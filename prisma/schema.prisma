@@ -25,16 +25,17 @@ model Sound {
     updatedAt   DateTime     @updatedAt
     createdById String
     deletedAt   DateTime?
-    guilds      GuildSound[]
+    guildSounds GuildSound[]
     createdBy   User         @relation(fields: [createdById], references: [id])
 
     @@index([name])
 }
 
 model Guild {
-    id     String       @id
-    name   String
-    sounds GuildSound[]
+    id               String       @id
+    name             String
+    sounds           GuildSound[]
+    soundMasterRoles String[]
 }
 
 model GuildSound {
