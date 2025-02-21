@@ -17,6 +17,7 @@ datasource db {
 model Sound {
     id          Int          @id @default(autoincrement())
     name        String
+    emoji       String
     url         String       @unique
     tags        String[]
     usegeCount  Int          @default(0)

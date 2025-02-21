@@ -4,6 +4,9 @@ import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 
 import { TRPCReactProvider } from "~/trpc/react";
+import { Authenticated, NotAuthenticated } from "./_components/authentication";
+import Link from "next/link";
+import { auth } from "~/server/auth";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -11,13 +14,25 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const session = await auth();
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <TRPCReactProvider>
+          <nav className="flex items-center justify-between gap-4 bg-black/50 p-4">
+            <span className="text-lg font-bold">Mxng</span>
+            <div>
+              <Authenticated>{session?.user?.name}</Authenticated>
+              <NotAuthenticated>
+                <Link href="/api/auth/signin">Sign in</Link>
+              </NotAuthenticated>
+            </div>
+          </nav>
+          {children}
+        </TRPCReactProvider>
       </body>
     </html>
   );
