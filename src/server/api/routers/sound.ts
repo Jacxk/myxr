@@ -20,19 +20,24 @@ export const soundRouter = createTRPCRouter({
         orderBy: { createdAt: "desc" },
         take: input.limit,
         skip: (input.page - 1) * input.limit,
-      })
+      });
       return sounds ?? [];
     }),
 
   getLatests: publicProcedure
     .input(z.object({ limit: z.number().default(10) }))
     .query(async ({ ctx, input }) => {
-      const sounds = await ctx.db.sound.findFirst({
+      const sounds = await ctx.db.sound.findMany({
         orderBy: { createdAt: "desc" },
         take: input.limit,
+        include: {
+          createdBy: {
+            select: { image: true, name: true, role: true, removed: true },
+          },
+        },
       });
 
-      return sounds ?? null;
+      return sounds ?? [];
     }),
 
   getSecretMessage: protectedProcedure.query(() => {

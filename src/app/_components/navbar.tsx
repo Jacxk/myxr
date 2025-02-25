@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { UploadIcon } from "~/components/icons/upload";
 import {
   Select,
   SelectContent,
@@ -21,6 +22,9 @@ export default async function Navbar() {
       <div>
         <Authenticated>
           <div className="flex items-center gap-2">
+            <Link href="/upload">
+              <UploadIcon />
+            </Link>
             <Select>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select a Guild" />
