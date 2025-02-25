@@ -3,6 +3,7 @@ import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 
 import { db } from "~/server/db";
+import { getDiscordGuilds } from "~/utils/discord-requests";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -14,11 +15,21 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
+      guilds: Guild[];
       // ...other properties
       // role: UserRole;
     } & DefaultSession["user"];
   }
 
+  interface Guild {
+    id: string;
+    name: string;
+    icon: string;
+    owner: boolean;
+    permissions: number;
+    features: string[];
+    banner: string;
+  }
   // interface User {
   //   // ...other properties
   //   // role: UserRole;
@@ -45,12 +56,16 @@ export const authConfig = {
   ],
   adapter: PrismaAdapter(db),
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
+    session: async ({ session, user }) => {
+      const guilds = await getDiscordGuilds(user.id);
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          guilds,
+          id: user.id,
+        },
+      };
+    },
   },
 } satisfies NextAuthConfig;
