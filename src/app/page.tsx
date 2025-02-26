@@ -1,15 +1,13 @@
 import { api, HydrateClient } from "~/trpc/server";
-import { LatestSounds } from "./_components/sound";
+import { LatestSounds } from "./_components/latest-sounds";
 
 export default async function Home() {
   void api.sound.getLatests.prefetch({});
 
   return (
     <HydrateClient>
-      <main className="flex min-h-screen flex-col">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-          <LatestSounds />
-        </div>
+      <main className="flex min-h-full flex-col items-center">
+        <LatestSounds />
       </main>
     </HydrateClient>
   );

@@ -32,7 +32,13 @@ export const soundRouter = createTRPCRouter({
         take: input.limit,
         include: {
           createdBy: {
-            select: { image: true, name: true, role: true, removed: true },
+            select: {
+              image: true,
+              name: true,
+              role: true,
+              removed: true,
+              id: true,
+            },
           },
         },
       });
