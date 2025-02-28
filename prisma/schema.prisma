@@ -83,15 +83,16 @@ model Session {
 }
 
 model User {
-    id       String    @id @default(cuid())
-    name     String?
-    email    String?   @unique
-    image    String?
-    removed  Boolean   @default(false)
-    accounts Account[]
-    sessions Session[]
-    Sounds   Sound[]
-    role     Role      @default(USER)
+    id            String    @id @default(cuid())
+    name          String?
+    email         String?   @unique
+    image         String?
+    removed       Boolean   @default(false)
+    emailVerified DateTime?
+    accounts      Account[]
+    sessions      Session[]
+    Sounds        Sound[]
+    role          Role      @default(USER)
 
     @@index([name])
 }
