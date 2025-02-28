@@ -14,9 +14,12 @@ async function _discordRequest(path: string, authorization: string) {
 
 export async function getDiscordGuilds(id: string) {
   const authorization = await discordAuthorization(id);
-  const guilds = await _discordRequest("users/@me/guilds", authorization);
+  const res = await _discordRequest("users/@me/guilds", authorization);
 
-  return guilds.filter(
+  if (typeof res === "object" && res.message)
+    throw new Error(res.message);
+
+  return res.filter(
     (guild: any) => guild.owner || (guild.permissions & 0x20) === 0x20,
   );
 }
