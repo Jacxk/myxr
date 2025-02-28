@@ -1,22 +1,25 @@
-"use client";
+import { StepsProvider } from "~/context/StepsContext";
+import { EditDetailsStep } from "./_components/steps/edit-details";
+import { SelectFileStep } from "./_components/steps/select-file";
+import { Step } from "./_components/steps/step";
+import { auth } from "~/server/auth";
+import { Session } from "next-auth";
 
-import { UploadButton } from "~/utils/uploadthing";
+export default async function Home() {
+  const session: Session | null = await auth();
+  
+  delete session?.user.email;
 
-export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <UploadButton
-        endpoint="soundUploader"
-        onClientUploadComplete={(res) => {
-          // Do something with the response
-          console.log("Files: ", res);
-          alert("Upload Completed");
-        }}
-        onUploadError={(error: Error) => {
-          // Do something with the error.
-          alert(`ERROR! ${error.message}`);
-        }}
-      />
+    <main className="flex h-full flex-col items-center justify-between">
+      <StepsProvider>
+        <Step>
+          <SelectFileStep />
+        </Step>
+        <Step>
+          <EditDetailsStep session={session} />
+        </Step>
+      </StepsProvider>
     </main>
   );
 }

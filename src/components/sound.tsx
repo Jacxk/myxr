@@ -1,4 +1,6 @@
-import { useRef } from "react";
+"use client";
+
+import { useEffect, useRef } from "react";
 import {
   Card,
   CardContent,
@@ -9,6 +11,15 @@ import {
 } from "./ui/card";
 import { useAudio } from "../context/AudioContext";
 import Link from "next/link";
+import Twemoji from "react-twemoji";
+
+export interface SoundProperties {
+  id: string | number;
+  name: string;
+  emoji: string;
+  url: string;
+  createdBy: { name: string | null; id: string };
+}
 
 export default function Sound({
   id,
@@ -16,13 +27,7 @@ export default function Sound({
   emoji,
   url,
   createdBy,
-}: Readonly<{
-  id: string | number;
-  name: string;
-  emoji: string;
-  url: string;
-  createdBy: { name: string | null; id: string };
-}>) {
+}: Readonly<SoundProperties>) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const { currentAudio, setCurrentAudio } = useAudio();
 
@@ -44,23 +49,30 @@ export default function Sound({
   };
 
   return (
-    <Card className="cursor-pointer w-52 h-52" onClick={play}>
+    <Card
+      className="flex h-52 w-52 cursor-pointer flex-col justify-around"
+      onClick={play}
+    >
       <CardHeader>
         <CardTitle>
-            <Link href={`/sound/${id}`} onClick={(e) => e.stopPropagation()}>{name}</Link>
+          <Link href={`/sound/${id}`} onClick={(e) => e.stopPropagation()}>
+            {name}
+          </Link>
         </CardTitle>
-        <CardDescription className="text-center text-2xl">
-          {emoji}
-        </CardDescription>
+        <CardDescription></CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex items-center justify-center">
+        <Twemoji options={{ className: "twemoji" }}>{emoji}</Twemoji>
         <audio ref={audioRef} controls hidden>
           <source src={url} type="audio/mpeg" />
         </audio>
       </CardContent>
-      <CardFooter>
-        <Link href={`/user/${createdBy.id}`} onClick={(e) => e.stopPropagation()}>
-            <p>{createdBy.name ?? "Unknown"}</p>
+      <CardFooter className="flex flex-col items-start">
+        <Link
+          href={`/user/${createdBy.id}`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <p>{createdBy.name ?? "Unknown"}</p>
         </Link>
       </CardFooter>
     </Card>

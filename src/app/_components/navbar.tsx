@@ -9,15 +9,16 @@ import {
 } from "~/components/ui/select";
 import { auth } from "~/server/auth";
 import { Authenticated, NotAuthenticated } from "./authentication";
+import { Session } from "next-auth";
 
 export default async function Navbar() {
-  const session = await auth();
+  const session: Session | null = await auth();
 
   const user = session?.user;
   const guilds = user?.guilds.sort((a, b) => a.name.localeCompare(b.name));
 
   return (
-    <nav className="flex items-center justify-between gap-4 bg-black/50 p-4">
+    <nav className="flex items-center justify-between gap-4 p-4 shadow-md">
       <span className="text-lg font-bold">Mxng</span>
       <div>
         <Authenticated>
