@@ -6,7 +6,7 @@ export default async function Home() {
 
   return (
     <HydrateClient>
-      <main className="flex min-h-full flex-col items-center">
+      <main className="flex flex-col">
         <LatestSounds />
       </main>
     </HydrateClient>

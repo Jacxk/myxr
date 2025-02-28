@@ -8,6 +8,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
@@ -24,7 +25,6 @@ export function AccountMenu({ user }: Readonly<{ user: User | undefined }>) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex items-center gap-2">
-        <span>{user?.name}</span>
         <img
           src={user?.image ?? ""}
           alt={user?.name ?? "User image"}
@@ -32,6 +32,11 @@ export function AccountMenu({ user }: Readonly<{ user: User | undefined }>) {
         />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-40" align="end">
+        <DropdownMenuLabel className="flex justify-between">
+          <span className="text-neutral-400">Hello</span>
+          <span>{user?.name}</span>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
         <Link href="/upload">
           <DropdownMenuItem>Upload Sound</DropdownMenuItem>
         </Link>

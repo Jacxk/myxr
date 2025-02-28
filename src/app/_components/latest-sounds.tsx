@@ -12,10 +12,10 @@ export function LatestSounds() {
   }
 
   return (
-    <div className="flex flex-col w-full gap-4 p-5">
+    <div className="flex w-full flex-col gap-4 p-5">
       <h1 className="text-3xl font-bold">Latest Sounds</h1>
       <AudioProvider>
-        <div className="flex flex-wrap  gap-4">
+        <div className="flex flex-wrap gap-4">
           {latestSounds.map((sound) => (
             <Sound
               key={sound.id}

@@ -19,14 +19,12 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
-      <body>
+      <body className="h-screen">
         <TRPCReactProvider>
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-            <div className="flex h-screen flex-col">
+          <ThemeProvider attribute="class" enableSystem>
+            <div className="flex h-full w-full flex-col">
               <Navbar />
-              <div className="flex-1 bg-black/5 p-2 dark:bg-black/30">
-                {children}
-              </div>
+              <div className="mx-auto max-w-7xl flex-1 p-2">{children}</div>
               <Toaster />
             </div>
           </ThemeProvider>
