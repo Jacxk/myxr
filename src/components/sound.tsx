@@ -18,7 +18,7 @@ export interface SoundProperties {
   name: string;
   emoji: string;
   url: string;
-  tags?: string[]
+  tags?: string[];
   createdBy: { name: string | null; id: string };
 }
 
@@ -56,7 +56,11 @@ export default function Sound({
     >
       <CardHeader>
         <CardTitle>
-          <Link href={`/sound/${id}`} onClick={(e) => e.stopPropagation()}>
+          <Link
+            href={`/sound/${id}`}
+            onClick={(e) => e.stopPropagation()}
+            className="underline"
+          >
             {name}
           </Link>
         </CardTitle>
@@ -72,6 +76,7 @@ export default function Sound({
         <Link
           href={`/user/${createdBy.id}`}
           onClick={(e) => e.stopPropagation()}
+          className="underline"
         >
           <p>{createdBy.name ?? "Unknown"}</p>
         </Link>

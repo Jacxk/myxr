@@ -24,7 +24,9 @@ export default function RootLayout({
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
             <div className="flex h-screen flex-col">
               <Navbar />
-              <div className="flex-1 p-2 bg-black/30">{children}</div>
+              <div className="flex-1 bg-black/5 p-2 dark:bg-black/30">
+                {children}
+              </div>
               <Toaster />
             </div>
           </ThemeProvider>

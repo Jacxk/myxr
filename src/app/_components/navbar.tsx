@@ -1,15 +1,6 @@
 import { Session } from "next-auth";
 import Link from "next/link";
-import { UploadIcon } from "~/components/icons/upload";
 import { Button } from "~/components/ui/button";
-import {
-  Menubar,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarSeparator,
-  MenubarTrigger,
-} from "~/components/ui/menubar";
 import {
   Select,
   SelectContent,
@@ -18,6 +9,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { auth } from "~/server/auth";
+import { AccountMenu } from "./account-menu";
 import { Authenticated, NotAuthenticated } from "./authentication";
 
 export default async function Navbar() {
@@ -27,7 +19,7 @@ export default async function Navbar() {
   const guilds = user?.guilds.sort((a, b) => a.name.localeCompare(b.name));
 
   return (
-    <nav className="flex items-center justify-between gap-4 p-4 shadow-md px-8">
+    <nav className="flex items-center justify-between gap-4 p-4 px-8 shadow-md">
       <Link href="/" className="text-4xl font-bold">
         Mxng
       </Link>
@@ -46,44 +38,7 @@ export default async function Navbar() {
                 ))}
               </SelectContent>
             </Select>
-            <Menubar className="py-6 shadow-none">
-              <MenubarMenu>
-                <MenubarTrigger className="cursor-pointer">
-                  <div className="flex items-center gap-2">
-                    <span>{user?.name}</span>
-                    <img
-                      src={user?.image ?? ""}
-                      alt={user?.name ?? "User image"}
-                      className="h-8 w-8 rounded-full"
-                    />
-                  </div>
-                </MenubarTrigger>
-                <MenubarContent>
-                  <Link href="/upload">
-                    <MenubarItem className="cursor-pointer">
-                      Upload Sound
-                    </MenubarItem>
-                  </Link>
-                  <Link href={`/users/${user?.id}`}>
-                    <MenubarItem className="cursor-pointer">
-                      Profile
-                    </MenubarItem>
-                  </Link>
-                  <MenubarSeparator />
-                  <Link href="/settings">
-                    <MenubarItem className="cursor-pointer">
-                      Settings
-                    </MenubarItem>
-                  </Link>
-                  <MenubarSeparator />
-                  <Link href="/api/signout">
-                    <MenubarItem className="cursor-pointer">
-                      Sign out
-                    </MenubarItem>
-                  </Link>
-                </MenubarContent>
-              </MenubarMenu>
-            </Menubar>
+            <AccountMenu user={user} />
           </div>
         </Authenticated>
         <NotAuthenticated>
