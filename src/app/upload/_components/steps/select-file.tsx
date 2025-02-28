@@ -54,7 +54,7 @@ export function SelectFileStep() {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <CloudUploadIcon className="size-20 text-gray-600" />
+      <CloudUploadIcon className="size-16 text-gray-600" />
       <p className="mt-2 text-gray-600">Choose file or drag and drop</p>
       <input
         id="file-dropzone"

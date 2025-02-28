@@ -1,5 +1,15 @@
+import { Session } from "next-auth";
 import Link from "next/link";
 import { UploadIcon } from "~/components/icons/upload";
+import { Button } from "~/components/ui/button";
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarSeparator,
+  MenubarTrigger,
+} from "~/components/ui/menubar";
 import {
   Select,
   SelectContent,
@@ -9,7 +19,6 @@ import {
 } from "~/components/ui/select";
 import { auth } from "~/server/auth";
 import { Authenticated, NotAuthenticated } from "./authentication";
-import { Session } from "next-auth";
 
 export default async function Navbar() {
   const session: Session | null = await auth();
@@ -19,13 +28,12 @@ export default async function Navbar() {
 
   return (
     <nav className="flex items-center justify-between gap-4 p-4 shadow-md">
-      <span className="text-lg font-bold">Mxng</span>
+      <Link href="/" className="text-lg font-bold">
+        Mxng
+      </Link>
       <div>
         <Authenticated>
           <div className="flex items-center gap-2">
-            <Link href="/upload">
-              <UploadIcon />
-            </Link>
             <Select>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select a Guild" />
@@ -38,18 +46,50 @@ export default async function Navbar() {
                 ))}
               </SelectContent>
             </Select>
-            <div className="flex items-center gap-2">
-              <img
-                src={user?.image ?? ""}
-                alt={user?.name ?? "User image"}
-                className="h-8 w-8 rounded-full"
-              />
-              <span>{user?.name}</span>
-            </div>
+            <Menubar className="py-6 shadow-none">
+              <MenubarMenu>
+                <MenubarTrigger className="cursor-pointer">
+                  <div className="flex items-center gap-2">
+                    <span>{user?.name}</span>
+                    <img
+                      src={user?.image ?? ""}
+                      alt={user?.name ?? "User image"}
+                      className="h-8 w-8 rounded-full"
+                    />
+                  </div>
+                </MenubarTrigger>
+                <MenubarContent>
+                  <Link href="/upload">
+                    <MenubarItem className="cursor-pointer">
+                      Upload Sound
+                    </MenubarItem>
+                  </Link>
+                  <Link href={`/users/${user?.id}`}>
+                    <MenubarItem className="cursor-pointer">
+                      Profile
+                    </MenubarItem>
+                  </Link>
+                  <MenubarSeparator />
+                  <Link href="/settings">
+                    <MenubarItem className="cursor-pointer">
+                      Settings
+                    </MenubarItem>
+                  </Link>
+                  <MenubarSeparator />
+                  <Link href="/api/signout">
+                    <MenubarItem className="cursor-pointer">
+                      Sign out
+                    </MenubarItem>
+                  </Link>
+                </MenubarContent>
+              </MenubarMenu>
+            </Menubar>
           </div>
         </Authenticated>
         <NotAuthenticated>
-          <Link href="/api/auth/signin">Sign in</Link>
+          <Link href="/api/auth/signin">
+            <Button>Sign in</Button>
+          </Link>
         </NotAuthenticated>
       </div>
     </nav>
