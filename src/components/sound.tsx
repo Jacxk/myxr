@@ -1,6 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import Link from "next/link";
+import { useRef } from "react";
+import Twemoji from "react-twemoji";
+import { useAudio } from "../context/AudioContext";
 import {
   Card,
   CardContent,
@@ -9,15 +12,13 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { useAudio } from "../context/AudioContext";
-import Link from "next/link";
-import Twemoji from "react-twemoji";
 
 export interface SoundProperties {
   id: string | number;
   name: string;
   emoji: string;
   url: string;
+  tags?: string[]
   createdBy: { name: string | null; id: string };
 }
 

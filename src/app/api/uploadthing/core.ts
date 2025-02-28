@@ -1,5 +1,6 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
+import { z } from "zod";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 
@@ -11,28 +12,41 @@ export const ourFileRouter = {
       maxFileSize: "1MB",
     },
   })
-    .middleware(async ({ req }) => {
+    .input(
+      z.object({
+        emoji: z.string(),
+        name: z.string().max(20),
+        tags: z.array(z.string()).optional(),
+      }),
+    )
+    .middleware(async ({ input }) => {
       const session = await auth();
 
       if (!session || !session?.user)
         throw new UploadThingError("Unauthorized");
 
-      return { userId: session?.user.id, emoji: "🎵", name: "change me" };
+      return {
+        userId: session?.user.id,
+        emoji: input.emoji,
+        name: input.name,
+        tags: input.tags,
+      };
     })
     .onUploadComplete(async ({ metadata, file }) => {
       console.log("Upload complete for userId:", metadata.userId);
       console.log("file url", file.ufsUrl);
 
-      await db.sound.create({
+      const data = await db.sound.create({
         data: {
           url: file.ufsUrl,
           createdById: metadata.userId,
           emoji: metadata.emoji,
           name: metadata.name,
+          tags: metadata.tags,
         },
       });
 
-      return { uploadedBy: metadata.userId };
+      return { createdBy: metadata.userId, id: data.id };
     }),
 } satisfies FileRouter;
 
