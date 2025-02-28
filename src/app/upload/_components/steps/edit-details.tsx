@@ -9,6 +9,7 @@ import { Label } from "~/components/ui/label";
 import { AudioProvider } from "~/context/AudioContext";
 import { useSteps } from "~/context/StepsContext";
 import EmojiPicker, { EmojiStyle } from "emoji-picker-react";
+import prettyBytes from "pretty-bytes";
 
 export function EditDetailsStep({
   session,
@@ -23,7 +24,6 @@ export function EditDetailsStep({
   });
 
   useEffect(() => {
-    console.log(session);
     if (files.length > 0) {
       setFileProps({
         name: "Enter title",
@@ -58,15 +58,19 @@ export function EditDetailsStep({
               <Label htmlFor="tags">Tags</Label>
               <Input id="tags" />
             </div>
-            <EmojiPicker
-              emojiStyle={EmojiStyle.TWITTER}
-              onEmojiClick={(emoji) =>
-                setFileProps((prop) => ({ ...prop, emoji: emoji.emoji }))
-              }
-            />
-            <div className="flex gap-2">
-              <Button>Save Changes</Button>
-              <Button onClick={reset} variant="destructive">
+            <div>
+              <Label>Emoji</Label>
+              <EmojiPicker
+                lazyLoadEmojis
+                emojiStyle={EmojiStyle.TWITTER}
+                onEmojiClick={(emoji) =>
+                  setFileProps((prop) => ({ ...prop, emoji: emoji.emoji }))
+                }
+              />
+            </div>
+            <div className="flex justify-stretch gap-2">
+              <Button className="w-full">Save Changes</Button>
+              <Button className="w-full" onClick={reset} variant="destructive">
                 Cancel
               </Button>
             </div>
@@ -74,8 +78,13 @@ export function EditDetailsStep({
         </div>
         <div className="flex flex-col gap-5 align-top">
           <h1 className="text-center">Preview</h1>
-          <div className="flex justify-center">
+          <div className="flex flex-col items-center gap-4">
             <Sound {...fileProps} />
+            <div className="flex flex-col flex-wrap">
+              <p>File name: {files[0]?.name}</p>
+              <p>File size: {prettyBytes(files[0]?.size ?? 0)}</p>
+              <p>File type: {files[0]?.type}</p>
+            </div>
           </div>
         </div>
       </div>
