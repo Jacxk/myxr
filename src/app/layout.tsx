@@ -6,6 +6,7 @@ import { type Metadata } from "next";
 import { Toaster } from "~/components/ui/sonner";
 import { TRPCReactProvider } from "~/trpc/react";
 import Navbar from "./_components/navbar";
+import { ThemeProvider } from "./_components/theme-provider";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -20,11 +21,13 @@ export default function RootLayout({
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
         <TRPCReactProvider>
-          <div className="flex h-screen flex-col">
-            <Navbar />
-            <div className="flex-1 p-2">{children}</div>
-            <Toaster />
-          </div>
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+            <div className="flex h-screen flex-col">
+              <Navbar />
+              <div className="flex-1 p-2 bg-black/30">{children}</div>
+              <Toaster />
+            </div>
+          </ThemeProvider>
         </TRPCReactProvider>
       </body>
     </html>

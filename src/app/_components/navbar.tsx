@@ -27,8 +27,8 @@ export default async function Navbar() {
   const guilds = user?.guilds.sort((a, b) => a.name.localeCompare(b.name));
 
   return (
-    <nav className="flex items-center justify-between gap-4 p-4 shadow-md">
-      <Link href="/" className="text-lg font-bold">
+    <nav className="flex items-center justify-between gap-4 p-4 shadow-md px-8">
+      <Link href="/" className="text-4xl font-bold">
         Mxng
       </Link>
       <div>
