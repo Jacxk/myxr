@@ -8,6 +8,10 @@ import { useSteps } from "~/context/StepsContext";
 export interface SoundUploadProps {
   file?: File;
   oldFile?: File;
+  region?: {
+    start: number;
+    end: number;
+  };
 }
 
 export function SelectFileStep() {

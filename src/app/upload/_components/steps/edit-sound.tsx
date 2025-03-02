@@ -27,7 +27,7 @@ export function EditSoundStep() {
   const [region, setRegion] = useState<{
     start: number;
     end: number;
-  }>({ start: 0, end: 5 });
+  }>({ start: data.region?.start ?? 0, end: data.region?.end ?? 5 });
 
   useEffect(() => {
     const regionsPlugin = RegionsPlugin.create();
@@ -52,6 +52,7 @@ export function EditSoundStep() {
         color: "rgb(37 99 235 / 0.2)",
         resize: true,
       });
+      waveSurfer.current?.setTime(region.start);
       setTotalTime(time);
     });
 
@@ -89,7 +90,7 @@ export function EditSoundStep() {
     if (!data.file) return;
     toast.loading("Editing audio file...", { id: "editingAudio" });
     trimAudio(data.file, region.start, region.end).then((file) => {
-      setData({ file, oldFile: data.file });
+      setData({ file, oldFile: data.file, region });
       toast.dismiss("editingAudio");
       toast("Audio edited successfully!");
       nextStep();
@@ -115,7 +116,7 @@ export function EditSoundStep() {
             <div className="flex flex-col">
               <span>Name: {data.file?.name}</span>
               <span>
-                Region Length: {(region.end - region.start).toFixed(2)}s
+                Audio Length: {totalTime.toFixed(2)}s
               </span>
             </div>
           </CardContent>
@@ -135,7 +136,7 @@ export function EditSoundStep() {
                 <PlayIcon className="size-24" />
               )}
             </Button>
-            <span className="text-xs">{totalTime.toFixed(2)}s</span>
+            <span className="text-xs">{(region.end - region.start).toFixed(2)}s</span>
           </div>
           <div className="w-full" id="waveForm"></div>
         </div>

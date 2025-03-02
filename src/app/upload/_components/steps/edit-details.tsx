@@ -1,7 +1,8 @@
 "use client";
 
-import EmojiPicker, { EmojiStyle } from "emoji-picker-react";
+import EmojiPicker, { EmojiStyle, Theme } from "emoji-picker-react";
 import { Session } from "next-auth";
+import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import prettyBytes from "pretty-bytes";
 import { useCallback, useEffect, useState } from "react";
@@ -19,7 +20,8 @@ export function EditDetailsStep({
   session,
 }: Readonly<{ session: Session | null }>) {
   const router = useRouter();
-  const { data, reset } = useSteps<SoundUploadProps>();
+  const { theme } = useTheme();
+  const { data, prevStep, setData } = useSteps<SoundUploadProps>();
   const [uploading, setUploading] = useState<boolean>(false);
   const [fileProps, setFileProps] = useState<SoundProperties>({
     name: "",
@@ -61,6 +63,11 @@ export function EditDetailsStep({
     });
   }, [session, data.file]);
 
+  function goBack(): void {
+    setData({ file: data.oldFile, oldFile: undefined, region: data.region });
+    prevStep();
+  }
+
   return (
     <AudioProvider>
       <div className="flex h-full flex-col gap-20 p-10 transition sm:flex-row">
@@ -96,18 +103,19 @@ export function EditDetailsStep({
                 onEmojiClick={(emoji) =>
                   setFileProps((prop) => ({ ...prop, emoji: emoji.emoji }))
                 }
+                theme={theme === "dark" ? Theme.DARK : Theme.LIGHT}
               />
             </div>
             <div className="flex justify-stretch gap-2">
+              <Button className="w-full" onClick={goBack} variant="outline">
+                Back
+              </Button>
               <Button
                 className="w-full"
                 onClick={uploadFile}
                 disabled={uploading}
               >
                 {uploading ? "Saving..." : "Save Changes"}
-              </Button>
-              <Button className="w-full" onClick={reset} variant="destructive">
-                Cancel
               </Button>
             </div>
           </div>
