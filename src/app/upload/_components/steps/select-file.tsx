@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState } from "react";
 import { toast } from "sonner";
@@ -49,7 +49,7 @@ export function SelectFileStep() {
   return (
     <label
       htmlFor="file-dropzone"
-      className={`mt-0 flex h-full w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-4 transition hover:border-blue-600 hover:bg-blue-600/20 ${isDragging ? "border-green-600 bg-green-600/20" : ""}`}
+      className={`flex h-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-4 transition hover:border-blue-600 hover:bg-blue-600/20 ${isDragging ? "border-green-600 bg-green-600/20" : ""}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}

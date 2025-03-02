@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Children,
@@ -24,9 +24,7 @@ interface StepsContextProps {
   prevStep: () => void;
 }
 
-const StepsContext = createContext<StepsContextProps | undefined>(
-  undefined,
-);
+const StepsContext = createContext<StepsContextProps | undefined>(undefined);
 
 export const StepsProvider = ({ children }: { children: ReactNode }) => {
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -75,9 +73,7 @@ export const StepsProvider = ({ children }: { children: ReactNode }) => {
 export const useSteps = (): StepsContextProps => {
   const context = useContext(StepsContext);
   if (!context) {
-    throw new Error(
-      "useSteps must be used within an StepsProvider",
-    );
+    throw new Error("useSteps must be used within an StepsProvider");
   }
   return context;
 };

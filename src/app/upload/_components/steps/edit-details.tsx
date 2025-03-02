@@ -41,7 +41,7 @@ export function EditDetailsStep({
       },
     });
 
-    console.log(fileProps, res)
+    console.log(fileProps, res);
     toast("File uploaded successfully!");
     toast.dismiss("uploading");
     router.push("/");
@@ -65,7 +65,7 @@ export function EditDetailsStep({
 
   return (
     <AudioProvider>
-      <div className="flex h-full flex-col gap-20 p-10 sm:flex-row transition">
+      <div className="flex h-full flex-col gap-20 p-10 transition sm:flex-row">
         <div className="flex flex-col items-center gap-4">
           <h1>Edit details</h1>
           <div className="flex flex-col gap-4">

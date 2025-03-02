@@ -22,9 +22,13 @@ export default function RootLayout({
       <body className="h-screen">
         <TRPCReactProvider>
           <ThemeProvider attribute="class" enableSystem>
-            <div className="flex h-full w-full flex-col">
+            <div className="flex h-full flex-col">
               <Navbar />
-              <div className="mx-auto max-w-7xl flex-1 p-2">{children}</div>
+              <div className="flex h-full">
+                <div className="mx-auto h-full max-w-7xl flex-1 grow p-2">
+                  {children}
+                </div>
+              </div>
               <Toaster />
             </div>
           </ThemeProvider>
