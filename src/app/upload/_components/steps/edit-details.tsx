@@ -44,7 +44,6 @@ export function EditDetailsStep({
       },
     });
 
-    console.log(fileProps, res);
     toast("File uploaded successfully!");
     toast.dismiss("uploading");
     router.push("/");
@@ -52,7 +51,7 @@ export function EditDetailsStep({
 
   useEffect(() => {
     setFileProps({
-      name: "Enter title",
+      name: "",
       createdBy: {
         id: session?.user.id ?? "",
         name: session?.user.name ?? "",
@@ -63,6 +62,13 @@ export function EditDetailsStep({
     });
   }, [session, data.file]);
 
+  useEffect(() => {
+    setFileProps((props) => ({
+      ...props,
+      name: props.name ? props.name : "Enter name",
+    }));
+  }, [fileProps.name]);
+
   function goBack(): void {
     setData({ file: data.oldFile, oldFile: undefined, region: data.region });
     prevStep();
@@ -70,7 +76,7 @@ export function EditDetailsStep({
 
   return (
     <AudioProvider>
-      <div className="flex h-full flex-col gap-20 p-10 transition sm:flex-row">
+      <div className="flex h-full flex-col justify-center gap-20 p-10 transition sm:flex-row">
         <div className="flex flex-col items-center gap-4">
           <h1>Edit details</h1>
           <div className="flex flex-col gap-4">
@@ -124,11 +130,6 @@ export function EditDetailsStep({
           <h1 className="text-center">Preview</h1>
           <div className="flex flex-col items-center gap-4">
             <Sound {...fileProps} />
-            <div className="flex flex-col flex-wrap">
-              <p>File name: {data.file?.name}</p>
-              <p>File size: {prettyBytes(data.file?.size ?? 0)}</p>
-              <p>File type: {data.file?.type}</p>
-            </div>
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { User } from "next-auth";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useCallback } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,16 +25,18 @@ export function AccountMenu({ user }: Readonly<{ user: User | undefined }>) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-2">
-        <img
-          src={user?.image ?? ""}
-          alt={user?.name ?? "User image"}
-          className="h-8 w-8 rounded-full"
-        />
+      <DropdownMenuTrigger
+        className="flex cursor-pointer items-center gap-2"
+        asChild
+      >
+        <Avatar>
+          <AvatarImage src={user?.image as string} alt={user?.name as string} />
+          <AvatarFallback delayMs={500}>{user?.name}</AvatarFallback>
+        </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-40" align="end">
         <DropdownMenuLabel className="flex justify-between">
-          <span className="text-neutral-400">Hello</span>
+          <span className="text-muted-foreground">Hello</span>
           <span>{user?.name}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

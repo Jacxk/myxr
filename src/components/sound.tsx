@@ -51,10 +51,10 @@ export default function Sound({
 
   return (
     <Card
-      className="flex h-52 w-52 cursor-pointer flex-col justify-around"
+      className="relative flex h-52 w-52 cursor-pointer flex-col justify-between"
       onClick={play}
     >
-      <CardHeader>
+      <CardHeader className="static">
         <CardTitle>
           <Link
             href={`/sound/${id}`}
@@ -66,13 +66,13 @@ export default function Sound({
         </CardTitle>
         <CardDescription></CardDescription>
       </CardHeader>
-      <CardContent className="flex items-center justify-center">
-        <Twemoji options={{ className: "twemoji" }}>{emoji}</Twemoji>
+      <CardContent className="h-30 absolute bottom-0 left-0 right-0 top-0 flex items-center justify-center p-0">
+        <Twemoji options={{ className: "twemoji " }}>{emoji}</Twemoji>
         <audio ref={audioRef} controls hidden>
           <source src={url} type="audio/mpeg" />
         </audio>
       </CardContent>
-      <CardFooter className="flex flex-col items-start">
+      <CardFooter className="static justify-end p-6 pb-3">
         <Link
           href={`/user/${createdBy.id}`}
           onClick={(e) => e.stopPropagation()}

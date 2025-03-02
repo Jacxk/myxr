@@ -19,7 +19,7 @@ import { trimAudio } from "~/utils/audioTrimmer";
 import { SoundUploadProps } from "./select-file";
 
 export function EditSoundStep() {
-  const { data, prevStep, setData, nextStep } = useSteps<SoundUploadProps>();
+  const { data, reset, setData, nextStep } = useSteps<SoundUploadProps>();
   const waveSurfer = useRef<WaveSurfer | null>(null);
 
   const [totalTime, setTotalTime] = useState<number>(0);
@@ -98,7 +98,7 @@ export function EditSoundStep() {
   }
 
   return (
-    <div className="flex h-full flex-col items-center gap-6 overflow-hidden">
+    <div className="flex h-full flex-col items-center gap-6">
       <div className="flex w-full justify-center">
         <Card>
           <CardHeader>
@@ -115,34 +115,30 @@ export function EditSoundStep() {
             </p>
             <div className="flex flex-col">
               <span>Name: {data.file?.name}</span>
-              <span>
-                Audio Length: {totalTime.toFixed(2)}s
-              </span>
+              <span>Audio Length: {totalTime.toFixed(2)}s</span>
             </div>
           </CardContent>
         </Card>
       </div>
-      <div className="w-full rounded-2xl border p-4">
+      <div className="w-full touch-none rounded-2xl border p-4">
         <div className="flex flex-row gap-4">
-          <div className="flex flex-col items-center justify-center">
+          <div className="relative flex flex-col items-center justify-center">
             <Button
               variant="ghost"
-              className="cursor-pointer"
+              className="h-16 w-16 cursor-pointer [&_svg]:size-10"
               onClick={playPause}
             >
-              {isPlaying ? (
-                <PauseIcon className="size-16" />
-              ) : (
-                <PlayIcon className="size-24" />
-              )}
+              {isPlaying ? <PauseIcon /> : <PlayIcon />}
             </Button>
-            <span className="text-xs">{(region.end - region.start).toFixed(2)}s</span>
+            <span className="absolute bottom-0 text-xs">
+              {(region.end - region.start).toFixed(2)}s
+            </span>
           </div>
           <div className="w-full" id="waveForm"></div>
         </div>
       </div>
       <div className="flex w-full justify-end gap-4">
-        <Button variant="destructive" onClick={prevStep}>
+        <Button variant="destructive" onClick={reset}>
           Cancel
         </Button>
         <Button onClick={goToNextStep}>Continue</Button>
