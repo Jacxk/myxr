@@ -24,6 +24,7 @@ export function EditSoundStep() {
 
   const [totalTime, setTotalTime] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [fileChanged, setFileChanged] = useState<boolean>(false);
   const [region, setRegion] = useState<{
     start: number;
     end: number;
@@ -57,7 +58,8 @@ export function EditSoundStep() {
     });
 
     regionsPlugin.on("region-update", (region) => {
-      setRegion({ start: region.start, end: region.end });
+      setFileChanged(true);
+      setRegion({ start: region.start, end: region.end + 0.01 });
       waveSurfer.current?.setTime(region.start);
     });
 
@@ -72,6 +74,7 @@ export function EditSoundStep() {
 
     return () => {
       waveSurfer.current?.destroy();
+      regionsPlugin.destroy();
     };
   }, []);
 
@@ -88,9 +91,13 @@ export function EditSoundStep() {
 
   function goToNextStep() {
     if (!data.file) return;
+    if (!fileChanged) {
+      nextStep();
+      return;
+    }
     toast.loading("Editing audio file...", { id: "editingAudio" });
-    trimAudio(data.file, region.start, region.end).then((file) => {
-      setData({ file, oldFile: data.file, region });
+    trimAudio(data.file, region.start, region.end).then((newFile) => {
+      setData({ newFile, region, file: data.file });
       toast.dismiss("editingAudio");
       toast("Audio edited successfully!");
       nextStep();

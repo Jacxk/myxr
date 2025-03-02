@@ -4,7 +4,6 @@ import EmojiPicker, { EmojiStyle, Theme } from "emoji-picker-react";
 import { Session } from "next-auth";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
-import prettyBytes from "pretty-bytes";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import Sound, { SoundProperties } from "~/components/sound";
@@ -21,14 +20,14 @@ export function EditDetailsStep({
 }: Readonly<{ session: Session | null }>) {
   const router = useRouter();
   const { theme } = useTheme();
-  const { data, prevStep, setData } = useSteps<SoundUploadProps>();
+  const { data, prevStep } = useSteps<SoundUploadProps>();
   const [uploading, setUploading] = useState<boolean>(false);
   const [fileProps, setFileProps] = useState<SoundProperties>({
     name: "",
     createdBy: { id: "", name: "" },
     emoji: "",
     id: "",
-    url: URL.createObjectURL(data.file as Blob),
+    url: URL.createObjectURL(data.newFile as Blob),
     tags: [],
   });
 
@@ -36,7 +35,7 @@ export function EditDetailsStep({
     toast.loading("Uploading file...", { id: "uploading", duration: 9999999 });
     setUploading(true);
     const res = await uploadFiles("soundUploader", {
-      files: [data.file as File],
+      files: [data.newFile as File],
       input: {
         emoji: fileProps.emoji,
         name: fileProps.name,
@@ -58,9 +57,9 @@ export function EditDetailsStep({
       },
       emoji: "🎵",
       id: "",
-      url: URL.createObjectURL(data.file as Blob),
+      url: URL.createObjectURL(data.newFile as Blob),
     });
-  }, [session, data.file]);
+  }, [session, data.newFile]);
 
   useEffect(() => {
     setFileProps((props) => ({
@@ -68,11 +67,6 @@ export function EditDetailsStep({
       name: props.name ? props.name : "Enter name",
     }));
   }, [fileProps.name]);
-
-  function goBack(): void {
-    setData({ file: data.oldFile, oldFile: undefined, region: data.region });
-    prevStep();
-  }
 
   return (
     <AudioProvider>
@@ -113,7 +107,7 @@ export function EditDetailsStep({
               />
             </div>
             <div className="flex justify-stretch gap-2">
-              <Button className="w-full" onClick={goBack} variant="outline">
+              <Button className="w-full" onClick={prevStep} variant="outline">
                 Back
               </Button>
               <Button
