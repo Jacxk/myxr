@@ -8,17 +8,18 @@ import { PauseIcon } from "~/components/icons/pause";
 import { PlayIcon } from "~/components/icons/play";
 import { Button } from "~/components/ui/button";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "~/components/ui/card";
 import { useSteps } from "~/context/StepsContext";
 import { trimAudio } from "~/utils/audioTrimmer";
+import { SoundUploadProps } from "./select-file";
 
 export function EditSoundStep() {
-  const { files, prevStep, setFiles, nextStep } = useSteps();
+  const { data, prevStep, setData, nextStep } = useSteps<SoundUploadProps>();
   const waveSurfer = useRef<WaveSurfer | null>(null);
 
   const [totalTime, setTotalTime] = useState<number>(0);
@@ -38,7 +39,7 @@ export function EditSoundStep() {
       minPxPerSec: 1,
       dragToSeek: true,
       plugins: [regionsPlugin],
-      url: URL.createObjectURL(files[0] as Blob),
+      url: URL.createObjectURL(data.file as Blob),
       normalize: true,
     });
 
@@ -85,10 +86,10 @@ export function EditSoundStep() {
   }, [waveSurfer, region, isPlaying]);
 
   function goToNextStep() {
-    if (!files[0]) return;
+    if (!data.file) return;
     toast.loading("Editing audio file...", { id: "editingAudio" });
-    trimAudio(files[0], region.start, region.end).then((file) => {
-      setFiles([file]);
+    trimAudio(data.file, region.start, region.end).then((file) => {
+      setData({ file, oldFile: data.file });
       toast.dismiss("editingAudio");
       toast("Audio edited successfully!");
       nextStep();
@@ -112,7 +113,7 @@ export function EditSoundStep() {
               adjust the position of the region by draging it.
             </p>
             <div className="flex flex-col">
-              <span>Name: {files[0]?.name}</span>
+              <span>Name: {data.file?.name}</span>
               <span>
                 Region Length: {(region.end - region.start).toFixed(2)}s
               </span>

@@ -13,19 +13,20 @@ import { Label } from "~/components/ui/label";
 import { AudioProvider } from "~/context/AudioContext";
 import { useSteps } from "~/context/StepsContext";
 import { uploadFiles } from "~/utils/uploadthing";
+import { SoundUploadProps } from "./select-file";
 
 export function EditDetailsStep({
   session,
 }: Readonly<{ session: Session | null }>) {
   const router = useRouter();
-  const { files, reset } = useSteps();
+  const { data, reset } = useSteps<SoundUploadProps>();
   const [uploading, setUploading] = useState<boolean>(false);
   const [fileProps, setFileProps] = useState<SoundProperties>({
     name: "",
     createdBy: { id: "", name: "" },
     emoji: "",
     id: "",
-    url: URL.createObjectURL(files[0] as Blob),
+    url: URL.createObjectURL(data.file as Blob),
     tags: [],
   });
 
@@ -33,7 +34,7 @@ export function EditDetailsStep({
     toast.loading("Uploading file...", { id: "uploading", duration: 9999999 });
     setUploading(true);
     const res = await uploadFiles("soundUploader", {
-      files,
+      files: [data.file as File],
       input: {
         emoji: fileProps.emoji,
         name: fileProps.name,
@@ -45,23 +46,20 @@ export function EditDetailsStep({
     toast("File uploaded successfully!");
     toast.dismiss("uploading");
     router.push("/");
-  }, [files, fileProps]);
+  }, [data, fileProps]);
 
   useEffect(() => {
-    if (files.length > 0) {
-      setFileProps({
-        name: "Enter title",
-        createdBy: {
-          id: session?.user.id ?? "",
-          name: session?.user.name ?? "",
-        },
-        emoji: "🎵",
-        id: "",
-        url: URL.createObjectURL(files[0] as Blob),
-      });
-    }
-    console.log(fileProps);
-  }, [session, files]);
+    setFileProps({
+      name: "Enter title",
+      createdBy: {
+        id: session?.user.id ?? "",
+        name: session?.user.name ?? "",
+      },
+      emoji: "🎵",
+      id: "",
+      url: URL.createObjectURL(data.file as Blob),
+    });
+  }, [session, data.file]);
 
   return (
     <AudioProvider>
@@ -119,9 +117,9 @@ export function EditDetailsStep({
           <div className="flex flex-col items-center gap-4">
             <Sound {...fileProps} />
             <div className="flex flex-col flex-wrap">
-              <p>File name: {files[0]?.name}</p>
-              <p>File size: {prettyBytes(files[0]?.size ?? 0)}</p>
-              <p>File type: {files[0]?.type}</p>
+              <p>File name: {data.file?.name}</p>
+              <p>File size: {prettyBytes(data.file?.size ?? 0)}</p>
+              <p>File type: {data.file?.type}</p>
             </div>
           </div>
         </div>

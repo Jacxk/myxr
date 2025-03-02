@@ -5,8 +5,13 @@ import { toast } from "sonner";
 import { CloudUploadIcon } from "~/components/icons/cloud-upload";
 import { useSteps } from "~/context/StepsContext";
 
+export interface SoundUploadProps {
+  file?: File;
+  oldFile?: File;
+}
+
 export function SelectFileStep() {
-  const { files, setFiles, nextStep } = useSteps();
+  const { data, setData, nextStep } = useSteps<SoundUploadProps>();
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
   function onFileSelect(files: File[]) {
@@ -33,7 +38,7 @@ export function SelectFileStep() {
 
     if (event.dataTransfer.files.length > 0) {
       const uploadedFiles = Array.from(event.dataTransfer.files);
-      setFiles(uploadedFiles);
+      setData({ file: uploadedFiles[0] });
       onFileSelect(uploadedFiles);
     }
   };
@@ -41,7 +46,7 @@ export function SelectFileStep() {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const selectedFiles = Array.from(event.target.files);
-      setFiles(selectedFiles);
+      setData({ file: selectedFiles[0] });
       onFileSelect(selectedFiles);
     }
   };
@@ -63,7 +68,7 @@ export function SelectFileStep() {
         onChange={handleFileChange}
       />
       <div>
-        <span>{files[0]?.name}</span>
+        <span>{data.file?.name}</span>
       </div>
     </label>
   );

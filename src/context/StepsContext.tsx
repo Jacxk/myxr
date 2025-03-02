@@ -12,48 +12,50 @@ import {
 } from "react";
 import { StepProps } from "~/app/upload/_components/steps/step";
 
-interface StepsContextProps {
+interface StepsContextProps<D = unknown> {
   currentStep: number;
-  files: File[];
+  data: D;
   totalSteps: number;
   setCurrentStep: (step: number) => void;
-  setFiles: (files: File[]) => void;
+  setData: (data: D) => void;
   reset: () => void;
   registerStep: () => number;
   nextStep: () => void;
   prevStep: () => void;
 }
 
-const StepsContext = createContext<StepsContextProps | undefined>(undefined);
+const StepsContext = createContext<StepsContextProps<any> | undefined>(
+  undefined,
+);
 
-export const StepsProvider = ({ children }: { children: ReactNode }) => {
+export const StepsProvider = <D,>({ children }: { children: ReactNode }) => {
   const [currentStep, setCurrentStep] = useState<number>(1);
-  const [files, setFiles] = useState<File[]>([]);
+  const [data, setData] = useState<D>({} as D);
 
   const stepsArray = Children.toArray(children);
   const totalSteps = stepsArray.length;
 
   function reset() {
     setCurrentStep(1);
-    setFiles([]);
+    setData({} as D);
   }
   const registerStep = () => ++stepCounter;
   const nextStep = () => setCurrentStep((currentStep) => currentStep + 1);
   const prevStep = () => setCurrentStep((currentStep) => currentStep - 1);
 
-  const value = useMemo(
+  const value: StepsContextProps<D> = useMemo(
     () => ({
       currentStep,
-      files,
+      data,
       totalSteps,
       setCurrentStep,
-      setFiles,
+      setData,
       reset,
       registerStep,
       nextStep,
       prevStep,
     }),
-    [currentStep, files],
+    [currentStep, data],
   );
 
   let stepCounter = 0;
@@ -70,10 +72,10 @@ export const StepsProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useSteps = (): StepsContextProps => {
+export function useSteps<D>(): StepsContextProps<D> {
   const context = useContext(StepsContext);
   if (!context) {
     throw new Error("useSteps must be used within an StepsProvider");
   }
   return context;
-};
+}
