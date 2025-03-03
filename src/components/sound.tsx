@@ -20,6 +20,7 @@ export interface SoundProperties {
   url: string;
   tags?: string[];
   createdBy: { name: string | null; id: string };
+  className?: string;
 }
 
 export default function Sound({
@@ -28,6 +29,7 @@ export default function Sound({
   emoji,
   url,
   createdBy,
+  className,
 }: Readonly<SoundProperties>) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const { currentAudio, setCurrentAudio } = useAudio();
@@ -51,7 +53,7 @@ export default function Sound({
 
   return (
     <Card
-      className="relative flex h-52 w-52 cursor-pointer flex-col justify-between"
+      className={`relative flex h-44 w-44 cursor-pointer flex-col justify-between ${className}`}
       onClick={play}
     >
       <CardHeader className="static">
@@ -66,8 +68,8 @@ export default function Sound({
         </CardTitle>
         <CardDescription></CardDescription>
       </CardHeader>
-      <CardContent className="h-30 absolute bottom-0 left-0 right-0 top-0 flex items-center justify-center p-0">
-        <Twemoji options={{ className: "twemoji " }}>{emoji}</Twemoji>
+      <CardContent className="h-30 absolute bottom-0 left-0 right-0 top-0 flex items-center justify-center p-0 pointer-events-none">
+        <Twemoji options={{ className: "twemoji" }}>{emoji}</Twemoji>
         <audio ref={audioRef} controls hidden>
           <source src={url} type="audio/mpeg" />
         </audio>

@@ -11,6 +11,7 @@ import {
 import { auth } from "~/server/auth";
 import { AccountMenu } from "./account-menu";
 import { Authenticated, NotAuthenticated } from "./authentication";
+import { UploadIcon } from "~/components/icons/upload";
 
 export default async function Navbar() {
   const session: Session | null = await auth();
@@ -25,7 +26,7 @@ export default async function Navbar() {
       </Link>
       <div>
         <Authenticated>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             <Select>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select a Guild" />
@@ -38,6 +39,11 @@ export default async function Navbar() {
                 ))}
               </SelectContent>
             </Select>
+            <Link href="/upload">
+              <Button variant="outline">
+                <UploadIcon /> Upload
+              </Button>
+            </Link>
             <AccountMenu user={user} />
           </div>
         </Authenticated>
