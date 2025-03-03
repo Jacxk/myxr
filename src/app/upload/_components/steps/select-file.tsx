@@ -7,7 +7,7 @@ import { useSteps } from "~/context/StepsContext";
 
 export interface SoundUploadProps {
   file?: File;
-  newFile?: File;
+  newFile?: File | null;
   region?: {
     start: number;
     end: number;

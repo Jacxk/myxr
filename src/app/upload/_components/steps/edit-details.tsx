@@ -1,6 +1,10 @@
 "use client";
 
-import EmojiPicker, { EmojiStyle, Theme } from "emoji-picker-react";
+import EmojiPicker, {
+  EmojiStyle,
+  SuggestionMode,
+  Theme,
+} from "emoji-picker-react";
 import { Session } from "next-auth";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
@@ -31,24 +35,33 @@ export function EditDetailsStep({
     tags: [],
   });
 
-  const uploadFile = useCallback(async () => {
+  const uploadFile = useCallback(() => {
     toast.loading("Uploading file...", { id: "uploading", duration: 9999999 });
     setUploading(true);
-    const res = await uploadFiles("soundUploader", {
+    uploadFiles("soundUploader", {
       files: [data.newFile as File],
       input: {
         emoji: fileProps.emoji,
         name: fileProps.name,
         tags: fileProps.tags,
       },
-    });
-
-    toast("File uploaded successfully!");
-    toast.dismiss("uploading");
-    router.push("/");
+    })
+      .then(() => {
+        toast("File uploaded successfully!");
+        router.push("/");
+      })
+      .catch((error) => {
+        toast.error("There was an error while uploading.");
+        console.error(error);
+        setUploading(false);
+      })
+      .finally(() => {
+        toast.dismiss("uploading");
+      });
   }, [data, fileProps]);
 
   useEffect(() => {
+    console.log(data.newFile);
     setFileProps({
       name: "",
       createdBy: {
@@ -99,6 +112,8 @@ export function EditDetailsStep({
               <Label>Emoji</Label>
               <EmojiPicker
                 lazyLoadEmojis
+                autoFocusSearch={false}
+                suggestedEmojisMode={SuggestionMode.RECENT}
                 emojiStyle={EmojiStyle.TWITTER}
                 onEmojiClick={(emoji) =>
                   setFileProps((prop) => ({ ...prop, emoji: emoji.emoji }))
@@ -107,7 +122,12 @@ export function EditDetailsStep({
               />
             </div>
             <div className="flex justify-stretch gap-2">
-              <Button className="w-full" onClick={prevStep} variant="outline">
+              <Button
+                className="w-full"
+                onClick={prevStep}
+                variant="outline"
+                disabled={uploading}
+              >
                 Back
               </Button>
               <Button

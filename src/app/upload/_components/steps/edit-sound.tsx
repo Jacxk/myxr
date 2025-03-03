@@ -15,7 +15,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { useSteps } from "~/context/StepsContext";
-import { trimAudio } from "~/utils/audioTrimmer";
+import { trimAudioAndConvertToMp3 } from "~/utils/audioTrimmer";
 import { SoundUploadProps } from "./select-file";
 
 export function EditSoundStep() {
@@ -45,6 +45,9 @@ export function EditSoundStep() {
     });
 
     waveSurfer.current.on("decode", (time) => {
+      if (!data.newFile) setFileChanged(true);
+      if (time <= region.end) setRegion({ ...region, end: time });
+
       regionsPlugin.addRegion({
         ...region,
         minLength: 0.01,
@@ -59,7 +62,7 @@ export function EditSoundStep() {
 
     regionsPlugin.on("region-update", (region) => {
       setFileChanged(true);
-      setRegion({ start: region.start, end: region.end + 0.01 });
+      setRegion({ start: region.start, end: region.end });
       waveSurfer.current?.setTime(region.start);
     });
 
@@ -96,12 +99,14 @@ export function EditSoundStep() {
       return;
     }
     toast.loading("Editing audio file...", { id: "editingAudio" });
-    trimAudio(data.file, region.start, region.end).then((newFile) => {
-      setData({ newFile, region, file: data.file });
-      toast.dismiss("editingAudio");
-      toast("Audio edited successfully!");
-      nextStep();
-    });
+    trimAudioAndConvertToMp3(data.file, region.start, region.end + 0.01).then(
+      (newFile) => {
+        setData({ newFile, region, file: data.file });
+        toast.dismiss("editingAudio");
+        toast("Audio edited successfully!");
+        nextStep();
+      },
+    );
   }
 
   return (
