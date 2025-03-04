@@ -1,3 +1,5 @@
+"use client";
+
 import { createContext, ReactNode, useContext, useMemo, useState } from "react";
 
 interface AudioContextType {
@@ -8,14 +10,17 @@ interface AudioContextType {
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
 
 export const AudioProvider = ({ children }: { children: ReactNode }) => {
-  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(
+    null,
+  );
 
-  const value = useMemo(() => ({ currentAudio, setCurrentAudio }), [currentAudio]);
+  const value = useMemo(
+    () => ({ currentAudio, setCurrentAudio }),
+    [currentAudio],
+  );
 
   return (
-    <AudioContext.Provider value={value}>
-      {children}
-    </AudioContext.Provider>
+    <AudioContext.Provider value={value}>{children}</AudioContext.Provider>
   );
 };
 

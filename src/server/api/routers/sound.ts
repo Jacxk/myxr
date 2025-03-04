@@ -5,6 +5,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
+import { getSounds } from "~/utils/db";
 
 export const soundRouter = createTRPCRouter({
   me: protectedProcedure
@@ -26,24 +27,8 @@ export const soundRouter = createTRPCRouter({
 
   getLatests: publicProcedure
     .input(z.object({ limit: z.number().default(10) }))
-    .query(async ({ ctx, input }) => {
-      const sounds = await ctx.db.sound.findMany({
-        orderBy: { createdAt: "desc" },
-        take: input.limit,
-        include: {
-          createdBy: {
-            select: {
-              image: true,
-              name: true,
-              role: true,
-              removed: true,
-              id: true,
-            },
-          },
-        },
-      });
-
-      return sounds ?? [];
+    .query(async ({ input }) => {
+      return (await getSounds({ take: input.limit })) ?? [];
     }),
 
   getSecretMessage: protectedProcedure.query(() => {
