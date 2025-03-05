@@ -16,7 +16,7 @@ import {
 } from "~/components/ui/card";
 import { useSteps } from "~/context/StepsContext";
 import { trimAudioAndConvertToMp3 } from "~/utils/audioTrimmer";
-import { SoundUploadProps } from "./select-file";
+import { type SoundUploadProps } from "./select-file";
 
 export function EditSoundStep() {
   const { data, reset, setData, nextStep } = useSteps<SoundUploadProps>();
@@ -79,7 +79,7 @@ export function EditSoundStep() {
       waveSurfer.current?.destroy();
       regionsPlugin.destroy();
     };
-  }, []);
+  }, [region, data]);
 
   const playPause = useCallback(() => {
     if (isPlaying) {
@@ -87,7 +87,7 @@ export function EditSoundStep() {
     } else {
       const currentStart = waveSurfer.current?.getCurrentTime() ?? region.start;
       const start = currentStart >= region.end ? region.start : currentStart;
-      waveSurfer.current?.play(start, region.end);
+      void waveSurfer.current?.play(start, region.end);
     }
     setIsPlaying(!isPlaying);
   }, [waveSurfer, region, isPlaying]);
@@ -99,14 +99,19 @@ export function EditSoundStep() {
       return;
     }
     toast.loading("Editing audio file...", { id: "editingAudio" });
-    trimAudioAndConvertToMp3(data.file, region.start, region.end + 0.01).then(
-      (newFile) => {
+    trimAudioAndConvertToMp3(data.file, region.start, region.end + 0.01)
+      .then((newFile) => {
         setData({ newFile, region, file: data.file });
-        toast.dismiss("editingAudio");
         toast("Audio edited successfully!");
         nextStep();
-      },
-    );
+      })
+      .catch((error) => {
+        console.log(error)
+        toast.error("Something went wrong.");
+      })
+      .finally(() => {
+        toast.dismiss("editingAudio");
+      });
   }
 
   return (
@@ -116,7 +121,7 @@ export function EditSoundStep() {
           <CardHeader>
             <CardTitle>Edit Sound</CardTitle>
             <CardDescription>
-              Trim the sound to your liking. Maximum length is 5 seconds, that's
+              Trim the sound to your liking. Maximum length is 5 seconds, that&apos;s
               the maximum discord allows.
             </CardDescription>
           </CardHeader>

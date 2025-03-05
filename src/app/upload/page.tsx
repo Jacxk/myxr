@@ -1,4 +1,4 @@
-import { Session } from "next-auth";
+import { type Session } from "next-auth";
 import { Step } from "~/components/step";
 import { StepsProvider } from "~/context/StepsContext";
 import { auth } from "~/server/auth";

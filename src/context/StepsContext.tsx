@@ -5,12 +5,12 @@ import {
   cloneElement,
   createContext,
   isValidElement,
-  ReactNode,
+  type ReactNode,
   useContext,
   useMemo,
   useState,
 } from "react";
-import { StepProps } from "~/components/step";
+import { type StepProps } from "~/components/step";
 
 interface StepsContextProps<D = unknown> {
   currentStep: number;

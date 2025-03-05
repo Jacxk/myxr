@@ -37,7 +37,7 @@ export default function Sound({
 }: Readonly<SoundProperties>) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const { currentAudio, setCurrentAudio } = useAudio();
-  const { mutate, isPending, isSuccess } = api.guild.createSound.useMutation();
+  const { mutate, isPending, isSuccess, isError, error } = api.guild.createSound.useMutation();
 
   const play = () => {
     if (audioRef.current) {
@@ -46,7 +46,7 @@ export default function Sound({
         currentAudio.currentTime = 0;
       }
       if (audioRef.current.paused) {
-        audioRef.current.play();
+        void audioRef.current.play();
         setCurrentAudio(audioRef.current);
       } else {
         audioRef.current.pause();

@@ -1,6 +1,6 @@
 "use client";
 
-import { User } from "next-auth";
+import { type User } from "next-auth";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useCallback } from "react";
@@ -30,7 +30,7 @@ export function AccountMenu({ user }: Readonly<{ user: User | undefined }>) {
         asChild
       >
         <Avatar>
-          <AvatarImage src={user?.image as string} alt={user?.name as string} />
+          <AvatarImage src={user?.image!} alt={user?.name!} />
           <AvatarFallback delayMs={500}>{user?.name}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>

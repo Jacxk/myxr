@@ -42,7 +42,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-  const { type, event }: WebhookData = JSON.parse(body);
+  const { type, event } = JSON.parse(body) as WebhookData;
   const { guild } = event.data;
 
   if (type === 0) {

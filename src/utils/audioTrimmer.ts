@@ -49,7 +49,7 @@ export const trimAudioAndConvertToMp3 = async (
  * @returns {Promise<Blob>} - A Promise that resolves with the MP3 Blob.
  */
 const encodeMP3 = async (audioBuffer: AudioBuffer): Promise<Blob> => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const numberOfChannels = audioBuffer.numberOfChannels;
     const sampleRate = audioBuffer.sampleRate;
     const bitRate = 96; // You can adjust the bitrate here (kbps) - Lower for smaller file size
@@ -71,26 +71,26 @@ const encodeMP3 = async (audioBuffer: AudioBuffer): Promise<Blob> => {
     }
 
     // Convert to Int16 (LAME requires Int16)
-    let leftI16 = floatTo16BitPCM(left);
-    let rightI16 = floatTo16BitPCM(right);
+    const leftI16 = floatTo16BitPCM(left);
+    const rightI16 = floatTo16BitPCM(right);
 
-    let buffer = [];
+    const buffer = [];
     let remaining = leftI16.length;
-    let maxSamples = 1152; // Recommended chunk size for LAME
+    const maxSamples = 1152; // Recommended chunk size for LAME
 
     for (let i = 0; remaining > 0; i += maxSamples) {
-      let toEncode = Math.min(remaining, maxSamples);
-      let leftChunk = leftI16.subarray(i, i + toEncode);
-      let rightChunk = rightI16.subarray(i, i + toEncode);
+      const toEncode = Math.min(remaining, maxSamples);
+      const leftChunk = leftI16.subarray(i, i + toEncode);
+      const rightChunk = rightI16.subarray(i, i + toEncode);
 
-      let mp3buf = mp3encoder.encodeBuffer(leftChunk, rightChunk);
+      const mp3buf = mp3encoder.encodeBuffer(leftChunk, rightChunk);
       if (mp3buf.length > 0) {
         buffer.push(new Int8Array(mp3buf));
       }
       remaining -= toEncode;
     }
 
-    let mp3buf = mp3encoder.flush();
+    const mp3buf = mp3encoder.flush();
     if (mp3buf.length > 0) {
       buffer.push(new Int8Array(mp3buf));
     }
@@ -106,9 +106,9 @@ const encodeMP3 = async (audioBuffer: AudioBuffer): Promise<Blob> => {
  * @returns {Int16Array} - The converted Int16Array.
  */
 function floatTo16BitPCM(input: Float32Array): Int16Array {
-  let output = new Int16Array(input.length);
+  const output = new Int16Array(input.length);
   for (let i = 0; i < input.length; i++) {
-    let s = Math.max(-1, Math.min(1, input[i] ?? 1));
+    const s = Math.max(-1, Math.min(1, input[i] ?? 1));
     output[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
   }
   return output;

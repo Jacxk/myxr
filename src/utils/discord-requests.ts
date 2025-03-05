@@ -6,10 +6,7 @@ enum DiscordPermission {
 }
 
 function hasPermission(userPermission: number, permission: DiscordPermission) {
-  return (
-    (userPermission & DiscordPermission.MANAGE_GUILD_EXPRESSIONS) ===
-    DiscordPermission.MANAGE_GUILD_EXPRESSIONS
-  );
+  return (userPermission & permission) === permission;
 }
 
 async function createDiscordRequest(

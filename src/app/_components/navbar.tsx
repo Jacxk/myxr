@@ -1,4 +1,4 @@
-import { Session } from "next-auth";
+import { type Session } from "next-auth";
 import Link from "next/link";
 import { UploadIcon } from "~/components/icons/upload";
 import { Button } from "~/components/ui/button";

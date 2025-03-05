@@ -5,19 +5,19 @@ import EmojiPicker, {
   SuggestionMode,
   Theme,
 } from "emoji-picker-react";
-import { Session } from "next-auth";
+import { type Session } from "next-auth";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import Sound, { SoundProperties } from "~/components/sound";
+import Sound, { type SoundProperties } from "~/components/sound";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { AudioProvider } from "~/context/AudioContext";
 import { useSteps } from "~/context/StepsContext";
 import { uploadFiles } from "~/utils/uploadthing";
-import { SoundUploadProps } from "./select-file";
+import { type SoundUploadProps } from "./select-file";
 
 export function EditDetailsStep({
   session,
@@ -30,7 +30,7 @@ export function EditDetailsStep({
     name: "",
     createdBy: { id: "", name: "" },
     emoji: "",
-    id: "",
+    id: -1,
     url: URL.createObjectURL(data.newFile as Blob),
     tags: [],
   });
@@ -39,7 +39,7 @@ export function EditDetailsStep({
     toast.loading("Uploading file...", { id: "uploading", duration: 9999999 });
     setUploading(true);
     uploadFiles("soundUploader", {
-      files: [data.newFile as File],
+      files: [data.newFile!],
       input: {
         emoji: fileProps.emoji,
         name: fileProps.name,
@@ -69,7 +69,7 @@ export function EditDetailsStep({
         name: session?.user.name ?? "",
       },
       emoji: "🎵",
-      id: "",
+      id: -1,
       url: URL.createObjectURL(data.newFile as Blob),
     });
   }, [session, data.newFile]);
