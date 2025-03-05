@@ -35,8 +35,8 @@ function Step1({ guildId }) {
       <DialogHeader>
         <DialogTitle>We found a problem</DialogTitle>
         <DialogDescription>
-          Looks like the bot is not in this server. You need to invite it to the
-          server to continue.
+          Looks like the bot is not in this guild. You need to invite it to the
+          guild to continue.
         </DialogDescription>
       </DialogHeader>
       <DialogFooter>

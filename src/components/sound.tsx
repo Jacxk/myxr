@@ -1,9 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import Twemoji from "react-twemoji";
+import { toast } from "sonner";
+import { api } from "~/trpc/react";
 import { useAudio } from "../context/AudioContext";
+import { PlusIcon } from "./icons/plus";
+import { Button } from "./ui/button";
 import {
   Card,
   CardContent,
@@ -14,7 +18,7 @@ import {
 } from "./ui/card";
 
 export interface SoundProperties {
-  id: string | number;
+  id: number;
   name: string;
   emoji: string;
   url: string;
@@ -33,6 +37,7 @@ export default function Sound({
 }: Readonly<SoundProperties>) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const { currentAudio, setCurrentAudio } = useAudio();
+  const { mutate, isPending, isSuccess } = api.guild.createSound.useMutation();
 
   const play = () => {
     if (audioRef.current) {
@@ -51,12 +56,25 @@ export default function Sound({
     }
   };
 
+  function addSoundToGuild(event) {
+    event.stopPropagation();
+    mutate({
+      soundId: id,
+      // TODO: get the selected guild
+      guildId: "",
+    });
+  }
+
+  useEffect(() => {
+    if (isSuccess) toast("Sound added to guild");
+  }, [isSuccess]);
+
   return (
     <Card
-      className={`relative flex h-44 w-44 cursor-pointer flex-col justify-between ${className}`}
+      className={`flex w-48 cursor-pointer flex-col justify-between ${className}`}
       onClick={play}
     >
-      <CardHeader className="static">
+      <CardHeader>
         <CardTitle>
           <Link
             href={`/sound/${id}`}
@@ -68,20 +86,27 @@ export default function Sound({
         </CardTitle>
         <CardDescription></CardDescription>
       </CardHeader>
-      <CardContent className="h-30 absolute bottom-0 left-0 right-0 top-0 flex items-center justify-center p-0 pointer-events-none">
+      <CardContent className="flex items-center justify-center p-0">
         <Twemoji options={{ className: "twemoji" }}>{emoji}</Twemoji>
         <audio ref={audioRef} controls hidden>
           <source src={url} type="audio/mpeg" />
         </audio>
       </CardContent>
-      <CardFooter className="static justify-end p-6 pb-3">
-        <Link
+      <CardFooter className="flex w-full justify-between gap-4 p-6">
+        <Button
+          variant="outline"
+          onClick={addSoundToGuild}
+          disabled={isPending}
+        >
+          <PlusIcon />
+        </Button>
+        {/* <Link
           href={`/user/${createdBy.id}`}
           onClick={(e) => e.stopPropagation()}
           className="underline"
         >
           <p>{createdBy.name ?? "Unknown"}</p>
-        </Link>
+        </Link> */}
       </CardFooter>
     </Card>
   );
