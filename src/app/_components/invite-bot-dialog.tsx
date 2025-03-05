@@ -20,7 +20,7 @@ function generateBotInvite(guildId: string) {
   return `https://discord.com/oauth2/authorize?client_id=1293222273473318952&guild_id=${guildId}&disable_guild_select=true`;
 }
 
-function Step1({ guildId }) {
+function Step1({ guildId }: Readonly<{ guildId: string }>) {
   const { nextStep, reset } = useSteps();
 
   function openInviteLink() {
@@ -51,7 +51,13 @@ function Step1({ guildId }) {
   );
 }
 
-function Step2({ setOpen, guildId }) {
+function Step2({
+  setOpen,
+  guildId,
+}: Readonly<{
+  setOpen: ((open: boolean) => void)
+  guildId: string;
+}>) {
   const { prevStep, reset } = useSteps();
   const [fetchData, setFetchData] = useState<boolean>(false);
   const { data, isLoading } = api.guild.isBotIn.useQuery(guildId, {
@@ -99,7 +105,15 @@ function Step2({ setOpen, guildId }) {
   );
 }
 
-export function InviteBotDialog({ open, setOpen, guildId }) {
+export function InviteBotDialog({
+  open,
+  guildId,
+  setOpen,
+}: Readonly<{
+  open: boolean;
+  guildId: string;
+  setOpen: ((open: boolean) => void);
+}>) {
   const { data, isLoading } = api.guild.isBotIn.useQuery(guildId, {
     enabled: open,
   });

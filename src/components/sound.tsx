@@ -56,7 +56,9 @@ export default function Sound({
     }
   };
 
-  function addSoundToGuild(event) {
+  function addSoundToGuild(
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ): void {
     event.stopPropagation();
     mutate({
       soundId: id,
@@ -90,6 +92,7 @@ export default function Sound({
         <Twemoji options={{ className: "twemoji" }}>{emoji}</Twemoji>
         <audio ref={audioRef} controls hidden>
           <source src={url} type="audio/mpeg" />
+          <track kind="captions" />
         </audio>
       </CardContent>
       <CardFooter className="flex w-full justify-between gap-4 p-6">
