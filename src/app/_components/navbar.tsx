@@ -1,17 +1,11 @@
 import { Session } from "next-auth";
 import Link from "next/link";
+import { UploadIcon } from "~/components/icons/upload";
 import { Button } from "~/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
 import { auth } from "~/server/auth";
 import { AccountMenu } from "./account-menu";
 import { Authenticated, NotAuthenticated } from "./authentication";
-import { UploadIcon } from "~/components/icons/upload";
+import { SelectGuild } from "./select-guild";
 
 export default async function Navbar() {
   const session: Session | null = await auth();
@@ -27,18 +21,7 @@ export default async function Navbar() {
       <div>
         <Authenticated>
           <div className="flex items-center gap-4">
-            <Select>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select a Guild" />
-              </SelectTrigger>
-              <SelectContent>
-                {guilds?.map((guild) => (
-                  <SelectItem key={guild.id} value={guild.id}>
-                    {guild.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SelectGuild guilds={guilds} />
             <Link href="/upload">
               <Button variant="outline">
                 <UploadIcon /> Upload

@@ -1,25 +1,43 @@
+import { env } from "~/env";
 import { discordAuthorization } from "./db";
 
-async function _discordRequest(path: string, authorization: string) {
+enum DiscordPermission {
+  MANAGE_GUILD_EXPRESSIONS = 1 << 30,
+}
+
+function hasPermission(userPermission: number, permission: DiscordPermission) {
+  return (
+    (userPermission & DiscordPermission.MANAGE_GUILD_EXPRESSIONS) ===
+    DiscordPermission.MANAGE_GUILD_EXPRESSIONS
+  );
+}
+
+async function createDiscordRequest(
+  path: string,
+  authorization: string,
+): Promise<Response> {
   if (path.startsWith("/")) path = path.slice(1);
 
-  const res = await fetch(`https://discord.com/api/v10/${path}`, {
+  return await fetch(`https://discord.com/api/v10/${path}`, {
     headers: {
       Authorization: authorization,
     },
   });
-
-  return await res.json();
 }
 
 export async function getDiscordGuilds(id: string) {
   const authorization = await discordAuthorization(id);
-  const res = await _discordRequest("users/@me/guilds", authorization);
+  const res = await createDiscordRequest("users/@me/guilds", authorization);
+  const data = await res.json();
 
-  if (typeof res === "object" && res.message)
-    throw new Error(res.message);
+  if (typeof data === "object" && data.message) throw new Error(data.message);
 
-  return res.filter(
-    (guild: any) => guild.owner || (guild.permissions & 0x20) === 0x20,
+  return data.filter(
+    (guild: any) =>
+      guild.owner ||
+      hasPermission(
+        guild.permissions,
+        DiscordPermission.MANAGE_GUILD_EXPRESSIONS,
+      ),
   );
 }

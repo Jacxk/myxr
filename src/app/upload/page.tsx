@@ -1,10 +1,10 @@
 import { Session } from "next-auth";
+import { Step } from "~/components/step";
 import { StepsProvider } from "~/context/StepsContext";
 import { auth } from "~/server/auth";
 import { EditDetailsStep } from "./_components/steps/edit-details";
 import { EditSoundStep } from "./_components/steps/edit-sound";
 import { SelectFileStep } from "./_components/steps/select-file";
-import { Step } from "./_components/steps/step";
 
 export default async function Home() {
   const session: Session | null = await auth();

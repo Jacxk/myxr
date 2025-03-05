@@ -10,7 +10,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { StepProps } from "~/app/upload/_components/steps/step";
+import { StepProps } from "~/components/step";
 
 interface StepsContextProps<D = unknown> {
   currentStep: number;
@@ -36,8 +36,10 @@ export const StepsProvider = <D,>({ children }: { children: ReactNode }) => {
   const totalSteps = stepsArray.length;
 
   function reset() {
-    setCurrentStep(1);
-    setData({} as D);
+    setTimeout(() => {
+      setCurrentStep(1);
+      setData({} as D);
+    }, 100);
   }
   const registerStep = () => ++stepCounter;
   const nextStep = () => setCurrentStep((currentStep) => currentStep + 1);
