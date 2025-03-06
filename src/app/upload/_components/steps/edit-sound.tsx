@@ -87,7 +87,7 @@ export function EditSoundStep() {
     } else {
       const currentStart = waveSurfer.current?.getCurrentTime() ?? region.start;
       const start = currentStart >= region.end ? region.start : currentStart;
-      void waveSurfer.current?.play(start, region.end);
+      void waveSurfer.current!.play(start, region.end);
     }
     setIsPlaying(!isPlaying);
   }, [waveSurfer, region, isPlaying]);

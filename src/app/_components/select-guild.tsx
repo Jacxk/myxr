@@ -12,7 +12,7 @@ import { InviteBotDialog } from "./invite-bot-dialog";
 
 export function SelectGuild({
   guilds,
-}: Readonly<{ guilds: any[] | undefined }>) {
+}: Readonly<{ guilds: { id: string; name: string }[] | undefined }>) {
   const [guildSelected, setGuildSelected] = useState<string>("");
   const [modalOpenned, setModalOpenned] = useState<boolean>();
 

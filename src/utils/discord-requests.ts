@@ -1,3 +1,4 @@
+import { type APIGuild, type APISoundboardSound } from "discord-api-types/v10";
 import { env } from "~/env";
 import { discordAuthorization } from "./db";
 
@@ -5,38 +6,52 @@ enum DiscordPermission {
   MANAGE_GUILD_EXPRESSIONS = 1 << 30,
 }
 
-function hasPermission(userPermission: number, permission: DiscordPermission) {
-  return (userPermission & permission) === permission;
+interface DiscordError {
+  message: string;
+  code: number;
 }
 
-async function createDiscordRequest(
+function hasPermission(userPermission: string, permission: DiscordPermission) {
+  return (Number(userPermission) & permission) === permission;
+}
+
+async function createDiscordRequest<T>(
   path: string,
   authorization: string,
   opts?: RequestInit,
-): Promise<Response> {
+): Promise<T> {
   if (path.startsWith("/")) path = path.slice(1);
 
-  return await fetch(`https://discord.com/api/v10/${path}`, {
+  const res = await fetch(`https://discord.com/api/v10/${path}`, {
     ...opts,
     headers: {
       Authorization: authorization,
       "Content-Type": "application/json",
     },
   });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    const { message } = data as DiscordError;
+    throw new Error(message || "Failed to fetch data from Discord");
+  }
+
+  return data as T;
 }
 
 export async function getDiscordGuilds(id: string) {
   const authorization = await discordAuthorization(id);
-  const res = await createDiscordRequest("users/@me/guilds", authorization);
-  const data = await res.json();
-
-  if (typeof data === "object" && data.message) throw new Error(data.message);
+  const data = await createDiscordRequest<APIGuild[]>(
+    "users/@me/guilds",
+    authorization,
+  );
 
   return data.filter(
-    (guild: any) =>
+    (guild: APIGuild) =>
       guild.owner ||
       hasPermission(
-        guild.permissions,
+        guild.permissions!,
         DiscordPermission.MANAGE_GUILD_EXPRESSIONS,
       ),
   );
@@ -52,14 +67,14 @@ export async function createSound({
   name: string;
   emoji: string;
   sound: string;
-}) {
+}): Promise<APISoundboardSound> {
   const body = JSON.stringify({
     name,
-    emoji_name: emoji,
     sound,
+    emoji_name: emoji,
   });
   const authorization = `Bot ${env.DISCORD_BOT_TOKEN}`;
-  const res = await createDiscordRequest(
+  const data = await createDiscordRequest<APISoundboardSound>(
     `/guilds/${guildId}/soundboard-sounds`,
     authorization,
     {
@@ -67,12 +82,6 @@ export async function createSound({
       method: "POST",
     },
   );
-  const data = await res.json();
-  console.log(data);
-
-  if (!res.ok) {
-    throw new Error(data.message || "Failed to create sound");
-  }
 
   return data;
 }

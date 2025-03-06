@@ -33,12 +33,27 @@ export const guildRouter = createTRPCRouter({
       if (!data) throw Error("Cound not find the sound: " + input.soundId);
       const sound = await downloadSoundToBase64(data?.url);
 
-      return await createSound({
+      const soundData = await createSound({
         emoji: data.emoji,
         guildId: input.guildId,
         name: data.name,
         sound,
       });
+
+      void ctx.db.guildSound.create({
+        data: {
+          guildId: input.guildId,
+          soundId: input.soundId,
+          discordSoundId: soundData.sound_id,
+        },
+      });
+
+      void ctx.db.sound.update({
+        where: { id: input.soundId },
+        data: { usegeCount: { increment: 1 } },
+      });
+
+      return soundData;
     }),
 });
 
