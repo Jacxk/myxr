@@ -37,7 +37,8 @@ export default function Sound({
 }: Readonly<SoundProperties>) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const { currentAudio, setCurrentAudio } = useAudio();
-  const { mutate, isPending, isSuccess, isError } = api.guild.createSound.useMutation();
+  const { mutate, isPending, isSuccess, isError } =
+    api.guild.createSound.useMutation();
 
   const play = () => {
     if (audioRef.current) {
@@ -69,7 +70,7 @@ export default function Sound({
 
   useEffect(() => {
     if (isSuccess) toast("Sound added to guild");
-    if (isError) toast.error("There was an error!")
+    if (isError) toast.error("There was an error!");
   }, [isSuccess, isError]);
 
   return (

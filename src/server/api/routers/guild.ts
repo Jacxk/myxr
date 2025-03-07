@@ -7,15 +7,17 @@ import {
 import { createSound } from "~/utils/discord-requests";
 
 export const guildRouter = createTRPCRouter({
-  isBotIn: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
-    const query = await ctx.db.guild.findFirst({
-      where: { id: input },
-    });
-    return {
-      success: true,
-      value: !!query?.id,
-    };
-  }),
+  isBotIn: publicProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const query = await ctx.db.guild.findFirst({
+        where: { id: input },
+      });
+      return {
+        success: true,
+        value: !!query?.id,
+      };
+    }),
   createSound: protectedProcedure
     .input(
       z.object({
