@@ -1,4 +1,4 @@
-import Sound from "~/components/sound";
+import Sound from "~/components/sound/sound";
 import { AudioProvider } from "~/context/AudioContext";
 import { api } from "~/trpc/server";
 

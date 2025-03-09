@@ -5,12 +5,12 @@ import EmojiPicker, {
   SuggestionMode,
   Theme,
 } from "emoji-picker-react";
-import { type Session } from "next-auth";
+import { useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import Sound, { type SoundProperties } from "~/components/sound";
+import Sound, { type SoundProperties } from "~/components/sound/sound";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -19,10 +19,9 @@ import { useSteps } from "~/context/StepsContext";
 import { uploadFiles } from "~/utils/uploadthing";
 import { type SoundUploadProps } from "./select-file";
 
-export function EditDetailsStep({
-  session,
-}: Readonly<{ session: Session | null }>) {
+export function EditDetailsStep() {
   const router = useRouter();
+  const {data: session} = useSession()
   const { theme } = useTheme();
   const { data, prevStep } = useSteps<SoundUploadProps>();
   const [uploading, setUploading] = useState<boolean>(false);

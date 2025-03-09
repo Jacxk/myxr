@@ -9,6 +9,7 @@ import { ModalProvider } from "~/context/ModalContext";
 import { TRPCReactProvider } from "~/trpc/react";
 import Navbar from "./_components/navbar";
 import { ThemeProvider } from "./_components/theme-provider";
+import { SessionProvider } from "next-auth/react";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -22,22 +23,24 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <body className="h-screen">
-        <TRPCReactProvider>
-          <ThemeProvider attribute="class" enableSystem>
-            <ModalProvider>
-              <div className="flex h-full flex-col">
-                <Navbar />
-                <div className="flex h-full">
-                  <div className="mx-auto h-full max-w-7xl flex-1 grow p-2">
-                    {children}
-                    <Modal />
+        <SessionProvider>
+          <TRPCReactProvider>
+            <ThemeProvider attribute="class" enableSystem>
+              <ModalProvider>
+                <div className="flex h-full flex-col">
+                  <Navbar />
+                  <div className="flex h-full">
+                    <div className="mx-auto h-full max-w-7xl flex-1 grow p-2">
+                      {children}
+                      <Modal />
+                    </div>
                   </div>
+                  <Toaster />
                 </div>
-                <Toaster />
-              </div>
-            </ModalProvider>
-          </ThemeProvider>
-        </TRPCReactProvider>
+              </ModalProvider>
+            </ThemeProvider>
+          </TRPCReactProvider>
+        </SessionProvider>
       </body>
     </html>
   );

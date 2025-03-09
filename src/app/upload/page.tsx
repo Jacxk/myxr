@@ -1,5 +1,5 @@
-import { type Session } from "next-auth";
 import { Step } from "~/components/step";
+import { Button } from "~/components/ui/button";
 import { StepsProvider } from "~/context/StepsContext";
 import { auth } from "~/server/auth";
 import { EditDetailsStep } from "./_components/steps/edit-details";
@@ -7,7 +7,11 @@ import { EditSoundStep } from "./_components/steps/edit-sound";
 import { SelectFileStep } from "./_components/steps/select-file";
 
 export default async function Home() {
-  const session: Session | null = await auth();
+  const session = await auth();
+
+  if (!session || !session.user) {
+    return <Button>Sign In</Button>;
+  }
 
   return (
     <StepsProvider>
@@ -18,7 +22,7 @@ export default async function Home() {
         <EditSoundStep />
       </Step>
       <Step>
-        <EditDetailsStep session={session} />
+        <EditDetailsStep />
       </Step>
     </StepsProvider>
   );
