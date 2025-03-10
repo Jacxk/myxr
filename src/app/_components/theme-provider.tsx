@@ -1,15 +1,15 @@
 "use client";
 
 import { ThemeProvider as NextThemesProvider } from "next-themes";
-import * as React from "react";
+import { ComponentProps, useEffect, useState } from "react";
 
 export function ThemeProvider({
   children,
   ...props
-}: Readonly<React.ComponentProps<typeof NextThemesProvider>>) {
-  const [mounted, setMounted] = React.useState(false);
+}: Readonly<ComponentProps<typeof NextThemesProvider>>) {
+  const [mounted, setMounted] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setMounted(true);
   }, []);
 
