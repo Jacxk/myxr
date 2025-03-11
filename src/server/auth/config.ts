@@ -3,7 +3,8 @@ import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 
 import { db } from "~/server/db";
-import { getDiscordGuilds } from "~/utils/discord-requests";
+import { getUserTokenAndExpiration, updateAccessToken } from "~/utils/db";
+import { getDiscordGuilds, refreshAccessToken } from "~/utils/discord-requests";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -43,7 +44,10 @@ declare module "next-auth" {
  */
 export const authConfig = {
   providers: [
-    DiscordProvider,
+    DiscordProvider({
+      authorization:
+        "https://discord.com/api/oauth2/authorize?scope=identify%20email%20guilds",
+    }),
     /**
      * ...add more providers here.
      *
@@ -56,14 +60,32 @@ export const authConfig = {
   ],
   adapter: PrismaAdapter(db),
   callbacks: {
-    session: async ({ session, user }) => {
-      const guilds = await getDiscordGuilds(user.id);
+    signIn: async ({ account }) => {
+      if (account) {
+        await updateAccessToken(account.userId!, {
+          access_token: account.access_token!,
+          refresh_token: account.refresh_token!,
+          expires_at: Date.now() + account.expires_in! * 1000,
+        });
+      }
+      return true;
+    },
+    session: async ({ session, ...t }) => {
+      const { expired, refresh_token } = await getUserTokenAndExpiration(
+        session.userId,
+      );
+
+      if (expired && refresh_token) {
+        const data = await refreshAccessToken(refresh_token);
+        await updateAccessToken(session.userId, data);
+      }
+      const guilds = await getDiscordGuilds(session.user.id);
+
       return {
         ...session,
         user: {
           ...session.user,
           guilds,
-          id: user.id,
         },
       };
     },

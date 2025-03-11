@@ -47,3 +47,50 @@ export const getSoundsFromUser = async (id: string) => {
     include: soundInclude,
   });
 };
+
+export const updateAccessToken = async (
+  userId: string,
+  data: {
+    access_token: string;
+    refresh_token: string;
+    expires_at: number;
+  },
+) => {
+  const discordAccount = await db.account.findFirst({
+    where: { userId, provider: "discord" },
+  });
+  await db.account.update({
+    where: {
+      provider_providerAccountId: {
+        providerAccountId: discordAccount?.providerAccountId!,
+        provider: "discord",
+      },
+    },
+    data,
+  });
+};
+
+export const getUserTokenAndExpiration = async (
+  userId: string,
+): Promise<{
+  expires_at?: number;
+  refresh_token?: string;
+  expired?: boolean;
+}> => {
+  const data = await db.account.findFirst({
+    where: {
+      userId,
+    },
+    select: { expires_at: true, refresh_token: true },
+  });
+
+  const expires_at = data?.expires_at!;
+  const expired = Math.floor(Date.now() / 1000) >= data?.expires_at!;
+  const refresh_token = data?.refresh_token!;
+
+  return {
+    expires_at,
+    refresh_token,
+    expired,
+  };
+};

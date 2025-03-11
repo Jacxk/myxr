@@ -85,3 +85,29 @@ export async function createSound({
 
   return data;
 }
+
+export async function refreshAccessToken(refreshToken: string) {
+  const body = new URLSearchParams({
+    client_id: env.AUTH_DISCORD_ID,
+    client_secret: env.AUTH_DISCORD_SECRET,
+    grant_type: "refresh_token",
+    refresh_token: refreshToken,
+  });
+  const response = await fetch("https://discord.com/api/oauth2/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body,
+  });
+
+  if (!response.ok) throw new Error("Failed to refresh token");
+
+  const refreshedTokens = await response.json();
+
+  return {
+    access_token: refreshedTokens.access_token,
+    refresh_token: refreshedTokens.refresh_token ?? refreshToken,
+    expires_at: Math.floor(Date.now() / 1000) + refreshedTokens.expires_in,
+  };
+}
