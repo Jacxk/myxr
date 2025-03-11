@@ -62,6 +62,7 @@ export function SelectGuild({
 
     setBotAvailable(success && value);
     setGuildId(id);
+    localStorage.setItem("guildId", id);
   }
 
   useEffect(() => {
@@ -109,7 +110,10 @@ export function SelectGuild({
   }, [data, tries, isPending, botAvailable]);
 
   return (
-    <Select onValueChange={selectGuild}>
+    <Select
+      onValueChange={selectGuild}
+      defaultValue={localStorage.getItem("guildId") ?? ""}
+    >
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Select a Guild" />
       </SelectTrigger>

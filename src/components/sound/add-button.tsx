@@ -5,10 +5,8 @@ import { PlusIcon } from "../icons/plus";
 import { Button } from "../ui/button";
 
 export function AddToGuildButton({
-  guildId,
   soundId,
 }: Readonly<{
-  guildId: string;
   soundId: number;
 }>) {
   const { mutate, isPending, isSuccess, isError } =
@@ -17,6 +15,13 @@ export function AddToGuildButton({
   function addSoundToGuild(
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ): void {
+    const guildId = localStorage.getItem("guildId");
+
+    if (!guildId) {
+      toast.error("You need to select a guild first!");
+      return;
+    }
+
     event.stopPropagation();
     mutate({
       soundId,
