@@ -1,10 +1,10 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { useModal } from "~/context/ModalContext";
 import { api } from "~/trpc/react";
 import { PlusIcon } from "../icons/plus";
 import { Button } from "../ui/button";
-import { useModal } from "~/context/ModalContext";
 
 export function AddToGuildButton({
   soundId,

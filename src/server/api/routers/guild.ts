@@ -40,7 +40,7 @@ export const guildRouter = createTRPCRouter({
         sound,
       });
 
-      void ctx.db.guildSound.create({
+      await ctx.db.guildSound.create({
         data: {
           guildId: input.guildId,
           soundId: input.soundId,
@@ -48,7 +48,7 @@ export const guildRouter = createTRPCRouter({
         },
       });
 
-      void ctx.db.sound.update({
+      await ctx.db.sound.update({
         where: { id: input.soundId },
         data: { usegeCount: { increment: 1 } },
       });
