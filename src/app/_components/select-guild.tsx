@@ -36,6 +36,7 @@ export function SelectGuild({
     api.guild.isBotIn.useMutation();
 
   const maxTries = 3;
+  const defaultGuild = `${localStorage.getItem("guildId")}-${localStorage.getItem("guildName")}`;
 
   const onInviteClick = useCallback(() => {
     openInviteLink(guildId);
@@ -47,8 +48,9 @@ export function SelectGuild({
     });
   }, [content, guildId]);
 
-  async function selectGuild(id: string) {
-    const { success, value } = await mutateAsync(id);
+  async function selectGuild(guild: string) {
+    const [id, name] = guild.split("-");
+    const { success, value } = await mutateAsync(id!);
 
     if (!isPending && success && !value) {
       openModal({
@@ -62,8 +64,9 @@ export function SelectGuild({
     }
 
     setBotAvailable(success && value);
-    setGuildId(id);
-    localStorage.setItem("guildId", id);
+    setGuildId(id!);
+    localStorage.setItem("guildId", id!);
+    localStorage.setItem("guildName", name!);
   }
 
   useEffect(() => {
@@ -111,16 +114,13 @@ export function SelectGuild({
   }, [data, tries, isPending, botAvailable]);
 
   return (
-    <Select
-      onValueChange={selectGuild}
-      defaultValue={localStorage.getItem("guildId") ?? ""}
-    >
+    <Select onValueChange={selectGuild} defaultValue={defaultGuild ?? ""}>
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Select a Guild" />
       </SelectTrigger>
       <SelectContent>
         {guilds?.map((guild) => (
-          <SelectItem key={guild.id} value={guild.id}>
+          <SelectItem key={guild.id} value={`${guild.id}-${guild.name}`}>
             {guild.name}
           </SelectItem>
         )) ?? (
