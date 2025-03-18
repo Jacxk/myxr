@@ -3,14 +3,16 @@ import { toast } from "sonner";
 import { api } from "~/trpc/react";
 import { PlusIcon } from "../icons/plus";
 import { Button } from "../ui/button";
+import { useRouter } from "next/navigation";
 
 export function AddToGuildButton({
   soundId,
 }: Readonly<{
   soundId: number;
 }>) {
-  const { mutate, isPending, isSuccess, isError } =
+  const { mutate, isPending, isSuccess, isError, error } =
     api.guild.createSound.useMutation();
+  const router = useRouter()
 
   function addSoundToGuild(
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -31,7 +33,11 @@ export function AddToGuildButton({
 
   useEffect(() => {
     if (isSuccess) toast("Sound added to guild");
-    if (isError) toast.error("There was an error!");
+    if (isError) {
+      if (error.data?.code === "UNAUTHORIZED") {
+        router.push("/api/auth/signin");
+      } else toast.error("There was an error!");
+    }
   }, [isSuccess, isError]);
 
   return (
