@@ -23,6 +23,7 @@ export const guildRouter = createTRPCRouter({
       z.object({
         soundId: z.number(),
         guildId: z.string(),
+        guildName: z.string(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
@@ -30,8 +31,14 @@ export const guildRouter = createTRPCRouter({
         where: { id: input.soundId },
       });
 
-      if (!data) throw Error("Cound not find the sound: " + input.soundId);
+      if (!data) throw Error("SOUND_NOT_FOUND");
       const sound = await downloadSoundToBase64(data?.url);
+
+      const guildSound = await ctx.db.guildSound.findFirst({
+        where: { guildId: input.guildId, soundId: input.soundId },
+      });
+
+      if (guildSound) throw Error("SOUND_EXISTS");
 
       const soundData = await createSound({
         emoji: data.emoji,
@@ -46,6 +53,11 @@ export const guildRouter = createTRPCRouter({
           soundId: input.soundId,
           discordSoundId: soundData.sound_id,
         },
+      });
+
+      await ctx.db.guild.update({
+        where: { id: input.guildId },
+        data: { name: input.guildName },
       });
 
       await ctx.db.sound.update({

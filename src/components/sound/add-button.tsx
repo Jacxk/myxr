@@ -21,6 +21,7 @@ export function AddToGuildButton({
   ): void {
     event.stopPropagation();
     const guildId = localStorage.getItem("guildId");
+    const guildName = localStorage.getItem("guildName")!;
 
     if (!guildId) {
       toast.error("You need to select a guild first!");
@@ -28,7 +29,7 @@ export function AddToGuildButton({
     }
 
     const onAddClick = () => {
-      mutate({ soundId, guildId });
+      mutate({ soundId, guildId, guildName });
       closeModal();
     };
 
@@ -42,23 +43,27 @@ export function AddToGuildButton({
   useEffect(() => {
     if (isSuccess) toast("Sound added to guild");
     if (isError) {
-      switch (error?.data?.code) {
-        case "UNAUTHORIZED":
-          router.push("/api/auth/signin");
-          break;
-        case "INTERNAL_SERVER_ERROR":
-          if (error.message === "Unknown Guild") {
+      if (error?.data?.code === "UNAUTHORIZED") {
+        router.push("/api/auth/signin");
+      } else if (error?.data?.code === "INTERNAL_SERVER_ERROR") {
+        switch (error.message) {
+          case "SOUND_EXISTS":
+            toast.error("Sound already exists in the guild");
+            break;
+          case "Unknown Guild":
             toast.error(
               "This guild is not valid. Is the bot inside the guild?",
               { duration: 5000 },
             );
             break;
-          }
-          toast.error("There was an interal error!");
-          break;
-        default:
-          toast.error("There was an error!");
-      }
+          case "SOUND_NOT_FOUND":
+            toast.error("Sound not found. Try again later.");
+            break;
+          default:
+            toast.error("There was an interal error!");
+            break;
+        }
+      } else toast.error("There was an error!");
     }
   }, [isSuccess, isError]);
 
