@@ -40,7 +40,7 @@ export function AccountMenu({ user }: Readonly<{ user: User | undefined }>) {
           <span>{user?.name}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <Link href={`/users/${user?.id}`}>
+        <Link href={"/user/me"}>
           <DropdownMenuItem>Profile</DropdownMenuItem>
         </Link>
         <DropdownMenuSeparator />

@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "../ui/card";
 import { AddToGuildButton } from "./add-button";
+import { DeleteSoundButton } from "./delete-button";
 
 export interface SoundProperties {
   id: number;
@@ -22,6 +23,10 @@ export interface SoundProperties {
   tags?: string[];
   createdBy: { name: string | null; id: string };
   className?: string;
+  displayAddButton?: boolean;
+  displayDeleteButton?: boolean;
+  discordSoundId?: string;
+  guildId?: string;
 }
 
 export default function Sound({
@@ -31,6 +36,10 @@ export default function Sound({
   url,
   createdBy,
   className,
+  displayAddButton = true,
+  displayDeleteButton,
+  discordSoundId,
+  guildId,
 }: Readonly<SoundProperties>) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const { currentAudio, setCurrentAudio } = useAudio();
@@ -74,7 +83,13 @@ export default function Sound({
         </audio>
       </CardContent>
       <CardFooter className="flex w-full justify-between gap-4 p-6">
-        <AddToGuildButton soundId={id} />
+        {displayAddButton ? <AddToGuildButton soundId={id} /> : null}
+        {displayDeleteButton ? (
+          <DeleteSoundButton
+            discordSoundId={discordSoundId!}
+            guildId={guildId!}
+          />
+        ) : null}
       </CardFooter>
     </Card>
   );

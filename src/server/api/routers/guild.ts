@@ -4,7 +4,11 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { createSound } from "~/utils/discord-requests";
+import {
+  createSound,
+  deleteSound,
+  getSoundBoard,
+} from "~/utils/discord-requests";
 
 export const guildRouter = createTRPCRouter({
   isBotIn: publicProcedure
@@ -66,6 +70,32 @@ export const guildRouter = createTRPCRouter({
       });
 
       return soundData;
+    }),
+  getSoundBoard: protectedProcedure
+    .input(z.string())
+    .query(async ({ input, ctx }) => {
+      return await getSoundBoard(input);
+    }),
+  deleteSound: protectedProcedure
+    .input(
+      z.object({
+        guildId: z.string(),
+        soundId: z.string(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const guildSound = await ctx.db.guildSound.findFirst({
+        where: { guildId: input.guildId, discordSoundId: input.soundId },
+      });
+
+      if (guildSound) {
+        await ctx.db.guildSound.delete({
+          where: { discordSoundId: input.soundId },
+        });
+      }
+
+      await deleteSound(input.guildId, input.soundId);
+      return { success: true };
     }),
 });
 
