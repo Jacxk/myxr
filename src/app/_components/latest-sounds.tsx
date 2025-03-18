@@ -6,7 +6,10 @@ import { AudioProvider } from "~/context/AudioContext";
 import { api } from "~/trpc/react";
 
 export function LatestSounds() {
-  const [latestSounds] = api.sound.getLatests.useSuspenseQuery({});
+  const [latestSounds] = api.sound.getLatests.useSuspenseQuery(
+    {},
+    { refetchOnWindowFocus: false },
+  );
 
   if (!latestSounds) {
     return null;
