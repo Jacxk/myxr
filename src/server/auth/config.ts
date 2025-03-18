@@ -3,7 +3,11 @@ import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 
 import { db } from "~/server/db";
-import { getUserTokenAndExpiration, updateAccessToken } from "~/utils/db";
+import {
+  getDatabaseSession,
+  getUserTokenAndExpiration,
+  updateAccessToken,
+} from "~/utils/db";
 import { getDiscordGuilds, refreshAccessToken } from "~/utils/discord-requests";
 
 /**
@@ -60,17 +64,21 @@ export const authConfig = {
   ],
   adapter: PrismaAdapter(db),
   callbacks: {
+    // TODO: Change database schema to store bigger numbers
     signIn: async ({ account }) => {
       if (account) {
         await updateAccessToken(account.userId!, {
           access_token: account.access_token!,
           refresh_token: account.refresh_token!,
-          expires_at: Date.now() + account.expires_in! * 1000,
+          expires_at: Math.floor(Date.now() / 1000) + account.expires_in!,
         });
       }
       return true;
     },
-    session: async ({ session, ...t }) => {
+    session: async ({ session }) => {
+      const dbSession = await getDatabaseSession(session.sessionToken);
+      if (!dbSession) return session;
+
       const { expired, refresh_token } = await getUserTokenAndExpiration(
         session.userId,
       );
@@ -80,6 +88,7 @@ export const authConfig = {
         await updateAccessToken(session.userId, data);
       }
       const guilds = await getDiscordGuilds(session.user.id);
+      guilds.sort((a, b) => a.name.localeCompare(b.name))
 
       return {
         ...session,

@@ -94,3 +94,9 @@ export const getUserTokenAndExpiration = async (
     expired,
   };
 };
+
+export const getDatabaseSession = (sessionId: string) => {
+  return db.session.findFirst({
+    where: { sessionToken: sessionId },
+  });
+};
