@@ -1,5 +1,6 @@
 "use client";
 
+import type { Guild } from "next-auth";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
@@ -24,7 +25,7 @@ function openInviteLink(guildId: string) {
 
 export function SelectGuild({
   guilds,
-}: Readonly<{ guilds: { id: string; name: string }[] | undefined }>) {
+}: Readonly<{ guilds: Guild[] | undefined }>) {
   const { openModal, isOpen, closeModal, setContent, content } = useModal();
 
   const [guildId, setGuildId] = useState<string>("");
@@ -122,7 +123,11 @@ export function SelectGuild({
           <SelectItem key={guild.id} value={guild.id}>
             {guild.name}
           </SelectItem>
-        ))}
+        )) ?? (
+          <SelectItem value="none" disabled>
+            No guilds found
+          </SelectItem>
+        )}
       </SelectContent>
     </Select>
   );

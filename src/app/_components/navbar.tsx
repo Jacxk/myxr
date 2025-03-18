@@ -10,9 +10,6 @@ import { SelectGuild } from "./select-guild";
 export default async function Navbar() {
   const session: Session | null = await auth();
 
-  const user = session?.user;
-  const guilds = user?.guilds.sort((a, b) => a.name.localeCompare(b.name));
-
   return (
     <nav className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 border-b p-6 shadow-md">
       <Link href="/" className="text-4xl font-bold">
@@ -21,13 +18,13 @@ export default async function Navbar() {
       <div>
         <Authenticated>
           <div className="flex items-center gap-4">
-            <SelectGuild guilds={guilds} />
+            <SelectGuild guilds={session?.user.guilds} />
             <Link href="/upload">
               <Button variant="outline">
                 <UploadIcon /> Upload
               </Button>
             </Link>
-            <AccountMenu user={user} />
+            <AccountMenu user={session?.user} />
           </div>
         </Authenticated>
         <NotAuthenticated>

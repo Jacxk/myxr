@@ -3,9 +3,7 @@
 import Link from "next/link";
 import { useRef } from "react";
 import Twemoji from "react-twemoji";
-import { Authenticated } from "~/app/_components/authentication";
 import { useAudio } from "../../context/AudioContext";
-import { AddToGuildButton } from "./add-button";
 import { Button } from "../ui/button";
 import {
   Card,
@@ -14,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
+import { AddToGuildButton } from "./add-button";
 
 export interface SoundProperties {
   id: number;
@@ -75,9 +74,7 @@ export default function Sound({
         </audio>
       </CardContent>
       <CardFooter className="flex w-full justify-between gap-4 p-6">
-        <Authenticated>
-          <AddToGuildButton soundId={id} guildId="" />
-        </Authenticated>
+        <AddToGuildButton soundId={id} />
       </CardFooter>
     </Card>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { type User } from "next-auth";
+import type { User } from "next-auth";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useCallback } from "react";

@@ -1,19 +1,17 @@
-'use client'
+import { auth } from "~/server/auth";
 
-import { useSession } from "next-auth/react";
-
-export function Authenticated({
+export async function Authenticated({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { data: session } = useSession();
+  const session = await auth();
   return session?.user ? <>{children}</> : null;
 }
 
-export function NotAuthenticated({
+export async function NotAuthenticated({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const { data: session } = useSession();
+  const session = await auth();
   return !session?.user ? <>{children}</> : null;
 }

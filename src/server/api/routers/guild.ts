@@ -22,9 +22,7 @@ export const guildRouter = createTRPCRouter({
     .input(
       z.object({
         soundId: z.number(),
-        guildId: z.string({
-          message: "Test",
-        }),
+        guildId: z.string(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
