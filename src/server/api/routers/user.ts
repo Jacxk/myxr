@@ -14,7 +14,7 @@ export const userRouter = createTRPCRouter({
     const sounds = await getSoundsFromUser(ctx.session.user.id);
     const guildSounds = await ctx.db.guildSound.findMany({
       where: { soundId: { in: sounds.map((sound) => sound.id) } },
-      include: { sound: true, guild: true },
+      include: { sound: { include: { createdBy: true } }, guild: true },
     });
 
     return { sounds, guildSounds };

@@ -66,3 +66,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+img.twemoji-list {
+  height: 34px;
+  width: auto;
+  display: inline-block;
+}
