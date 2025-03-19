@@ -66,7 +66,7 @@ export default async function () {
     <SideTab className="grid h-full grid-cols-3 gap-4" defaultTab="sounds">
       <div className="flex h-full flex-col items-center justify-start gap-2 border-r p-6">
         <SideTabTrigger id="sounds">My Sounds</SideTabTrigger>
-        <SideTabTrigger id="guilds">Guild Sounds</SideTabTrigger>
+        <SideTabTrigger id="guilds">Guilds</SideTabTrigger>
       </div>
 
       <div className="col-span-2">
@@ -82,7 +82,7 @@ export default async function () {
             <TabsList className="w-full">
               {guilds.map((guild) => (
                 <TabsTrigger className="w-full" key={guild.id} value={guild.id}>
-                  {guild.name}
+                  {`${guild.name} (${data.filter((guildData) => guildData.guildId === guild.id).length})`}
                 </TabsTrigger>
               ))}
             </TabsList>
