@@ -132,7 +132,7 @@ export async function deleteSound(guildId: string, soundId: string) {
     BOT_AUTORIZATION,
     {
       method: "DELETE",
-      no_content_type: true
+      no_content_type: true,
     },
   );
 }

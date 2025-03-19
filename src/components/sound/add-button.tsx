@@ -60,10 +60,15 @@ export function AddToGuildButton({
             toast.error("Sound not found. Try again later.");
             break;
           default:
-            toast.error("There was an interal error!");
+            toast.error("There was an error!", {
+              duration: 5000,
+              description() {
+                return error.message
+              },
+            });
             break;
         }
-      } else toast.error("There was an error!");
+      } else toast.error("There was an internal error!");
     }
   }, [isSuccess, isError]);
 
