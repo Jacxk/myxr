@@ -62,9 +62,7 @@ export function AddToGuildButton({
           default:
             toast.error("There was an error!", {
               duration: 5000,
-              description() {
-                return error.message
-              },
+              description: error.message,
             });
             break;
         }

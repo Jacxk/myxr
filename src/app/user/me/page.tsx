@@ -34,6 +34,7 @@ export default async function () {
       createdById: guildSound.sound.createdById,
       guildName: guildSound.guild.name,
       guildId: guildSound.guildId,
+      discordSoundId: guildSound.discordSoundId,
       external: false,
     })),
     ...discordSounds.flatMap(({ guildId, sounds, guildName }) =>
@@ -49,8 +50,10 @@ export default async function () {
           soundName: discordSound.name,
           soundEmoji: discordSound.emoji_name ?? "🔊",
           soundId: discordSound.sound_id,
+          discordSoundId: discordSound.sound_id,
           url: `https://cdn.discordapp.com/soundboard-sounds/${discordSound.sound_id}`,
-          createdBy: discordSound.user?.global_name ?? discordSound.user?.username!,
+          createdBy:
+            discordSound.user?.global_name ?? discordSound.user?.username!,
           createdById: discordSound.user?.id ?? "discord",
           guildName,
           guildId,
@@ -61,7 +64,7 @@ export default async function () {
 
   return (
     <SideTab className="grid h-full grid-cols-3 gap-4" defaultTab="sounds">
-      <div className="flex h-full flex-col items-center justify-start border-r gap-2 p-6">
+      <div className="flex h-full flex-col items-center justify-start gap-2 border-r p-6">
         <SideTabTrigger id="sounds">My Sounds</SideTabTrigger>
         <SideTabTrigger id="guilds">Guild Sounds</SideTabTrigger>
       </div>

@@ -94,7 +94,7 @@ export const guildRouter = createTRPCRouter({
         });
       }
 
-      await deleteSound(input.guildId, input.soundId);
+      await deleteSound(input.guildId, input.soundId).catch(() => null);
       return { success: true };
     }),
 });

@@ -5,6 +5,10 @@ import { useRef } from "react";
 import Twemoji from "react-twemoji";
 import { AudioProvider, useAudio } from "~/context/AudioContext";
 import { Button } from "../ui/button";
+import { TrashIcon } from "../icons/trash";
+import { api } from "~/trpc/react";
+import { toast } from "sonner";
+import { useModal } from "~/context/ModalContext";
 
 export type SoundData = {
   soundName: string;
@@ -13,6 +17,7 @@ export type SoundData = {
   url: string;
   createdBy: string;
   createdById: string;
+  discordSoundId: string;
   guildName: string;
   guildId: string;
   external: boolean;
@@ -24,6 +29,8 @@ function SoundRow({
 }: Readonly<{ sound: SoundData; className?: string }>) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const { currentAudio, setCurrentAudio } = useAudio();
+  const { mutate } = api.guild.deleteSound.useMutation();
+  const { openModal, closeModal } = useModal();
 
   const play = () => {
     if (audioRef.current) {
@@ -40,6 +47,33 @@ function SoundRow({
         setCurrentAudio(null);
       }
     }
+  };
+
+  const deleteSound = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    const onButtonClick = () => {
+      mutate(
+        { soundId: sound.discordSoundId, guildId: sound.guildId },
+        {
+          onSuccess: () => {
+            toast("Sound deleted successfully!");
+          },
+          onError: (error) => {
+            toast.error("Failed to delete sound.", {
+              description: error.message,
+            });
+          },
+        },
+      );
+      closeModal();
+    };
+
+    openModal({
+      title: "Delete Sound",
+      body: `Are you sure you want to delete the sound "${sound.soundName}"? This action cannot be undone.`,
+      footer: <Button onClick={onButtonClick}>Confirm</Button>,
+    });
   };
 
   return (
@@ -61,7 +95,7 @@ function SoundRow({
           </audio>
         </div>
         <span className="col-span-2">{sound.soundName}</span>
-        <div>
+        <div className="flex justify-between">
           <Button className="p-0" variant="link" asChild>
             <Link
               onClick={(e) => e.stopPropagation()}
@@ -69,6 +103,9 @@ function SoundRow({
             >
               {sound.createdBy}
             </Link>
+          </Button>
+          <Button variant="destructive" size="icon" onClick={deleteSound}>
+            <TrashIcon />
           </Button>
         </div>
       </div>
