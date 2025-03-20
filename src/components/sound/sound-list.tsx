@@ -9,24 +9,29 @@ import { TrashIcon } from "../icons/trash";
 import { api } from "~/trpc/react";
 import { toast } from "sonner";
 import { useModal } from "~/context/ModalContext";
+import type { GuildSound, Sound, User } from "@prisma/client";
+import { Snowflake } from "discord-api-types/globals";
 
-export type SoundData = {
-  soundName: string;
-  soundId: string;
-  soundEmoji: string;
-  url: string;
-  createdBy: string;
-  createdById: string;
-  discordSoundId: string;
-  guildName: string;
-  guildId: string;
+interface SoundData extends GuildSound {
+  sound: Sound;
   external: boolean;
-};
+}
+
+interface SoundIncludedUser extends Sound {
+  createdBy: User;
+}
 
 function SoundRow({
   sound,
+  discordSoundId,
+  guildId,
   className = "",
-}: Readonly<{ sound: SoundData; className?: string }>) {
+}: Readonly<{
+  sound: SoundIncludedUser;
+  discordSoundId: Snowflake;
+  guildId: Snowflake;
+  className?: string;
+}>) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const { currentAudio, setCurrentAudio } = useAudio();
   const { mutate } = api.guild.deleteSound.useMutation();
@@ -54,7 +59,7 @@ function SoundRow({
 
     const onButtonClick = () => {
       mutate(
-        { soundId: sound.discordSoundId, guildId: sound.guildId },
+        { soundId: discordSoundId, guildId: guildId },
         {
           onSuccess: () => {
             toast("Sound deleted successfully!");
@@ -71,7 +76,7 @@ function SoundRow({
 
     openModal({
       title: "Delete Sound",
-      body: `Are you sure you want to delete the sound "${sound.soundName}"? This action cannot be undone.`,
+      body: `Are you sure you want to delete the sound "${sound}"? This action cannot be undone.`,
       footer: <Button onClick={onButtonClick}>Confirm</Button>,
     });
   };
@@ -86,7 +91,7 @@ function SoundRow({
       <div className="grid h-full w-full cursor-pointer grid-cols-4 items-center">
         <div>
           <Twemoji options={{ className: "twemoji-list" }}>
-            {sound.soundEmoji}
+            {sound.emoji}
           </Twemoji>
 
           <audio ref={audioRef} controls hidden>
@@ -94,14 +99,14 @@ function SoundRow({
             <track kind="captions" />
           </audio>
         </div>
-        <span className="col-span-2">{sound.soundName}</span>
+        <span className="col-span-2">{sound.name}</span>
         <div className="flex justify-between">
           <Button className="p-0" variant="link" asChild>
             <Link
               onClick={(e) => e.stopPropagation()}
               href={`/user/${sound.createdById}`}
             >
-              {sound.createdBy}
+              {sound.createdBy.name}
             </Link>
           </Button>
           <Button variant="destructive" size="icon" onClick={deleteSound}>
@@ -124,20 +129,22 @@ function SoundTableHeader() {
 }
 
 export function SoundTableList({
-  data,
+  guildSounds,
 }: Readonly<{
-  data: SoundData[];
+  guildSounds: SoundData[];
 }>) {
   return (
     <AudioProvider>
       <div className="flex w-full flex-col">
         <SoundTableHeader />
         <div className="divide-y">
-          {data.map((sound) => (
+          {guildSounds.map((guildSound) => (
             <SoundRow
-              key={sound.soundId + sound.guildId}
-              sound={sound}
-              className={sound.external ? "bg-yellow-100/5" : ""}
+              key={guildSound.soundId}
+              sound={guildSound.sound as SoundIncludedUser}
+              discordSoundId={guildSound.discordSoundId}
+              guildId={guildSound.guildId}
+              className={guildSound.external ? "bg-yellow-100/5" : ""}
             />
           ))}
         </div>
