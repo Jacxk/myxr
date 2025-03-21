@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import Sound from "~/components/sound/sound";
 import { AudioProvider } from "~/context/AudioContext";
 import { api } from "~/trpc/server";
@@ -9,6 +10,9 @@ export default async function Home({
 }>) {
   const { id } = await params;
   const userSounds = await api.user.getSounds(id);
+
+  if (userSounds.length === 0) return notFound();
+
   const name = userSounds[0]?.createdBy.name;
 
   return (
