@@ -28,7 +28,7 @@ export default function RootLayout({
               <div className="flex h-full flex-col">
                 <Navbar />
                 <div className="flex h-full">
-                  <div className="mx-auto h-full max-w-7xl flex-1 grow p-2 pt-10">
+                  <div className="mx-auto h-full max-w-7xl flex-1 grow p-2 py-10">
                     {children}
                     <Modal />
                   </div>

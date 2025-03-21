@@ -79,7 +79,7 @@ export function EditSoundStep() {
       waveSurfer.current?.destroy();
       regionsPlugin.destroy();
     };
-  }, [region, data]);
+  }, []);
 
   const playPause = useCallback(() => {
     if (isPlaying) {

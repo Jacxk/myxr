@@ -21,7 +21,7 @@ import { type SoundUploadProps } from "./select-file";
 
 export function EditDetailsStep() {
   const router = useRouter();
-  const {data: session} = useSession()
+  const { data: session } = useSession();
   const { theme } = useTheme();
   const { data, prevStep } = useSteps<SoundUploadProps>();
   const [uploading, setUploading] = useState<boolean>(false);
@@ -60,7 +60,6 @@ export function EditDetailsStep() {
   }, [data, fileProps]);
 
   useEffect(() => {
-    console.log(data.newFile);
     setFileProps({
       name: "",
       createdBy: {
@@ -71,7 +70,7 @@ export function EditDetailsStep() {
       id: -1,
       url: URL.createObjectURL(data.newFile as Blob),
     });
-  }, [session, data.newFile]);
+  }, [data.newFile]);
 
   useEffect(() => {
     setFileProps((props) => ({
