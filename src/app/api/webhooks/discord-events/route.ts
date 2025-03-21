@@ -1,27 +1,16 @@
+import type {
+  APIGuild,
+  APIWebhookEvent,
+  APIWebhookEventApplicationAuthorizedData,
+} from "discord-api-types/v10";
+import {
+  ApplicationWebhookEventType,
+  ApplicationWebhookType,
+} from "discord-api-types/v10";
 import { NextResponse } from "next/server";
 import nacl from "tweetnacl";
 import { env } from "~/env";
-import { db } from "~/server/db";
-
-enum DataType {
-  APPLICATION_AUTHORIZED = "APPLICATION_AUTHORIZED",
-  ENTITLEMENT_CREATE = "ENTITLEMENT_CREATE",
-  QUEST_USER_ENROLLMENT = "QUEST_USER_ENROLLMENT",
-}
-
-interface WebhookData {
-  type?: number;
-  event: {
-    type: DataType;
-    timestamp: Date;
-    data: {
-      guild?: {
-        id: string;
-      };
-      user: object;
-    };
-  };
-}
+import { upsertGuild } from "~/utils/db";
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -42,20 +31,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-  const { type, event } = JSON.parse(body) as WebhookData;
-  const { guild } = event.data;
+  const { type, event } = JSON.parse(body) as APIWebhookEvent;
 
-  if (type === 0) {
+  if (type === ApplicationWebhookType.Ping) {
     return new NextResponse(null, { status: 204 });
   } else {
-    if (event.type === DataType.APPLICATION_AUTHORIZED && guild) {
-      await db.guild.create({
-        data: {
-          id: guild.id,
-          // TODO: Remove this field and only use the ID
-          name: "",
-        },
-      });
+    const { guild } = event.data as APIWebhookEventApplicationAuthorizedData;
+    if (
+      event.type === ApplicationWebhookEventType.ApplicationAuthorized &&
+      guild
+    ) {
+      await upsertGuild({
+        id: guild.id,
+        name: guild.name,
+      } as APIGuild);
     }
     return NextResponse.json({}, { status: 200 });
   }

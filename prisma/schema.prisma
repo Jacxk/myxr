@@ -32,10 +32,11 @@ model Sound {
 }
 
 model Guild {
-    id               String       @id
+    id               String            @id
     name             String
     sounds           GuildSound[]
     soundMasterRoles String[]
+    users            GuildMembership[]
 }
 
 model GuildSound {
@@ -46,6 +47,16 @@ model GuildSound {
     sound          Sound  @relation(fields: [soundId], references: [id])
 
     @@id([guildId, soundId])
+}
+
+model GuildMembership {
+    userId  String
+    user    User   @relation(fields: [userId], references: [id])
+    guildId String
+    guild   Guild  @relation(fields: [guildId], references: [id])
+
+    @@id([userId, guildId])
+    @@index([guildId])
 }
 
 enum Role {
@@ -83,16 +94,18 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
+    id            String            @id @default(cuid())
     name          String?
-    email         String?   @unique
+    email         String?           @unique
     image         String?
-    removed       Boolean   @default(false)
+    removed       Boolean           @default(false)
     emailVerified DateTime?
+    updatedAt     DateTime          @updatedAt
     accounts      Account[]
     sessions      Session[]
-    Sounds        Sound[]
-    role          Role      @default(USER)
+    sounds        Sound[]
+    guilds        GuildMembership[]
+    role          Role              @default(USER)
 
     @@index([name])
 }

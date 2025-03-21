@@ -5,10 +5,12 @@ import DiscordProvider from "next-auth/providers/discord";
 import { db } from "~/server/db";
 import {
   getDatabaseSession,
+  getUserGuilds,
   getUserTokenAndExpiration,
   updateAccessToken,
+  updateGuildMemberShip,
 } from "~/utils/db";
-import { getDiscordGuilds, refreshAccessToken } from "~/utils/discord-requests";
+import { refreshAccessToken } from "~/utils/discord-requests";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -64,7 +66,9 @@ export const authConfig = {
   ],
   adapter: PrismaAdapter(db),
   callbacks: {
-    // TODO: Change database schema to store bigger numbers
+    authorized: async ({ auth }) => {
+      return !!auth;
+    },
     signIn: async ({ account }) => {
       if (account) {
         await updateAccessToken(account.userId!, {
@@ -87,14 +91,17 @@ export const authConfig = {
         const data = await refreshAccessToken(refresh_token);
         await updateAccessToken(session.userId, data);
       }
-      const guilds = await getDiscordGuilds(session.user.id);
-      guilds.sort((a, b) => a.name.localeCompare(b.name))
+
+      await updateGuildMemberShip(session.userId);
+
+      const guilds = await getUserGuilds(session.userId);
+      guilds?.sort((a, b) => a.guild.name.localeCompare(b.guild.name));
 
       return {
         ...session,
         user: {
           ...session.user,
-          guilds,
+          guilds: guilds?.map(({ guild }) => ({ ...guild })),
         },
       };
     },
