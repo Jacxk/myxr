@@ -36,7 +36,8 @@ export const trimAudioAndConvertToMp3 = async (
 
     // Convert to MP3
     const mp3Blob = await encodeMP3(trimmedAudioBuffer);
-    return new File([mp3Blob], `${file.name}.mp3`, { type: "audio/mp3" });
+    const name = `${file.name.split(".").slice(0, -1).join(".")}.mp3`;
+    return new File([mp3Blob], name, { type: "audio/mp3" });
   } catch (error) {
     console.error("Error during MP3 encoding:", error);
     return null; // Or handle the error as needed
