@@ -10,7 +10,11 @@ export default async function ({
   const guildSounds = await api.user.getGuildSounds(id);
 
   if (guildSounds.length === 0) {
-    return <span>No sounds found for this Guild</span>;
+    return (
+      <div className="flex w-full flex-wrap items-center justify-center">
+        <span>No sounds found for this Guild...</span>
+      </div>
+    );
   }
 
   return (

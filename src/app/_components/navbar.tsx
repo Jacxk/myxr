@@ -11,7 +11,7 @@ export default async function Navbar() {
   const session: Session | null = await auth();
 
   return (
-    <nav className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 border-b p-6 shadow-md">
+    <nav className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 border-b p-6">
       <Link href="/" className="text-4xl font-bold">
         Myxr
       </Link>

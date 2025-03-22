@@ -5,15 +5,19 @@ export default async function ({ children }: { children: React.ReactNode }) {
   const session = await auth();
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-row flex-wrap gap-2 w-full">
+    <div className="flex w-full flex-col">
+      <div className="flex flex-row flex-wrap justify-center gap-1 border-b">
         {session?.user.guilds.map((guild) => (
-          <TabLink key={guild.id} href={`/user/me/guilds/${guild.id}`}>
+          <TabLink
+            className="rounded-b-none"
+            key={guild.id}
+            href={`/user/me/guilds/${guild.id}`}
+          >
             {guild.name}
           </TabLink>
         ))}
       </div>
-      {children}
+      <div className="flex py-6">{children}</div>
     </div>
   );
 }
