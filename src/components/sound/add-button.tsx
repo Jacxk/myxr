@@ -1,9 +1,11 @@
+"use client";
+
+import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { useModal } from "~/context/ModalContext";
 import { api } from "~/trpc/react";
-import { PlusIcon } from "../icons/plus";
 import { Button } from "../ui/button";
 
 export function AddToGuildButton({
@@ -71,8 +73,13 @@ export function AddToGuildButton({
   }, [isSuccess, isError]);
 
   return (
-    <Button variant="outline" onClick={addSoundToGuild} disabled={isPending}>
-      <PlusIcon />
+    <Button
+      variant="outline"
+      size="icon"
+      onClick={addSoundToGuild}
+      disabled={isPending}
+    >
+      <Plus />
     </Button>
   );
 }

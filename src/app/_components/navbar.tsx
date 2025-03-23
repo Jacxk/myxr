@@ -1,6 +1,6 @@
+import { Upload } from "lucide-react";
 import { type Session } from "next-auth";
 import Link from "next/link";
-import { UploadIcon } from "~/components/icons/upload";
 import { Button } from "~/components/ui/button";
 import { auth } from "~/server/auth";
 import { AccountMenu } from "./account-menu";
@@ -21,7 +21,7 @@ export default async function Navbar() {
             <SelectGuild guilds={session?.user.guilds} />
             <Link href="/upload">
               <Button variant="outline">
-                <UploadIcon /> Upload
+                <Upload /> Upload
               </Button>
             </Link>
             <AccountMenu user={session?.user} />

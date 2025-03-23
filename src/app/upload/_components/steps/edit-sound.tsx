@@ -1,11 +1,10 @@
 "use client";
 
+import { Pause, Play } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import WaveSurfer from "wavesurfer.js";
 import RegionsPlugin from "wavesurfer.js/dist/plugins/regions.esm.js";
-import { PauseIcon } from "~/components/icons/pause";
-import { PlayIcon } from "~/components/icons/play";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -145,7 +144,7 @@ export function EditSoundStep() {
               className="h-16 w-16 cursor-pointer [&_svg]:size-10"
               onClick={playPause}
             >
-              {isPlaying ? <PauseIcon /> : <PlayIcon />}
+              {isPlaying ? <Pause /> : <Play />}
             </Button>
             <span className="absolute bottom-0 text-xs">
               {(region.end - region.start).toFixed(2)}s

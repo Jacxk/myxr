@@ -1,16 +1,16 @@
 "use client";
 
+import type { GuildSound, Sound, User } from "@prisma/client";
+import { Snowflake } from "discord-api-types/globals";
+import { Trash } from "lucide-react";
 import Link from "next/link";
 import { useRef } from "react";
 import Twemoji from "react-twemoji";
-import { AudioProvider, useAudio } from "~/context/AudioContext";
-import { Button } from "../ui/button";
-import { TrashIcon } from "../icons/trash";
-import { api } from "~/trpc/react";
 import { toast } from "sonner";
+import { AudioProvider, useAudio } from "~/context/AudioContext";
 import { useModal } from "~/context/ModalContext";
-import type { GuildSound, Sound, User } from "@prisma/client";
-import { Snowflake } from "discord-api-types/globals";
+import { api } from "~/trpc/react";
+import { Button } from "../ui/button";
 
 interface SoundData extends GuildSound {
   sound: Sound;
@@ -110,7 +110,7 @@ function SoundRow({
             </Link>
           </Button>
           <Button variant="destructive" size="icon" onClick={deleteSound}>
-            <TrashIcon />
+            <Trash />
           </Button>
         </div>
       </div>

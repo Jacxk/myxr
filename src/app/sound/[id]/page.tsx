@@ -1,14 +1,13 @@
+import { Avatar } from "@radix-ui/react-avatar";
+import { Download } from "lucide-react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { DownloadIcon } from "~/components/icons/download";
-import { PlusIcon } from "~/components/icons/plus";
+import { AddToGuildButton } from "~/components/sound/add-button";
+import { AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { api } from "~/trpc/server";
 import { SoundEmoji } from "./_components/emoji";
-import { Avatar } from "@radix-ui/react-avatar";
-import { AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Guild } from "./_components/guild";
-import Link from "next/link";
-import { AddToGuildButton } from "~/components/sound/add-button";
 
 export default async function ({
   params,
@@ -57,7 +56,7 @@ export default async function ({
           <div className="flex gap-2">
             <AddToGuildButton soundId={Number(id)} />
             <Button size="icon" variant="outline">
-              <DownloadIcon />
+              <Download />
             </Button>
           </div>
         </div>

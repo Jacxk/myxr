@@ -1,8 +1,8 @@
 "use client";
 
+import { UploadCloud } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { CloudUploadIcon } from "~/components/icons/cloud-upload";
 import { useSteps } from "~/context/StepsContext";
 
 export interface SoundUploadProps {
@@ -63,7 +63,7 @@ export function SelectFileStep() {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <CloudUploadIcon className="size-16 text-gray-600" />
+      <UploadCloud className="size-16 text-gray-600" />
       <p className="mt-2 text-gray-600">Choose file or drag and drop</p>
       <input
         id="file-dropzone"
