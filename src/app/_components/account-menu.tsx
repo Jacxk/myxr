@@ -30,7 +30,7 @@ export function AccountMenu({ user }: Readonly<{ user: User | undefined }>) {
         asChild
       >
         <Avatar>
-          <AvatarImage src={user?.image!} alt={user?.name!} />
+          <AvatarImage src={user?.image + "?size=40"} alt={user?.name!} />
           <AvatarFallback delayMs={500}>{user?.name}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
