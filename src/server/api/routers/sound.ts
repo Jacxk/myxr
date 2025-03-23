@@ -5,7 +5,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { getSounds } from "~/utils/db";
+import { getSound, getSounds } from "~/utils/db";
 
 export const soundRouter = createTRPCRouter({
   me: protectedProcedure
@@ -33,5 +33,9 @@ export const soundRouter = createTRPCRouter({
 
   getSecretMessage: protectedProcedure.query(() => {
     return "you can now see this secret message!";
+  }),
+  getSound: publicProcedure.input(z.string()).query(({ input }) => {
+    if (isNaN(Number(input))) return null;
+    return getSound(Number(input));
   }),
 });

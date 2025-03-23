@@ -50,6 +50,16 @@ export const getSoundsFromUser = async (id: string) => {
   });
 };
 
+export const getSound = (id: number) => {
+  return db.sound.findFirst({
+    where: { id },
+    include: {
+      createdBy: true,
+      guildSounds: { select: { guild: { select: { name: true, id: true } } } },
+    },
+  });
+};
+
 export const updateAccessToken = async (
   userId: string,
   data: {
