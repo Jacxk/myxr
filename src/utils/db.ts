@@ -1,6 +1,6 @@
+import type { APIGuild } from "discord-api-types/v10";
 import { db } from "~/server/db";
 import { getDiscordGuilds } from "./discord-requests";
-import type { APIGuild } from "discord-api-types/v10";
 
 const soundInclude = {
   createdBy: {
@@ -27,14 +27,14 @@ export const discordAuthorization = async (id: string) => {
   return `Bearer ${user?.access_token}`;
 };
 
-export const getSounds = async ({
+export const getSounds = ({
   take,
   skip,
 }: {
   take?: number;
   skip?: number;
 } = {}) => {
-  return await db.sound.findMany({
+  return db.sound.findMany({
     orderBy: { createdAt: "desc" },
     take,
     skip,
@@ -43,11 +43,23 @@ export const getSounds = async ({
 };
 
 export const getSoundsFromUser = async (id: string) => {
-  return await db.sound.findMany({
-    orderBy: { createdAt: "desc" },
-    where: { createdById: id },
-    include: soundInclude,
+  const getData = (createdById: string) =>
+    db.sound.findMany({
+      orderBy: { createdAt: "desc" },
+      where: { createdById },
+      include: soundInclude,
+    });
+  const sounds = await getData(id);
+
+  if (sounds.length > 0) return sounds;
+
+  const user = await db.account.findFirst({
+    where: { providerAccountId: id },
   });
+
+  if (user) return getData(user.userId);
+
+  return [];
 };
 
 export const getSound = (id: number) => {
