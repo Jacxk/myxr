@@ -37,11 +37,30 @@ export const soundRouter = createTRPCRouter({
   getSound: publicProcedure.input(z.string()).query(({ input }) => {
     return getSound(input);
   }),
-  search: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
-    return ctx.db.sound.findMany({
-      where: {
-        OR: [{ name: { search: input } }, { tags: { search: input } }],
-      },
-    });
-  }),
+  search: publicProcedure
+    .input(
+      z.object({
+        query: z.string(),
+        type: z.enum(["Normal", "Tag"]),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      if (input.type === "Tag") {
+        const tag = await ctx.db.tag.findFirst({
+          where: { name: input.query },
+          include: { sounds: true },
+        });
+
+        return tag?.sounds ?? [];
+      }
+
+      return ctx.db.sound.findMany({
+        where: {
+          OR: [
+            { name: { search: input.query } },
+            { tags: { some: { name: { search: input.query } } } },
+          ],
+        },
+      });
+    }),
 });
