@@ -84,8 +84,8 @@ export default async function ({
             <span>Tags</span>
             <div className="flex flex-wrap gap-1">
               {sound.tags.map((tag) => (
-                <Button key={tag} variant="secondary">
-                  {tag}
+                <Button key={tag.name} variant="secondary">
+                  {tag.name}
                 </Button>
               ))}
             </div>

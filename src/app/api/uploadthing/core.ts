@@ -42,7 +42,12 @@ export const ourFileRouter = {
           createdById: metadata.userId,
           emoji: metadata.emoji,
           name: metadata.name,
-          tags: metadata.tags,
+          tags: {
+            connectOrCreate: metadata.tags?.map((name) => ({
+              create: { name },
+              where: { name },
+            })),
+          },
         },
       });
 

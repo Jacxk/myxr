@@ -20,7 +20,6 @@ model Sound {
     name        String
     emoji       String
     url         String       @unique
-    tags        String
     usegeCount  Int          @default(0)
     createdAt   DateTime     @default(now())
     updatedAt   DateTime     @updatedAt
@@ -28,8 +27,14 @@ model Sound {
     deletedAt   DateTime?
     guildSounds GuildSound[]
     createdBy   User         @relation(fields: [createdById], references: [id])
+    tags        Tag[]
 
     @@index([name])
+}
+
+model Tag {
+    name   String  @id @unique
+    sounds Sound[]
 }
 
 model Guild {
@@ -42,7 +47,7 @@ model Guild {
 
 model GuildSound {
     guildId        String
-    soundId        Int
+    soundId        String
     discordSoundId String @unique
     guild          Guild  @relation(fields: [guildId], references: [id])
     sound          Sound  @relation(fields: [soundId], references: [id])
