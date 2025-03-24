@@ -38,4 +38,11 @@ export const soundRouter = createTRPCRouter({
     if (isNaN(Number(input))) return null;
     return getSound(Number(input));
   }),
+  search: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
+    return ctx.db.sound.findMany({
+      where: {
+        OR: [{ name: { search: input } }, { tags: { search: input } }],
+      },
+    });
+  }),
 });

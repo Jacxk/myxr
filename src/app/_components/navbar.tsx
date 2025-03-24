@@ -5,6 +5,7 @@ import { Button } from "~/components/ui/button";
 import { auth } from "~/server/auth";
 import { AccountMenu } from "./account-menu";
 import { Authenticated, NotAuthenticated } from "./authentication";
+import { SearchBar } from "./search-bar";
 import { SelectGuild } from "./select-guild";
 
 export default async function Navbar() {
@@ -15,13 +16,14 @@ export default async function Navbar() {
       <Link href="/" className="text-4xl font-bold">
         Myxr
       </Link>
+      <SearchBar />
       <div>
         <Authenticated>
           <div className="flex items-center gap-4">
             <SelectGuild guilds={session?.user.guilds} />
             <Link href="/upload">
-              <Button variant="outline">
-                <Upload /> Upload
+              <Button variant="outline" size="icon">
+                <Upload />
               </Button>
             </Link>
             <AccountMenu user={session?.user} />

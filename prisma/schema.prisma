@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+    provider        = "prisma-client-js"
+    previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
@@ -19,7 +20,7 @@ model Sound {
     name        String
     emoji       String
     url         String       @unique
-    tags        String[]
+    tags        String
     usegeCount  Int          @default(0)
     createdAt   DateTime     @default(now())
     updatedAt   DateTime     @updatedAt
