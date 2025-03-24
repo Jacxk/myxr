@@ -62,7 +62,7 @@ export const getSoundsFromUser = async (id: string) => {
   return [];
 };
 
-export const getSound = (id: number) => {
+export const getSound = (id: string) => {
   return db.sound.findFirst({
     where: { id },
     include: {

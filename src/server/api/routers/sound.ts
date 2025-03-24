@@ -35,8 +35,7 @@ export const soundRouter = createTRPCRouter({
     return "you can now see this secret message!";
   }),
   getSound: publicProcedure.input(z.string()).query(({ input }) => {
-    if (isNaN(Number(input))) return null;
-    return getSound(Number(input));
+    return getSound(input);
   }),
   search: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
     return ctx.db.sound.findMany({

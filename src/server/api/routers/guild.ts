@@ -25,7 +25,7 @@ export const guildRouter = createTRPCRouter({
   createSound: protectedProcedure
     .input(
       z.object({
-        soundId: z.number(),
+        soundId: z.string(),
         guildId: z.string(),
         guildName: z.string(),
       }),
