@@ -6,6 +6,7 @@ import { AddToGuildButton } from "~/components/sound/add-button";
 import { AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { api } from "~/trpc/server";
+import { CreatedDate } from "./_components/created-date";
 import { SoundEmoji } from "./_components/emoji";
 import { Guild } from "./_components/guild";
 
@@ -76,12 +77,9 @@ export default async function ({
           </div>
         </div>
         <div className="flex w-1/5 flex-col gap-6">
+          <CreatedDate date={sound.createdAt} />
           <div className="flex flex-col">
-            <span>Date Created</span>
-            <span>{sound.createdAt.toLocaleDateString()}</span>
-          </div>
-          <div className="flex flex-col">
-            <span>Tags</span>
+            <span className="text-lg font-semibold">Tags</span>
             <div className="flex flex-wrap gap-1">
               {sound.tags.map((tag) => (
                 <Button key={tag.name} variant="secondary" asChild>
