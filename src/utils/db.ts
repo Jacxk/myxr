@@ -1,6 +1,7 @@
 import type { APIGuild } from "discord-api-types/v10";
 import { db } from "~/server/db";
 import { getDiscordGuilds } from "./discord-requests";
+import { GuildSound } from "@prisma/client";
 
 const soundInclude = {
   createdBy: {
@@ -68,6 +69,7 @@ export const getSound = (id: string) => {
     include: {
       createdBy: true,
       guildSounds: { select: { guild: { select: { name: true, id: true } } } },
+      tags: true,
     },
   });
 };
@@ -178,5 +180,30 @@ export const upsertGuild = async (guild: APIGuild) => {
     where: { id: guild.id },
     create: { id: guild.id, name: guild.name },
     update: { name: guild.name },
+  });
+};
+
+export const handleSoundGuildCreate = async ({
+  guildId,
+  guildName,
+  soundId,
+  discordSoundId,
+}: GuildSound & { guildName: string }) => {
+  await db.guildSound.create({
+    data: {
+      guildId,
+      soundId,
+      discordSoundId,
+    },
+  });
+
+  await db.guild.update({
+    where: { id: guildId },
+    data: { name: guildName },
+  });
+
+  await db.sound.update({
+    where: { id: soundId },
+    data: { usegeCount: { increment: 1 } },
   });
 };

@@ -4,6 +4,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
+import { handleSoundGuildCreate } from "~/utils/db";
 import {
   createSound,
   deleteSound,
@@ -51,22 +52,9 @@ export const guildRouter = createTRPCRouter({
         sound,
       });
 
-      await ctx.db.guildSound.create({
-        data: {
-          guildId: input.guildId,
-          soundId: input.soundId,
-          discordSoundId: soundData.sound_id,
-        },
-      });
-
-      await ctx.db.guild.update({
-        where: { id: input.guildId },
-        data: { name: input.guildName },
-      });
-
-      await ctx.db.sound.update({
-        where: { id: input.soundId },
-        data: { usegeCount: { increment: 1 } },
+      await handleSoundGuildCreate({
+        discordSoundId: soundData.sound_id,
+        ...input,
       });
 
       return soundData;
