@@ -13,7 +13,7 @@ import { api } from "~/trpc/react";
 import { Button } from "../ui/button";
 
 interface SoundData extends GuildSound {
-  sound: Sound;
+  sound: SoundIncludedUser;
   external: boolean;
 }
 
@@ -76,7 +76,7 @@ function SoundRow({
 
     openModal({
       title: "Delete Sound",
-      body: `Are you sure you want to delete the sound "${sound}"? This action cannot be undone.`,
+      body: `Are you sure you want to delete the sound "${sound.name}"? This action cannot be undone.`,
       footer: <Button onClick={onButtonClick}>Confirm</Button>,
     });
   };
@@ -88,11 +88,15 @@ function SoundRow({
       className={`gap-0 rounded-none ${className}`}
       asChild
     >
-      <div className="grid h-full w-full cursor-pointer grid-cols-4 items-center">
+      <div className="grid h-fit w-full cursor-pointer grid-cols-4 items-center">
         <div>
-          <Twemoji options={{ className: "twemoji-list" }}>
-            {sound.emoji}
-          </Twemoji>
+          {sound.emoji.startsWith("http") ? (
+            <img src={sound.emoji} alt="emoji" className="twemoji-list" />
+          ) : (
+            <Twemoji options={{ className: "twemoji-list" }}>
+              {sound.emoji}
+            </Twemoji>
+          )}
 
           <audio ref={audioRef} controls hidden>
             <source src={sound.url} type="audio/mpeg" />
@@ -141,7 +145,7 @@ export function SoundTableList({
           {guildSounds.map((guildSound) => (
             <SoundRow
               key={guildSound.soundId}
-              sound={guildSound.sound as SoundIncludedUser}
+              sound={guildSound.sound}
               discordSoundId={guildSound.discordSoundId}
               guildId={guildSound.guildId}
               className={guildSound.external ? "bg-yellow-100/5" : ""}

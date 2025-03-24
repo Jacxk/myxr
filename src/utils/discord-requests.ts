@@ -118,12 +118,16 @@ export async function refreshAccessToken(refreshToken: string) {
 }
 
 export async function getSoundBoard(guildId: string) {
-  const data = await createDiscordRequest<{ items: APISoundboardSound[] }>(
-    `/guilds/${guildId}/soundboard-sounds`,
-    BOT_AUTORIZATION,
-  );
+  try {
+    const data = await createDiscordRequest<{ items: APISoundboardSound[] }>(
+      `/guilds/${guildId}/soundboard-sounds`,
+      BOT_AUTORIZATION,
+    );
 
-  return data.items;
+    return data.items;
+  } catch (e) {
+    return [];
+  }
 }
 
 export async function deleteSound(guildId: string, soundId: string) {
