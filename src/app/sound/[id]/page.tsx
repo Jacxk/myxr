@@ -9,6 +9,7 @@ import { api } from "~/trpc/server";
 import { CreatedDate } from "./_components/created-date";
 import { SoundEmoji } from "./_components/emoji";
 import { Guild } from "./_components/guild";
+import { SoundWaveForm } from "~/components/sound/sound-waveform";
 
 export default async function ({
   params,
@@ -54,6 +55,7 @@ export default async function ({
               </Link>
             </Button>
           </div>
+
           <div className="flex gap-2">
             <AddToGuildButton soundId={Number(id)} />
             <Button size="icon" variant="outline">
@@ -62,6 +64,7 @@ export default async function ({
           </div>
         </div>
       </div>
+      <SoundWaveForm url={sound.url} />
       <div className="border-b" />
       <div className="flex flex-row justify-between gap-4">
         <div className="flex flex-col gap-4">
