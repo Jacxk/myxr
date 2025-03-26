@@ -18,9 +18,11 @@ export default async function ({
 
   return (
     <AudioProvider>
-      {data.map((sound) => (
-        <Sound key={sound.id} {...sound} />
-      ))}
+      <div className="flex flex-row gap-4 ">
+        {data.map((sound) => (
+          <Sound key={sound.id} {...sound} />
+        ))}
+      </div>
     </AudioProvider>
   );
 }

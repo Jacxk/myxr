@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 
@@ -11,10 +11,9 @@ export function SearchBar() {
   const router = useRouter();
 
   const handleSearch = (e: React.FormEvent) => {
-    console.log("test")
     e.preventDefault();
     if (query.trim()) {
-      router.push(`/sound?q=${encodeURIComponent(query)}`);
+      router.push(`/sound?q=${encodeURIComponent(query.trim())}`);
     }
   };
 
