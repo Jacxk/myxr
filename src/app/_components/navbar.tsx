@@ -7,6 +7,12 @@ import { AccountMenu } from "./account-menu";
 import { Authenticated, NotAuthenticated } from "./authentication";
 import { SearchBar } from "./search-bar";
 import { SelectGuild } from "./select-guild";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 
 export default async function Navbar() {
   const session: Session | null = await auth();
@@ -22,9 +28,16 @@ export default async function Navbar() {
           <div className="flex items-center gap-4">
             <SelectGuild guilds={session?.user.guilds} />
             <Link href="/upload">
-              <Button variant="outline" size="icon">
-                <Upload />
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon">
+                      <Upload />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Upload a Sound</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </Link>
             <AccountMenu user={session?.user} />
           </div>

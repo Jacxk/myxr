@@ -1,5 +1,5 @@
 import { Avatar } from "@radix-ui/react-avatar";
-import { Download } from "lucide-react";
+import { Download, Flag } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AddToGuildButton } from "~/components/sound/add-button";
@@ -10,6 +10,12 @@ import { CreatedDate } from "./_components/created-date";
 import { SoundEmoji } from "./_components/emoji";
 import { Guild } from "./_components/guild";
 import { SoundWaveForm } from "~/components/sound/sound-waveform";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 
 export default async function ({
   params,
@@ -57,10 +63,27 @@ export default async function ({
           </div>
 
           <div className="flex gap-2">
-            <AddToGuildButton soundId={id} />
-            <Button size="icon" variant="outline">
-              <Download />
-            </Button>
+            <TooltipProvider  delayDuration={0}>
+              <AddToGuildButton soundId={id} />
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button size="icon" variant="outline">
+                    <Download />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Download</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button size="icon" variant="destructive">
+                    <Flag />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Report</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
       </div>

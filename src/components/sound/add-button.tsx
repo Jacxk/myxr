@@ -7,6 +7,12 @@ import { toast } from "sonner";
 import { useModal } from "~/context/ModalContext";
 import { api } from "~/trpc/react";
 import { Button } from "../ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 
 export function AddToGuildButton({
   soundId,
@@ -73,13 +79,20 @@ export function AddToGuildButton({
   }, [isSuccess, isError]);
 
   return (
-    <Button
-      variant="outline"
-      size="icon"
-      onClick={addSoundToGuild}
-      disabled={isPending}
-    >
-      <Plus />
-    </Button>
+    <TooltipProvider delayDuration={0}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={addSoundToGuild}
+            disabled={isPending}
+          >
+            <Plus />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Add Sound to Guild</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
