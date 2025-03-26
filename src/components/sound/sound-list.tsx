@@ -23,11 +23,13 @@ function SoundRow({
   discordSoundId,
   guildId,
   className = "",
+  external,
 }: Readonly<{
   sound: SoundIncludedUser;
   discordSoundId: Snowflake;
   guildId: Snowflake;
   className?: string;
+  external?: boolean;
 }>) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const { currentAudio, setCurrentAudio } = useAudio();
@@ -71,16 +73,33 @@ function SoundRow({
             <track kind="captions" />
           </audio>
         </div>
-        <span className="col-span-2">{sound.name}</span>
-        <div className="flex justify-between">
-          <Button className="p-0" variant="link" asChild>
-            <Link
-              onClick={(e) => e.stopPropagation()}
-              href={`/user/${sound.createdById}`}
-            >
-              {sound.createdBy.name}
-            </Link>
-          </Button>
+        <div className="col-span-2">
+          {external ? (
+            <span>{sound.name}</span>
+          ) : (
+            <Button className="p-0" variant="link" asChild>
+              <Link
+                onClick={(e) => e.stopPropagation()}
+                href={`/sound/${sound.id}`}
+              >
+                {sound.name}
+              </Link>
+            </Button>
+          )}
+        </div>
+        <div className="flex justify-between items-center">
+          {external ? (
+            <span>{sound.createdBy.name}</span>
+          ) : (
+            <Button className="p-0" variant="link" asChild>
+              <Link
+                onClick={(e) => e.stopPropagation()}
+                href={`/user/${sound.createdById}`}
+              >
+                {sound.createdBy.name}
+              </Link>
+            </Button>
+          )}
           <DeleteSoundButton
             discordSoundId={discordSoundId}
             guildId={guildId}
@@ -117,6 +136,7 @@ export function SoundTableList({
               sound={guildSound.sound}
               discordSoundId={guildSound.discordSoundId}
               guildId={guildSound.guildId}
+              external={guildSound.external}
               className={guildSound.external ? "bg-yellow-100/5" : ""}
             />
           ))}
