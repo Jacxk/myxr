@@ -1,3 +1,5 @@
+import Sound from "~/components/sound/sound";
+import { AudioProvider } from "~/context/AudioContext";
 import { api } from "~/trpc/server";
 
 export default async function ({
@@ -11,5 +13,14 @@ export default async function ({
     query: q || tag,
   });
 
-  return <span>{data.map((s) => s.name)}</span>;
+  if (data.length === 0)
+    return <span>No sounds where found matching the criteria.</span>;
+
+  return (
+    <AudioProvider>
+      {data.map((sound) => (
+        <Sound key={sound.id} {...sound} />
+      ))}
+    </AudioProvider>
+  );
 }
