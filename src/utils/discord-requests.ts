@@ -140,3 +140,15 @@ export async function deleteSound(guildId: string, soundId: string) {
     },
   );
 }
+
+export async function isBotInGuild(guildId: string): Promise<boolean> {
+  try {
+    await createDiscordRequest<APIGuild>(
+      `/guilds/${guildId}`,
+      BOT_AUTORIZATION,
+    );
+    return true;
+  } catch {
+    return false;
+  }
+}
