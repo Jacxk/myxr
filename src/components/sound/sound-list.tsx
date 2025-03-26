@@ -2,15 +2,12 @@
 
 import type { GuildSound, Sound, User } from "@prisma/client";
 import { Snowflake } from "discord-api-types/globals";
-import { Trash } from "lucide-react";
 import Link from "next/link";
 import { useRef } from "react";
 import Twemoji from "react-twemoji";
-import { toast } from "sonner";
 import { AudioProvider, useAudio } from "~/context/AudioContext";
-import { useModal } from "~/context/ModalContext";
-import { api } from "~/trpc/react";
 import { Button } from "../ui/button";
+import { DeleteSoundButton } from "./delete-button";
 
 interface SoundData extends GuildSound {
   sound: SoundIncludedUser;
@@ -34,8 +31,6 @@ function SoundRow({
 }>) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const { currentAudio, setCurrentAudio } = useAudio();
-  const { mutate } = api.guild.deleteSound.useMutation();
-  const { openModal, closeModal } = useModal();
 
   const play = () => {
     if (audioRef.current) {
@@ -52,33 +47,6 @@ function SoundRow({
         setCurrentAudio(null);
       }
     }
-  };
-
-  const deleteSound = (e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    const onButtonClick = () => {
-      mutate(
-        { soundId: discordSoundId, guildId: guildId },
-        {
-          onSuccess: () => {
-            toast("Sound deleted successfully!");
-          },
-          onError: (error) => {
-            toast.error("Failed to delete sound.", {
-              description: error.message,
-            });
-          },
-        },
-      );
-      closeModal();
-    };
-
-    openModal({
-      title: "Delete Sound",
-      body: `Are you sure you want to delete the sound "${sound.name}"? This action cannot be undone.`,
-      footer: <Button onClick={onButtonClick}>Confirm</Button>,
-    });
   };
 
   return (
@@ -113,9 +81,10 @@ function SoundRow({
               {sound.createdBy.name}
             </Link>
           </Button>
-          <Button variant="destructive" size="icon" onClick={deleteSound}>
-            <Trash />
-          </Button>
+          <DeleteSoundButton
+            discordSoundId={discordSoundId}
+            guildId={guildId}
+          />
         </div>
       </div>
     </Button>

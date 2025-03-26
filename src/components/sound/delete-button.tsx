@@ -1,8 +1,15 @@
+import { Trash } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { useModal } from "~/context/ModalContext";
 import { api } from "~/trpc/react";
 import { Button } from "../ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 
 export function DeleteSoundButton({
   discordSoundId,
@@ -20,10 +27,19 @@ export function DeleteSoundButton({
     event.stopPropagation();
 
     const onDeleteClick = () => {
-      mutate({
-        soundId: discordSoundId,
-        guildId,
-      });
+      mutate(
+        { soundId: discordSoundId, guildId: guildId },
+        {
+          onSuccess: () => {
+            toast("Sound deleted successfully!");
+          },
+          onError: (error) => {
+            toast.error("Failed to delete sound.", {
+              description: error.message,
+            });
+          },
+        },
+      );
       closeModal();
     };
 
@@ -46,8 +62,19 @@ export function DeleteSoundButton({
   }, [isSuccess]);
 
   return (
-    <Button variant="destructive" onClick={onDeleteClickButton}>
-      Delete
-    </Button>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="destructive"
+            onClick={onDeleteClickButton}
+            size="icon"
+          >
+            <Trash />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Remove Sound from Guild</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
