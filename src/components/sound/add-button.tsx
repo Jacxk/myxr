@@ -11,7 +11,7 @@ import { Button } from "../ui/button";
 export function AddToGuildButton({
   soundId,
 }: Readonly<{
-  soundId: number;
+  soundId: string;
 }>) {
   const { mutate, isPending, isSuccess, isError, error } =
     api.guild.createSound.useMutation();

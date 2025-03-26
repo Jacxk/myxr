@@ -16,7 +16,7 @@ import { AddToGuildButton } from "./add-button";
 import { DeleteSoundButton } from "./delete-button";
 
 export interface SoundProperties {
-  id: number;
+  id: string;
   name: string;
   emoji: string;
   url: string;

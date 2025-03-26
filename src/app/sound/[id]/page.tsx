@@ -57,7 +57,7 @@ export default async function ({
           </div>
 
           <div className="flex gap-2">
-            <AddToGuildButton soundId={Number(id)} />
+            <AddToGuildButton soundId={id} />
             <Button size="icon" variant="outline">
               <Download />
             </Button>
