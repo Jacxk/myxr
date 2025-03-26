@@ -1,7 +1,12 @@
+import type { Metadata } from "next";
 import Sound from "~/components/sound/sound";
 import { AudioProvider } from "~/context/AudioContext";
 import { auth } from "~/server/auth";
 import { api } from "~/trpc/server";
+
+export const metadata: Metadata = {
+  title: "My Sounds - Myxr",
+};
 
 export default async function () {
   const session = await auth();

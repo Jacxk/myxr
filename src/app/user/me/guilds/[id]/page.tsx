@@ -1,7 +1,27 @@
 import { APISoundboardSound } from "discord-api-types/v10";
+import { Metadata } from "next";
 import { SoundTableList } from "~/components/sound/sound-list";
+import { auth } from "~/server/auth";
 import { api } from "~/trpc/server";
 import { getSoundBoard } from "~/utils/discord-requests";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const seesion = await auth();
+
+  const [guild] = (seesion?.user.guilds ?? []).filter(
+    (guild) => guild.id === id,
+  );
+  if (!guild) return {};
+
+  return {
+    title: `Guild ${guild.name} Sounds - Myxr`,
+  };
+}
 
 export default async function ({
   params,

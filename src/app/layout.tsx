@@ -13,7 +13,7 @@ import { ThemeProvider } from "./_components/theme-provider";
 export const metadata: Metadata = {
   title: "Myxr",
   description: "Upload sounds to Discord with ease",
-  icons: [{ rel: "icon", url: "/favicon.svg" }],
+  icons: { icon: "/favicon.svg" },
 };
 
 export default function RootLayout({

@@ -6,6 +6,11 @@ import { EditDetailsStep } from "./_components/steps/edit-details";
 import { EditSoundStep } from "./_components/steps/edit-sound";
 import { SelectFileStep } from "./_components/steps/select-file";
 import { SessionProvider } from "next-auth/react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Upload a Sound - Myxr",
+};
 
 export default async function Home() {
   const session = await auth();

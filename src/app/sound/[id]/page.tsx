@@ -16,6 +16,27 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
+import { Metadata } from "next";
+import { cache } from "react";
+
+export const getSound = cache(async (id: string) => {
+  return await api.sound.getSound(id);
+})
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const sound = await getSound(id);
+
+  if (!sound) return {};
+
+  return {
+    title: `${sound?.name} - Myxr`,
+  };
+}
 
 export default async function ({
   params,
@@ -23,7 +44,7 @@ export default async function ({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const sound = await api.sound.getSound(id);
+  const sound = await getSound(id);
 
   if (!sound) return notFound();
 
@@ -63,7 +84,7 @@ export default async function ({
           </div>
 
           <div className="flex gap-2">
-            <TooltipProvider  delayDuration={0}>
+            <TooltipProvider delayDuration={0}>
               <AddToGuildButton soundId={id} />
 
               <Tooltip>

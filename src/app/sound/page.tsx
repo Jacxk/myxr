@@ -1,6 +1,19 @@
+import { Metadata } from "next";
 import Sound from "~/components/sound/sound";
 import { AudioProvider } from "~/context/AudioContext";
 import { api } from "~/trpc/server";
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | undefined }>;
+}): Promise<Metadata> {
+  const { tag, q } = await searchParams;
+
+  return {
+    title: `${q ?? tag} - Myxr`,
+  };
+}
 
 export default async function ({
   searchParams,
@@ -18,7 +31,7 @@ export default async function ({
 
   return (
     <AudioProvider>
-      <div className="flex flex-row gap-4 ">
+      <div className="flex flex-row gap-4">
         {data.map((sound) => (
           <Sound key={sound.id} {...sound} />
         ))}
