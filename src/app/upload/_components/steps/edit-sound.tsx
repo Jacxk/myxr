@@ -36,9 +36,13 @@ export function EditSoundStep() {
     setTotalTime(time);
   };
 
-  const onRegionUpdate = (region: Region) => {
+  const onRegionCreate = (thisRegion: Region) => {
+    setRegion(thisRegion);
+  }
+
+  const onRegionUpdate = (thisRegion: Region) => {
     setFileChanged(true);
-    setRegion(region);
+    setRegion(thisRegion);
   };
 
   function goToNextStep() {
@@ -90,6 +94,7 @@ export function EditSoundStep() {
         url={URL.createObjectURL(data.file as Blob)}
         regionData={data.region}
         onDecode={onDecode}
+        onRegionCreate={onRegionCreate}
         onRegionUpdate={onRegionUpdate}
         editable
       />

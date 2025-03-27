@@ -14,6 +14,7 @@ type SoundWaveFromProps = {
   regionData?: LocalRegion;
   onDecode?: (time: number) => void;
   onRegionUpdate?: (region: Region) => void;
+  onRegionCreate?: (region: Region) => void;
 };
 
 type LocalRegion = {
@@ -27,6 +28,7 @@ export function SoundWaveForm({
   regionData,
   onDecode,
   onRegionUpdate,
+  onRegionCreate,
 }: Readonly<SoundWaveFromProps>) {
   const waveSurfer = useRef<WaveSurfer>();
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -64,6 +66,10 @@ export function SoundWaveForm({
           resize: true,
         });
         waveSurfer.current?.setTime(region.start);
+      });
+
+      regionsPlugin.on("region-created", (region) => {
+        onRegionCreate?.(region);
       });
 
       regionsPlugin.on("region-update", (region) => {
