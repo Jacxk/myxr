@@ -45,6 +45,7 @@ export function AddToGuildButton({
       title: `Add sound to ${localStorage.getItem("guildName")}`,
       body: "Are you sure you want to add this sound?",
       footer: <Button onClick={onAddClick}>Add</Button>,
+      authOnly: true
     });
   }
 

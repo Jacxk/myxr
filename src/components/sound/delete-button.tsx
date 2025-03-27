@@ -51,6 +51,7 @@ export function DeleteSoundButton({
           Delete
         </Button>
       ),
+      authOnly: true,
     });
   };
 

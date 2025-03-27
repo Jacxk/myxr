@@ -9,6 +9,7 @@ import { ModalProvider } from "~/context/ModalContext";
 import { TRPCReactProvider } from "~/trpc/react";
 import Navbar from "./_components/navbar";
 import { ThemeProvider } from "./_components/theme-provider";
+import { SessionProvider } from "next-auth/react";
 
 export const metadata: Metadata = {
   title: "Myxr",
@@ -30,7 +31,9 @@ export default function RootLayout({
                 <div className="flex h-full">
                   <div className="mx-auto h-full max-w-7xl flex-1 grow p-2 py-10">
                     {children}
-                    <Modal />
+                    <SessionProvider>
+                      <Modal />
+                    </SessionProvider>
                   </div>
                 </div>
                 <Toaster />

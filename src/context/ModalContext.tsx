@@ -13,16 +13,16 @@ type ModalContent = {
   body?: ReactNode | string;
   description?: ReactNode | string;
   footer?: ReactNode | string;
+  closeButton?: boolean;
+  authOnly?: boolean;
 };
 
 type ModalContextProps = {
+  openModal: (content: ModalContent) => void;
+  updateModal: (updatedContent: Partial<ModalContent>) => void;
+  closeModal: () => void;
   isOpen: boolean;
   content: ModalContent | null;
-  closeButton: boolean;
-  setIsOpen: (value: boolean) => void;
-  setContent: (content: ModalContent) => void;
-  openModal: (content?: ModalContent) => void;
-  closeModal: () => void;
 };
 
 const ModalContext = createContext<ModalContextProps | undefined>(undefined);
@@ -30,39 +30,32 @@ const ModalContext = createContext<ModalContextProps | undefined>(undefined);
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [content, setContent] = useState<ModalContent | null>(null);
-  const [contentTimeout, setContentTimeout] = useState<NodeJS.Timeout | null>(null);
 
-  const openModal = (newContent?: ModalContent) => {
-    if (!newContent && !content)
-      throw new Error(
-        "There's no content to display. Provide a content to openModal() or use setContent()",
-      );
-    if (newContent) setContent(newContent);
+  const openModal = (newContent: ModalContent) => {
+    setContent(newContent);
     setIsOpen(true);
-    if (contentTimeout) {
-      clearTimeout(contentTimeout);
-      setContentTimeout(null);
-    }
+  };
+
+  const updateModal = (updatedContent: Partial<ModalContent>) => {
+    setContent((prevContent) =>
+      prevContent ? { ...prevContent, ...updatedContent } : prevContent,
+    );
   };
 
   const closeModal = () => {
     setIsOpen(false);
-    setContentTimeout(
-      setTimeout(() => {
-        setContent(null);
-      }, 500),
-    );
+    setTimeout(() => {
+      setContent(null); // Clear content after modal closes
+    }, 500); // Match the closing animation duration
   };
 
   const value: ModalContextProps = useMemo(
     () => ({
+      openModal,
+      updateModal,
+      closeModal,
       isOpen,
       content,
-      openModal,
-      closeModal,
-      setContent,
-      setIsOpen,
-      closeButton: true,
     }),
     [isOpen, content],
   );

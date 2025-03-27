@@ -26,7 +26,7 @@ function openInviteLink(guildId: string) {
 export function SelectGuild({
   guilds,
 }: Readonly<{ guilds: Guild[] | undefined }>) {
-  const { openModal, isOpen, closeModal, setContent, content } = useModal();
+  const { openModal, isOpen, closeModal, updateModal } = useModal();
 
   const [guildId, setGuildId] = useState<string>("");
   const [botAvailable, setBotAvailable] = useState<boolean>(false);
@@ -40,13 +40,12 @@ export function SelectGuild({
 
   const onInviteClick = useCallback(() => {
     openInviteLink(guildId);
-    setContent({
+    updateModal({
       title: "Invite link generated",
       description:
         "We've opened a new tab with the invite link. If it didn't open try clicking the button again.",
-      footer: <Button onClick={onInviteClick}>Invite</Button>,
     });
-  }, [content, guildId]);
+  }, [guildId]);
 
   async function selectGuild(guild: string) {
     const [id, name] = guild.split("-");
@@ -58,6 +57,7 @@ export function SelectGuild({
         description:
           "Looks like the bot is not in this guild. You need to invite it to the guild to continue.",
         footer: <Button onClick={onInviteClick}>Invite</Button>,
+        authOnly: true,
       });
     } else if (!success) {
       toast.error("Something went wrong...");
@@ -95,18 +95,19 @@ export function SelectGuild({
     if (data?.success && data.value) {
       closeModal();
       toast("Bot has been added!", { description: "You may continue..." });
+      return;
     }
+
     if (tries > 0) {
-      setContent({
-        ...content,
+      updateModal({
         title: "Oh no...",
         description:
           "We couldn't detect the bot inside the guild. Try inviting it again.",
-        footer: <Button onClick={onInviteClick}>Invite</Button>,
       });
     }
+
     if (tries >= maxTries) {
-      setContent({
+      updateModal({
         title: "This is akward.",
         description: `We've tried ${tries} times to verify if the bot joined. Maybe try again later.`,
       });
