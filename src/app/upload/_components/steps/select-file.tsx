@@ -69,6 +69,7 @@ export function SelectFileStep() {
         id="file-dropzone"
         type="file"
         className="hidden"
+        accept="audio/*"
         onChange={handleFileChange}
       />
       <div>
