@@ -24,16 +24,11 @@ export const soundRouter = createTRPCRouter({
       });
       return sounds ?? [];
     }),
-
   getLatests: publicProcedure
     .input(z.object({ limit: z.number().default(10) }))
     .query(async ({ input }) => {
       return (await getSounds({ take: input.limit })) ?? [];
     }),
-
-  getSecretMessage: protectedProcedure.query(() => {
-    return "you can now see this secret message!";
-  }),
   getSound: publicProcedure.input(z.string()).query(({ input }) => {
     return getSound(input);
   }),
