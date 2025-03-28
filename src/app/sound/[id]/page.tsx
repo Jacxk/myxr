@@ -1,27 +1,27 @@
 import { Avatar } from "@radix-ui/react-avatar";
 import { Download, Flag } from "lucide-react";
+import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { AddToGuildButton } from "~/components/sound/add-button";
+import { SoundWaveForm } from "~/components/sound/sound-waveform";
 import { AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
-import { api } from "~/trpc/server";
-import { CreatedDate } from "./_components/created-date";
-import { SoundEmoji } from "./_components/emoji";
-import { Guild } from "./_components/guild";
-import { SoundWaveForm } from "~/components/sound/sound-waveform";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
-import { Metadata } from "next";
-import { cache } from "react";
+import { api } from "~/trpc/server";
+import { CreatedDate } from "./_components/created-date";
+import { SoundEmoji } from "./_components/emoji";
+import { Guild } from "./_components/guild";
 
 export const getSound = cache(async (id: string) => {
   return await api.sound.getSound(id);
-})
+});
 
 export async function generateMetadata({
   params,
@@ -112,7 +112,11 @@ export default async function ({
       <div className="border-b" />
       <div className="flex flex-row justify-between gap-4">
         <div className="flex flex-col gap-4">
-          <h1>Guilds using sound</h1>
+          {sound.guildSounds.length === 0 ? (
+            <span>No guilds are using this sound.</span>
+          ) : (
+            <span>Guilds using sound</span>
+          )}
           <div className="flex flex-wrap gap-4">
             {sound.guildSounds.map((guildSound) => (
               <Guild

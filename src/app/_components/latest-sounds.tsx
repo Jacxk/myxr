@@ -16,7 +16,7 @@ export function LatestSounds() {
   }
 
   return (
-    <div className="flex w-full flex-col gap-4 p-5">
+    <div className="flex w-full flex-col gap-4">
       <div className="flex flex-row items-end justify-between">
         <h1 className="text-3xl font-bold">Latest Sounds</h1>
         <Link href="/latest">View more...</Link>

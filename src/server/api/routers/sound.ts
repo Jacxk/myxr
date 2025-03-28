@@ -25,7 +25,7 @@ export const soundRouter = createTRPCRouter({
       return sounds ?? [];
     }),
   getLatests: publicProcedure
-    .input(z.object({ limit: z.number().default(10) }))
+    .input(z.object({ limit: z.number().default(6) }))
     .query(async ({ input }) => {
       return (await getSounds({ take: input.limit })) ?? [];
     }),
