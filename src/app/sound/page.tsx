@@ -31,7 +31,7 @@ export default async function ({
 
   return (
     <AudioProvider>
-      <div className="flex flex-row gap-4">
+      <div className="flex flex-row gap-4 flex-wrap justify-center">
         {data.map((sound) => (
           <Sound key={sound.id} {...sound} />
         ))}

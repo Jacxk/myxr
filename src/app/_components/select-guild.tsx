@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowDown } from "lucide-react";
 import type { Guild } from "next-auth";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -116,8 +117,10 @@ export function SelectGuild({
 
   return (
     <Select onValueChange={selectGuild} defaultValue={defaultGuild ?? ""}>
-      <SelectTrigger className="w-[180px]">
-        <SelectValue placeholder="Select a Guild" />
+      <SelectTrigger className="sm:min-w-[180px]" asChild>
+        <div className="hidden sm:flex">
+          <SelectValue placeholder="Select a Guild" />
+        </div>
       </SelectTrigger>
       <SelectContent>
         {guilds?.map((guild) => (

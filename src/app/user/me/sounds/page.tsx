@@ -22,7 +22,7 @@ export default async function () {
 
   return (
     <AudioProvider>
-      <div className="flex flex-row flex-wrap gap-2">
+      <div className="flex flex-row flex-wrap justify-center gap-2">
         {sounds.map((sound) => (
           <Sound key={sound.id} {...sound} />
         ))}

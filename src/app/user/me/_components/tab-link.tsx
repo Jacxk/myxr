@@ -18,7 +18,7 @@ export function TabLink({
   const activeClass =
     pathname.startsWith(href)
       ? "bg-secondary/50"
-      : "";
+      : "text-primary/75";
 
   return (
     <Link

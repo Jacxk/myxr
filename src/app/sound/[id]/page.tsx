@@ -49,12 +49,12 @@ export default async function ({
   if (!sound) return notFound();
 
   return (
-    <div className="flex w-full flex-col gap-8">
-      <div className="flex w-full flex-row gap-8">
+    <div className="flex w-full flex-col gap-4">
+      <div className="flex w-full flex-row gap-4">
         <div className="flex">
           <SoundEmoji emoji={sound.emoji} />
         </div>
-        <div className="flex flex-grow flex-row justify-between">
+        <div className="flex flex-grow flex-col justify-between gap-6 sm:flex-row">
           <div className="flex flex-col">
             <div className="flex gap-2">
               <h1 className="text-3xl font-extrabold">{sound.name}</h1>
@@ -110,7 +110,7 @@ export default async function ({
       </div>
       <SoundWaveForm url={sound.url} />
       <div className="border-b" />
-      <div className="flex flex-row justify-between gap-4">
+      <div className="flex flex-col-reverse justify-between gap-4 sm:flex-row">
         <div className="flex flex-col gap-4">
           {sound.guildSounds.length === 0 ? (
             <span>No guilds are using this sound.</span>
@@ -127,11 +127,14 @@ export default async function ({
             ))}
           </div>
         </div>
-        <div className="flex w-1/5 flex-col gap-6">
-          <CreatedDate date={sound.createdAt} />
-          <div className="flex flex-col">
-            <span className="text-lg font-semibold">Tags</span>
-            <div className="flex flex-wrap gap-1">
+        <div className="flex flex-col gap-4 sm:w-1/5">
+          <CreatedDate
+            className="flex-row items-center justify-between sm:flex-col sm:items-start sm:justify-normal"
+            date={sound.createdAt}
+          />
+          <div className="flex flex-row items-center justify-between sm:flex-col sm:items-start sm:justify-normal">
+            <span className="w-52 font-semibold">Tags</span>
+            <div className="flex flex-wrap gap-1 justify-end">
               {sound.tags.map((tag) => (
                 <Button key={tag.name} variant="secondary" asChild>
                   <Link href={`/sound?tag=${tag.name}`}>{tag.name}</Link>

@@ -28,7 +28,7 @@ export const Modal = () => {
               You need to be logged in to perform this action.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <Button variant="secondary" onClick={close}>
               Close
             </Button>
@@ -49,7 +49,7 @@ export const Modal = () => {
           <DialogDescription>{content?.description}</DialogDescription>
         </DialogHeader>
         {content?.body}
-        <DialogFooter>
+        <DialogFooter className="gap-2">
           {!content?.closeButton && (
             <Button type="button" variant="secondary" onClick={close}>
               Close

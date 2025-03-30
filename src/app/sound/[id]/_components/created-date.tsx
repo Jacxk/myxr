@@ -2,10 +2,13 @@
 
 import TimeAgo from "react-timeago";
 
-export function CreatedDate({ date }: Readonly<{ date: Date }>) {
+export function CreatedDate({
+  date,
+  className,
+}: Readonly<{ date: Date; className?: string }>) {
   return (
-    <div className="flex flex-col">
-      <span className="text-lg font-semibold">Created</span>
+    <div className={`flex ${className}`}>
+      <span className="w-52 font-semibold">Created</span>
       <TimeAgo date={date} />
     </div>
   );
