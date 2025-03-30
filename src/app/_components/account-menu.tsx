@@ -1,6 +1,7 @@
 "use client";
 
 import type { User } from "next-auth";
+import { signOut } from "next-auth/react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useCallback } from "react";
@@ -55,9 +56,9 @@ export function AccountMenu({ user }: Readonly<{ user: User | undefined }>) {
           <DropdownMenuItem>Settings</DropdownMenuItem>
         </Link>
         <DropdownMenuSeparator />
-        <Link href="/api/auth/signout">
-          <DropdownMenuItem>Sign out</DropdownMenuItem>
-        </Link>
+        <DropdownMenuItem onClick={() => signOut({ redirectTo: "/" })}>
+          Sign out
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

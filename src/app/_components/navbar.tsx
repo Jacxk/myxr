@@ -13,6 +13,7 @@ import { AccountMenu } from "./account-menu";
 import { Authenticated, NotAuthenticated } from "./authentication";
 import { SearchBar } from "./search-bar";
 import { SelectGuild } from "./select-guild";
+import { SignInButton } from "./signin";
 
 export default async function Navbar() {
   const session: Session | null = await auth();
@@ -41,10 +42,9 @@ export default async function Navbar() {
         </Link>
         <AccountMenu user={session?.user} />
       </Authenticated>
+
       <NotAuthenticated>
-        <Link href="/api/auth/signin">
-          <Button>Sign in</Button>
-        </Link>
+        <SignInButton />
       </NotAuthenticated>
     </nav>
   );
