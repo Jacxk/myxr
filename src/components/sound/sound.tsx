@@ -5,13 +5,6 @@ import { useRef } from "react";
 import Twemoji from "react-twemoji";
 import { useAudio } from "../../context/AudioContext";
 import { Button } from "../ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
 import { AddToGuildButton } from "./add-button";
 import { DeleteSoundButton } from "./delete-button";
 
@@ -21,7 +14,7 @@ export interface SoundProperties {
   emoji: string;
   url: string;
   tags?: string[];
-  createdBy: { name: string | null; id: string };
+  createdBy?: { name: string | null; id: string };
   className?: string;
   displayAddButton?: boolean;
   displayDeleteButton?: boolean;
@@ -34,7 +27,6 @@ export default function Sound({
   name,
   emoji,
   url,
-  createdBy,
   className,
   displayAddButton = true,
   displayDeleteButton,
@@ -62,35 +54,37 @@ export default function Sound({
   };
 
   return (
-    <Card
-      className={`flex w-48 cursor-pointer flex-col justify-between ${className}`}
-      onClick={play}
+    <div
+      className={`flex h-44 w-32 flex-col items-center justify-center ${className}`}
     >
-      <CardHeader>
-        <CardTitle>
-          <Button className="p-0" variant="link" asChild>
-            <Link href={`/sound/${id}`} onClick={(e) => e.stopPropagation()}>
-              {name}
-            </Link>
-          </Button>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex items-center justify-center p-0">
+      <button
+        className="flex transform cursor-pointer transition-transform active:scale-90"
+        onClick={play}
+      >
         <Twemoji options={{ className: "twemoji" }}>{emoji}</Twemoji>
-        <audio ref={audioRef} controls hidden>
-          <source src={url} type="audio/mpeg" />
-          <track kind="captions" />
-        </audio>
-      </CardContent>
-      <CardFooter className="flex w-full justify-between gap-4 p-6">
-        {displayAddButton ? <AddToGuildButton soundId={id} /> : null}
+      </button>
+
+      <Button className="p-0" variant="link" asChild>
+        <Link href={`/sound/${id}`} className="w-full truncate text-ellipsis">
+          {name}
+        </Link>
+      </Button>
+
+      <div className="flex flex-row gap-2">
+        <div>{displayAddButton ? <AddToGuildButton soundId={id} /> : null}</div>
+
         {displayDeleteButton ? (
           <DeleteSoundButton
             discordSoundId={discordSoundId!}
             guildId={guildId!}
           />
         ) : null}
-      </CardFooter>
-    </Card>
+      </div>
+
+      <audio ref={audioRef} controls hidden>
+        <source src={url} type="audio/mpeg" />
+        <track kind="captions" />
+      </audio>
+    </div>
   );
 }
