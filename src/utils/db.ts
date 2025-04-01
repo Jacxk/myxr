@@ -132,7 +132,7 @@ export const getDatabaseSession = (sessionId: string) => {
   });
 };
 
-export const updateGuildMemberShip = async (userId: string) => {
+export const updateGuildMemberShip = async (userId: string, force?: boolean) => {
   const user = await db.user.findFirst({
     where: { id: userId },
     select: { updatedAt: true },
@@ -141,7 +141,7 @@ export const updateGuildMemberShip = async (userId: string) => {
   if (!user?.updatedAt) return;
 
   const fiveMinutesAgo = new Date(Date.now() - 5 * 60000);
-  if (user.updatedAt > fiveMinutesAgo) return;
+  if (!force && user.updatedAt > fiveMinutesAgo) return;
 
   const guilds = await getDiscordGuilds(userId);
 

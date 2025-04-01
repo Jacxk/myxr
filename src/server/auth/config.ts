@@ -70,8 +70,9 @@ export const authConfig = {
       return !!auth;
     },
     signIn: async ({ account }) => {
-      if (account) {
-        await updateAccessToken(account.userId!, {
+      if (account?.userId) {
+        await updateGuildMemberShip(account.userId, true);
+        await updateAccessToken(account.userId, {
           access_token: account.access_token!,
           refresh_token: account.refresh_token!,
           expires_at: Math.floor(Date.now() / 1000) + account.expires_in!,

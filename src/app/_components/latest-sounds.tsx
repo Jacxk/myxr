@@ -7,7 +7,7 @@ import { api } from "~/trpc/react";
 
 export function LatestSounds() {
   const [latestSounds] = api.sound.getLatests.useSuspenseQuery(
-    {},
+    { limit: 8 },
     { refetchOnWindowFocus: false },
   );
 

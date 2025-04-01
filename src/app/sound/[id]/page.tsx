@@ -134,7 +134,7 @@ export default async function ({
           />
           <div className="flex flex-row items-center justify-between sm:flex-col sm:items-start sm:justify-normal">
             <span className="w-52 font-semibold">Tags</span>
-            <div className="flex flex-wrap gap-1 justify-end">
+            <div className="flex flex-wrap justify-end gap-1">
               {sound.tags.map((tag) => (
                 <Button key={tag.name} variant="secondary" asChild>
                   <Link href={`/sound?tag=${tag.name}`}>{tag.name}</Link>

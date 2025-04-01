@@ -1,6 +1,5 @@
 "use client";
 
-import { ArrowDown } from "lucide-react";
 import type { Guild } from "next-auth";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
