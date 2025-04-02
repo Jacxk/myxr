@@ -3,42 +3,66 @@
 import {
   createContext,
   type ReactNode,
-  type RefObject,
   useContext,
+  useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
 interface AudioContextType {
-  currentAudio: HTMLAudioElement | null;
-  play: (ref: RefObject<HTMLAudioElement>) => void;
+  audioRef: React.RefObject<HTMLAudioElement>;
+  isPlaying: boolean;
+  play: (src: string) => void;
+  pause: () => void;
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
 
 export const AudioProvider = ({ children }: { children: ReactNode }) => {
-  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(
-    null,
-  );
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  const play = (ref: RefObject<HTMLAudioElement>) => {
-    if (ref.current) {
-      if (currentAudio) {
-        currentAudio.pause();
-        currentAudio.currentTime = 0;
-      }
-      ref.current.play();
-      setCurrentAudio(ref.current);
+  const play = (src: string) => {
+    if (audioRef.current) {
+      audioRef.current.src = src;
+      audioRef.current.play();
     }
+  };
+  const pause = () => {
+    audioRef.current?.pause();
   };
 
   const value = useMemo(
-    () => ({ currentAudio, play }),
-    [currentAudio],
+    () => ({ audioRef, isPlaying, play, pause }),
+    [audioRef, isPlaying],
   );
 
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const handlePlay = () => setIsPlaying(true);
+    const handleStop = () => setIsPlaying(false);
+
+    audio.addEventListener("play", handlePlay);
+    audio.addEventListener("pause", handleStop);
+    audio.addEventListener("ended", handleStop);
+
+    return () => {
+      audio.removeEventListener("play", handlePlay);
+      audio.removeEventListener("pause", handleStop);
+      audio.removeEventListener("ended", handleStop);
+    };
+  }, []);
+
   return (
-    <AudioContext.Provider value={value}>{children}</AudioContext.Provider>
+    <AudioContext.Provider value={value}>
+      {children}
+      <audio ref={audioRef} preload="auto" controls hidden>
+        <track kind="captions" />
+      </audio>
+    </AudioContext.Provider>
   );
 };
 

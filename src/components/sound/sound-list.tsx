@@ -3,7 +3,6 @@
 import type { GuildSound, Sound, User } from "@prisma/client";
 import { Snowflake } from "discord-api-types/globals";
 import Link from "next/link";
-import { useRef } from "react";
 import Twemoji from "react-twemoji";
 import { AudioProvider, useAudio } from "~/context/AudioContext";
 import { Button } from "../ui/button";
@@ -31,13 +30,12 @@ function SoundRow({
   className?: string;
   external?: boolean;
 }>) {
-  const audioRef = useRef<HTMLAudioElement>(null);
   const { play } = useAudio();
 
   return (
     <Button
       variant="ghost"
-      onClick={play.bind(null, audioRef)}
+      onClick={() => play(sound.url)}
       className={`gap-0 rounded-none ${className}`}
       asChild
     >
@@ -50,11 +48,6 @@ function SoundRow({
               {sound.emoji}
             </Twemoji>
           )}
-
-          <audio ref={audioRef} controls hidden>
-            <source src={sound.url} type="audio/mpeg" />
-            <track kind="captions" />
-          </audio>
         </div>
         <div className="col-span-2">
           {external ? (
