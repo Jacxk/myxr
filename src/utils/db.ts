@@ -28,19 +28,31 @@ export const discordAuthorization = async (id: string) => {
   return `Bearer ${user?.access_token}`;
 };
 
-export const getSounds = ({
+export const getSounds = async ({
   take,
   skip,
+  userId,
 }: {
   take?: number;
   skip?: number;
+  userId?: string;
 } = {}) => {
-  return db.sound.findMany({
+  const sounds = await db.sound.findMany({
     orderBy: { createdAt: "desc" },
     take,
     skip,
-    include: soundInclude,
+    include: {
+      ...soundInclude,
+      likedBy: { where: { userId } },
+    },
   });
+
+  return (
+    sounds.map((sound) => ({
+      ...sound,
+      liked: sound.likedBy.length > 0,
+    })) ?? []
+  );
 };
 
 export const getSoundsFromUser = async (id: string) => {
@@ -48,28 +60,37 @@ export const getSoundsFromUser = async (id: string) => {
     db.sound.findMany({
       orderBy: { createdAt: "desc" },
       where: { createdById },
-      include: soundInclude,
+      include: { ...soundInclude, likedBy: { where: { userId: id } } },
     });
   const sounds = await getData(id);
 
-  if (sounds.length > 0) return sounds;
+  if (sounds.length > 0)
+    return sounds.map((sound) => ({
+      ...sound,
+      liked: sound.likedBy.length > 0,
+    }));
 
   const user = await db.account.findFirst({
     where: { providerAccountId: id },
   });
 
-  if (user) return getData(user.userId);
+  if (user)
+    return (await getData(user.userId)).map((sound) => ({
+      ...sound,
+      liked: sound.likedBy.length > 0,
+    }));
 
   return [];
 };
 
-export const getSound = (id: string) => {
+export const getSound = (id: string, userId?: string) => {
   return db.sound.findFirst({
     where: { id },
     include: {
       createdBy: true,
       guildSounds: { select: { guild: { select: { name: true, id: true } } } },
       tags: true,
+      likedBy: { where: { userId } },
     },
   });
 };
@@ -132,7 +153,10 @@ export const getDatabaseSession = (sessionId: string) => {
   });
 };
 
-export const updateGuildMemberShip = async (userId: string, force?: boolean) => {
+export const updateGuildMemberShip = async (
+  userId: string,
+  force?: boolean,
+) => {
   const user = await db.user.findFirst({
     where: { id: userId },
     select: { updatedAt: true },

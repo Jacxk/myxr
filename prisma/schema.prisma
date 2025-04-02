@@ -28,6 +28,7 @@ model Sound {
     guildSounds GuildSound[]
     createdBy   User         @relation(fields: [createdById], references: [id])
     tags        Tag[]
+    likedBy     LikedSound[]
 
     @@index([name])
 }
@@ -68,6 +69,7 @@ model GuildMembership {
 enum Role {
     USER
     ADMIN
+    PRO
 }
 
 // Necessary for Next auth
@@ -112,6 +114,7 @@ model User {
     sounds        Sound[]
     guilds        GuildMembership[]
     role          Role              @default(USER)
+    likedSounds   LikedSound[]
 
     @@index([name])
 }
@@ -122,4 +125,13 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model LikedSound {
+    userId  String
+    soundId String
+    user    User   @relation(fields: [userId], references: [id])
+    sound   Sound  @relation(fields: [soundId], references: [id])
+
+    @@id([userId, soundId])
 }

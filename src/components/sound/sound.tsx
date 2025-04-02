@@ -7,6 +7,7 @@ import { useAudio } from "../../context/AudioContext";
 import { Button } from "../ui/button";
 import { AddToGuildButton } from "./add-button";
 import { DeleteSoundButton } from "./delete-button";
+import { LikeButton } from "./like-button";
 
 export interface SoundProperties {
   id: string;
@@ -20,6 +21,7 @@ export interface SoundProperties {
   displayDeleteButton?: boolean;
   discordSoundId?: string;
   guildId?: string;
+  liked?: boolean;
 }
 
 export default function Sound({
@@ -32,6 +34,7 @@ export default function Sound({
   displayDeleteButton,
   discordSoundId,
   guildId,
+  liked,
 }: Readonly<SoundProperties>) {
   const { isPlaying, currentId, play } = useAudio();
   const currentlyPlay = useMemo(
@@ -59,7 +62,8 @@ export default function Sound({
       </Button>
 
       <div className="flex flex-row gap-2">
-        <div>{displayAddButton ? <AddToGuildButton soundId={id} /> : null}</div>
+        {displayAddButton ? <AddToGuildButton soundId={id} /> : null}
+        {displayAddButton ? <LikeButton soundId={id} liked={liked} /> : null}
 
         {displayDeleteButton ? (
           <DeleteSoundButton

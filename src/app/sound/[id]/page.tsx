@@ -18,9 +18,13 @@ import { api } from "~/trpc/server";
 import { CreatedDate } from "./_components/created-date";
 import { SoundEmoji } from "./_components/emoji";
 import { Guild } from "./_components/guild";
+import { auth } from "~/server/auth";
+import { LikeButton } from "~/components/sound/like-button";
 
 export const getSound = cache(async (id: string) => {
-  return await api.sound.getSound(id);
+  const session = await auth();
+  const userId = session?.user.id;
+  return await api.sound.getSound({ id, userId });
 });
 
 export async function generateMetadata({
@@ -86,6 +90,8 @@ export default async function ({
           <div className="flex gap-2">
             <TooltipProvider delayDuration={0}>
               <AddToGuildButton soundId={id} />
+
+              <LikeButton soundId={id} liked={sound.likedBy.length > 0} />
 
               <Tooltip>
                 <TooltipTrigger asChild>

@@ -19,17 +19,7 @@ export function LatestSounds() {
     <div className="grid w-full grid-cols-3 gap-x-2 gap-y-6 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9">
       <h1 className="col-span-full text-3xl font-bold">Latest Sounds</h1>
       {latestSounds.map((sound) => (
-        <Sound
-          key={sound.id}
-          createdBy={{
-            id: sound.createdBy.id,
-            name: sound.createdBy.name,
-          }}
-          emoji={sound.emoji}
-          id={sound.id}
-          name={sound.name}
-          url={sound.url}
-        />
+        <Sound key={sound.id} {...sound} />
       ))}
       <div className="col-span-full flex justify-center">
         <Button variant="link" asChild>

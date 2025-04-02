@@ -26,9 +26,9 @@ export const soundRouter = createTRPCRouter({
     }),
   getLatests: publicProcedure
     .input(z.object({ limit: z.number().default(6) }))
-    .query(async ({ input }) => {
-      return (await getSounds({ take: input.limit })) ?? [];
-    }),
+    .query(({ input, ctx }) =>
+      getSounds({ take: input.limit, userId: ctx.session?.user.id }),
+    ),
   getAllSounds: publicProcedure
     .input(
       z.object({
@@ -43,7 +43,10 @@ export const soundRouter = createTRPCRouter({
         skip: input.cursor ? 1 : 0, // Skip the cursor if provided
         cursor: input.cursor ? { id: input.cursor } : undefined,
         orderBy: { usegeCount: "desc" },
-        include: { createdBy: true },
+        include: {
+          createdBy: true,
+          likedBy: { where: { userId: ctx.session?.user.id } },
+        },
       });
 
       let nextCursor: typeof input.cursor | undefined = undefined;
@@ -53,13 +56,23 @@ export const soundRouter = createTRPCRouter({
       }
 
       return {
-        sounds,
+        sounds: sounds.map((sound) => ({
+          ...sound,
+          liked: sound.likedBy.length > 0,
+        })),
         nextCursor,
       };
     }),
-  getSound: publicProcedure.input(z.string()).query(({ input }) => {
-    return getSound(input);
-  }),
+  getSound: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        userId: z.string().optional(),
+      }),
+    )
+    .query(({ input }) => {
+      return getSound(input.id, input.userId);
+    }),
   search: publicProcedure
     .input(
       z.object({
@@ -85,5 +98,32 @@ export const soundRouter = createTRPCRouter({
           ],
         },
       });
+    }),
+  likeSound: protectedProcedure
+    .input(
+      z.object({
+        soundId: z.string(),
+        liked: z.boolean(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session?.user.id;
+      const data = {
+        userId,
+        soundId: input.soundId,
+      };
+
+      const existingLike = await ctx.db.likedSound.findFirst({ where: data });
+      let liked;
+
+      if (existingLike) {
+        await ctx.db.likedSound.delete({ where: { userId_soundId: data } });
+        liked = false;
+      } else {
+        await ctx.db.likedSound.create({ data });
+        liked = true;
+      }
+
+      return { success: true, value: liked };
     }),
 });
