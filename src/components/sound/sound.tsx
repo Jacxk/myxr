@@ -6,6 +6,7 @@ import { useAudio } from "../../context/AudioContext";
 import { Button } from "../ui/button";
 import { AddToGuildButton } from "./add-button";
 import { DeleteSoundButton } from "./delete-button";
+import { useRef } from "react";
 
 export interface SoundProperties {
   id: string;
@@ -32,7 +33,8 @@ export default function Sound({
   discordSoundId,
   guildId,
 }: Readonly<SoundProperties>) {
-  const { audioRef, play } = useAudio();
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const { play } = useAudio();
 
   return (
     <div
@@ -40,7 +42,7 @@ export default function Sound({
     >
       <button
         className="flex transform cursor-pointer transition-transform active:scale-90"
-        onClick={play}
+        onClick={play.bind(null, audioRef)}
       >
         <Twemoji options={{ className: "twemoji" }}>{emoji}</Twemoji>
       </button>

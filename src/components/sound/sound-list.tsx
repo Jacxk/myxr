@@ -3,6 +3,7 @@
 import type { GuildSound, Sound, User } from "@prisma/client";
 import { Snowflake } from "discord-api-types/globals";
 import Link from "next/link";
+import { useRef } from "react";
 import Twemoji from "react-twemoji";
 import { AudioProvider, useAudio } from "~/context/AudioContext";
 import { Button } from "../ui/button";
@@ -30,12 +31,13 @@ function SoundRow({
   className?: string;
   external?: boolean;
 }>) {
-  const { audioRef, play } = useAudio();
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const { play } = useAudio();
 
   return (
     <Button
       variant="ghost"
-      onClick={play}
+      onClick={play.bind(null, audioRef)}
       className={`gap-0 rounded-none ${className}`}
       asChild
     >
@@ -68,7 +70,7 @@ function SoundRow({
             </Button>
           )}
         </div>
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           {external ? (
             <span>{sound.createdBy.name}</span>
           ) : (

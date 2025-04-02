@@ -6,37 +6,34 @@ import {
   type RefObject,
   useContext,
   useMemo,
-  useRef,
   useState,
 } from "react";
 
 interface AudioContextType {
   currentAudio: HTMLAudioElement | null;
-  audioRef: RefObject<HTMLAudioElement>;
-  play: () => void;
+  play: (ref: RefObject<HTMLAudioElement>) => void;
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
 
 export const AudioProvider = ({ children }: { children: ReactNode }) => {
-  const audioRef = useRef<HTMLAudioElement>(null);
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(
     null,
   );
 
-  const play = () => {
-    if (audioRef.current) {
+  const play = (ref: RefObject<HTMLAudioElement>) => {
+    if (ref.current) {
       if (currentAudio) {
         currentAudio.pause();
         currentAudio.currentTime = 0;
       }
-      audioRef.current.play();
-      setCurrentAudio(audioRef.current);
+      ref.current.play();
+      setCurrentAudio(ref.current);
     }
   };
 
   const value = useMemo(
-    () => ({ currentAudio, audioRef, play }),
+    () => ({ currentAudio, play }),
     [currentAudio],
   );
 
