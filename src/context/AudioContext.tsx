@@ -13,7 +13,8 @@ import {
 interface AudioContextType {
   audioRef: React.RefObject<HTMLAudioElement>;
   isPlaying: boolean;
-  play: (src: string) => void;
+  currentId: string | null;
+  play: (id: string, src: string) => void;
   pause: () => void;
 }
 
@@ -22,11 +23,13 @@ const AudioContext = createContext<AudioContextType | undefined>(undefined);
 export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentId, setCurrentId] = useState<string | null>(null);
 
-  const play = (src: string) => {
+  const play = (id: string, src: string) => {
     if (audioRef.current) {
       audioRef.current.src = src;
       audioRef.current.play();
+      setCurrentId(id);
     }
   };
   const pause = () => {
@@ -34,8 +37,8 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const value = useMemo(
-    () => ({ audioRef, isPlaying, play, pause }),
-    [audioRef, isPlaying],
+    () => ({ audioRef, isPlaying, currentId, play, pause }),
+    [audioRef, isPlaying, currentId],
   );
 
   useEffect(() => {

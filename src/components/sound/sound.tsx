@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo } from "react";
 import Twemoji from "react-twemoji";
 import { useAudio } from "../../context/AudioContext";
 import { Button } from "../ui/button";
@@ -32,15 +33,19 @@ export default function Sound({
   discordSoundId,
   guildId,
 }: Readonly<SoundProperties>) {
-  const { play } = useAudio();
+  const { isPlaying, currentId, play } = useAudio();
+  const currentlyPlay = useMemo(
+    () => isPlaying && currentId === id,
+    [isPlaying, currentId],
+  );
 
   return (
     <div
       className={`flex shrink flex-col items-center justify-center ${className}`}
     >
       <button
-        className="flex transform cursor-pointer transition-transform active:scale-90"
-        onClick={() => play(url)}
+        className={`flex transform cursor-pointer transition-transform ${currentlyPlay ? "scale-90" : ""}`}
+        onClick={() => play(id, url)}
       >
         <Twemoji options={{ className: "twemoji w-20 h-20" }}>{emoji}</Twemoji>
       </button>

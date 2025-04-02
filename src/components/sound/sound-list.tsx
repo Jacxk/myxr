@@ -35,7 +35,7 @@ function SoundRow({
   return (
     <Button
       variant="ghost"
-      onClick={() => play(sound.url)}
+      onClick={() => play(discordSoundId, sound.url)}
       className={`gap-0 rounded-none ${className}`}
       asChild
     >
