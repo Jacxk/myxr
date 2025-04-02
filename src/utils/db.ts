@@ -90,7 +90,7 @@ export const getSound = (id: string, userId?: string) => {
       createdBy: true,
       guildSounds: { select: { guild: { select: { name: true, id: true } } } },
       tags: true,
-      likedBy: { where: { userId } },
+      likedBy: true,
     },
   });
 };

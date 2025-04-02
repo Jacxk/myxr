@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { AddToGuildButton } from "~/components/sound/add-button";
+import { LikeButton } from "~/components/sound/like-button";
 import { SoundWaveForm } from "~/components/sound/sound-waveform";
 import { AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -18,13 +19,11 @@ import { api } from "~/trpc/server";
 import { CreatedDate } from "./_components/created-date";
 import { SoundEmoji } from "./_components/emoji";
 import { Guild } from "./_components/guild";
+import { SoundData } from "./_components/sound-data";
 import { auth } from "~/server/auth";
-import { LikeButton } from "~/components/sound/like-button";
 
 export const getSound = cache(async (id: string) => {
-  const session = await auth();
-  const userId = session?.user.id;
-  return await api.sound.getSound({ id, userId });
+  return await api.sound.getSound({ id });
 });
 
 export async function generateMetadata({
@@ -48,6 +47,7 @@ export default async function ({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const session = await auth();
   const sound = await getSound(id);
 
   if (!sound) return notFound();
@@ -60,12 +60,7 @@ export default async function ({
         </div>
         <div className="flex flex-grow flex-col justify-between gap-6 sm:flex-row">
           <div className="flex flex-col">
-            <div className="flex gap-2">
-              <h1 className="text-3xl font-extrabold">{sound.name}</h1>
-              <span className="items-center rounded-full bg-secondary p-2 px-3">
-                Uses: {sound.usegeCount}
-              </span>
-            </div>
+            <h1 className="text-3xl font-extrabold">{sound.name}</h1>
             <Button
               className="flex w-fit flex-row items-center gap-2 p-0"
               variant="link"
@@ -91,7 +86,12 @@ export default async function ({
             <TooltipProvider delayDuration={0}>
               <AddToGuildButton soundId={id} />
 
-              <LikeButton soundId={id} liked={sound.likedBy.length > 0} />
+              <LikeButton
+                soundId={id}
+                liked={sound.likedBy.some(
+                  (data) => data.userId === session?.user.id,
+                )}
+              />
 
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -134,20 +134,23 @@ export default async function ({
           </div>
         </div>
         <div className="flex flex-col gap-4 sm:w-1/5">
-          <CreatedDate
-            className="flex-row items-center justify-between sm:flex-col sm:items-start sm:justify-normal"
-            date={sound.createdAt}
-          />
-          <div className="flex flex-row items-center justify-between sm:flex-col sm:items-start sm:justify-normal">
-            <span className="w-52 font-semibold">Tags</span>
-            <div className="flex flex-wrap justify-end gap-1">
+          <SoundData title="Created">
+            <CreatedDate date={sound.createdAt} />
+          </SoundData>
+
+          <SoundData title="Uses">{sound.usegeCount}</SoundData>
+
+          <SoundData title="Likes">{sound.likedBy.length}</SoundData>
+
+          {sound.tags.length > 0 && (
+            <SoundData title="Tags">
               {sound.tags.map((tag) => (
                 <Button key={tag.name} variant="secondary" asChild>
                   <Link href={`/sound?tag=${tag.name}`}>{tag.name}</Link>
                 </Button>
               ))}
-            </div>
-          </div>
+            </SoundData>
+          )}
         </div>
       </div>
     </div>

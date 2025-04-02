@@ -67,11 +67,10 @@ export const soundRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
-        userId: z.string().optional(),
       }),
     )
     .query(({ input }) => {
-      return getSound(input.id, input.userId);
+      return getSound(input.id);
     }),
   search: publicProcedure
     .input(
