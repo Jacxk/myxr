@@ -5,6 +5,7 @@ import { AudioProvider } from "~/context/AudioContext";
 
 export default async function Home() {
   void api.sound.getLatests.prefetch({});
+  void api.sound.getAllSounds.prefetchInfinite({});
 
   return (
     <HydrateClient>

@@ -1,7 +1,19 @@
 import { Castle, Volume2 } from "lucide-react";
+import { redirect } from "next/navigation";
+import { auth } from "~/server/auth";
+import { api } from "~/trpc/server";
 import { TabLink } from "./_components/tab-link";
 
-export default function ({ children }: { children: React.ReactNode }) {
+export default async function ({ children }: { children: React.ReactNode }) {
+  const session = await auth();
+
+  if (session?.user) {
+    void api.user.getGuildSounds.prefetch(session.user.id);
+    void api.user.getGuildSounds.prefetch(session.user.guilds[0]?.id!);
+  } else {
+    return redirect("/");
+  }
+
   return (
     <div className="flex flex-col gap-4 sm:flex-row">
       <div className="flex flex-row justify-center gap-2 sm:w-1/2 sm:flex-col sm:justify-start lg:w-1/4">

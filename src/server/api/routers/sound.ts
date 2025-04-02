@@ -34,7 +34,7 @@ export const soundRouter = createTRPCRouter({
       z.object({
         limit: z.number().min(1).max(100).default(50),
         cursor: z.string().nullish(),
-        direction: z.enum(["forward", "backward"]),
+        direction: z.enum(["forward", "backward"]).default("forward"),
       }),
     )
     .query(async ({ ctx, input }) => {
