@@ -33,25 +33,7 @@ export default function Sound({
   discordSoundId,
   guildId,
 }: Readonly<SoundProperties>) {
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const { currentAudio, setCurrentAudio } = useAudio();
-
-  const play = () => {
-    if (audioRef.current) {
-      if (currentAudio && currentAudio !== audioRef.current) {
-        currentAudio.pause();
-        currentAudio.currentTime = 0;
-      }
-      if (audioRef.current.paused) {
-        void audioRef.current.play();
-        setCurrentAudio(audioRef.current);
-      } else {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-        setCurrentAudio(null);
-      }
-    }
-  };
+  const { audioRef, play } = useAudio();
 
   return (
     <div

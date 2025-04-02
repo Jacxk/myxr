@@ -3,7 +3,6 @@
 import type { GuildSound, Sound, User } from "@prisma/client";
 import { Snowflake } from "discord-api-types/globals";
 import Link from "next/link";
-import { useRef } from "react";
 import Twemoji from "react-twemoji";
 import { AudioProvider, useAudio } from "~/context/AudioContext";
 import { Button } from "../ui/button";
@@ -31,25 +30,7 @@ function SoundRow({
   className?: string;
   external?: boolean;
 }>) {
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const { currentAudio, setCurrentAudio } = useAudio();
-
-  const play = () => {
-    if (audioRef.current) {
-      if (currentAudio && currentAudio !== audioRef.current) {
-        currentAudio.pause();
-        currentAudio.currentTime = 0;
-      }
-      if (audioRef.current.paused) {
-        audioRef.current.play();
-        setCurrentAudio(audioRef.current);
-      } else {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-        setCurrentAudio(null);
-      }
-    }
-  };
+  const { audioRef, play } = useAudio();
 
   return (
     <Button
