@@ -81,7 +81,7 @@ export function AddToGuildButton({
 
   return (
     <TooltipProvider delayDuration={0}>
-      <Tooltip>
+      <Tooltip disableHoverableContent>
         <TooltipTrigger asChild>
           <Button
             variant="outline"

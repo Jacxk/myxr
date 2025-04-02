@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import Sound from "~/components/sound/sound";
-import { AudioProvider } from "~/context/AudioContext";
+import { Button } from "~/components/ui/button";
 import { api } from "~/trpc/react";
 
 export function LatestSounds() {
   const [latestSounds] = api.sound.getLatests.useSuspenseQuery(
-    { limit: 8 },
+    { limit: 9 },
     { refetchOnWindowFocus: false },
   );
 
@@ -16,28 +16,26 @@ export function LatestSounds() {
   }
 
   return (
-    <div className="flex w-full flex-col gap-4">
-      <div className="flex flex-row items-end justify-between">
-        <h1 className="text-3xl font-bold">Latest Sounds</h1>
-        <Link href="/latest">View more...</Link>
+    <div className="grid w-full grid-cols-3 gap-x-2 gap-y-6 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9">
+      <h1 className="col-span-full text-3xl font-bold">Latest Sounds</h1>
+      {latestSounds.map((sound) => (
+        <Sound
+          key={sound.id}
+          createdBy={{
+            id: sound.createdBy.id,
+            name: sound.createdBy.name,
+          }}
+          emoji={sound.emoji}
+          id={sound.id}
+          name={sound.name}
+          url={sound.url}
+        />
+      ))}
+      <div className="col-span-full flex justify-center">
+        <Button variant="link" asChild>
+          <Link href="/latest">View more...</Link>
+        </Button>
       </div>
-      <AudioProvider>
-        <div className="flex flex-wrap justify-center gap-4 md:justify-normal">
-          {latestSounds.map((sound) => (
-            <Sound
-              key={sound.id}
-              createdBy={{
-                id: sound.createdBy.id,
-                name: sound.createdBy.name,
-              }}
-              emoji={sound.emoji}
-              id={sound.id}
-              name={sound.name}
-              url={sound.url}
-            />
-          ))}
-        </div>
-      </AudioProvider>
     </div>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
 import Twemoji from "react-twemoji";
 import { useAudio } from "../../context/AudioContext";
 import { Button } from "../ui/button";
@@ -37,7 +36,7 @@ export default function Sound({
 
   return (
     <div
-      className={`flex h-44 w-32 flex-col items-center justify-center ${className}`}
+      className={`flex shrink flex-col items-center justify-center ${className}`}
     >
       <button
         className="flex transform cursor-pointer transition-transform active:scale-90"
@@ -46,10 +45,12 @@ export default function Sound({
         <Twemoji options={{ className: "twemoji" }}>{emoji}</Twemoji>
       </button>
 
-      <Button className="p-0" variant="link" asChild>
-        <Link href={`/sound/${id}`} className="w-full truncate text-ellipsis">
-          {name}
-        </Link>
+      <Button
+        className="whitespace-normal break-words p-0 text-center"
+        variant="link"
+        asChild
+      >
+        <Link href={`/sound/${id}`}>{name}</Link>
       </Button>
 
       <div className="flex flex-row gap-2">

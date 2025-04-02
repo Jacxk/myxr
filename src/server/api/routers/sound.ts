@@ -29,6 +29,34 @@ export const soundRouter = createTRPCRouter({
     .query(async ({ input }) => {
       return (await getSounds({ take: input.limit })) ?? [];
     }),
+  getAllSounds: publicProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(100).default(50),
+        cursor: z.string().nullish(),
+        direction: z.enum(["forward", "backward"]),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const sounds = await ctx.db.sound.findMany({
+        take: input.limit + 1, // Fetch one extra to check if there's a next page
+        skip: input.cursor ? 1 : 0, // Skip the cursor if provided
+        cursor: input.cursor ? { id: input.cursor } : undefined,
+        orderBy: { usegeCount: "desc" },
+        include: { createdBy: true },
+      });
+
+      let nextCursor: typeof input.cursor | undefined = undefined;
+      if (sounds.length > input.limit) {
+        const nextItem = sounds.pop();
+        nextCursor = nextItem!.id;
+      }
+
+      return {
+        sounds,
+        nextCursor,
+      };
+    }),
   getSound: publicProcedure.input(z.string()).query(({ input }) => {
     return getSound(input);
   }),
