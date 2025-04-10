@@ -138,9 +138,17 @@ export default async function ({
             <CreatedDate date={sound.createdAt} />
           </SoundData>
 
-          <SoundData title="Uses">{sound.usegeCount}</SoundData>
+          <SoundData title="Usage">
+            {Intl.NumberFormat(navigator.language, {
+              notation: "compact",
+            }).format(sound.usegeCount)}
+          </SoundData>
 
-          <SoundData title="Likes">{sound.likedBy.length}</SoundData>
+          <SoundData title="Likes">
+            {Intl.NumberFormat(navigator.language, {
+              notation: "compact",
+            }).format(sound.likedBy.length)}
+          </SoundData>
 
           {sound.tags.length > 0 && (
             <SoundData title="Tags">

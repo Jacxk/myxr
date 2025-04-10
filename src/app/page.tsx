@@ -1,5 +1,5 @@
 import { api, HydrateClient } from "~/trpc/server";
-import { LatestSounds } from "./_components/latest-sounds";
+import { LatestSounds } from "./_components/page/latest-sounds";
 import { AllSounds } from "./_components/page/all-sounds";
 import { AudioProvider } from "~/context/AudioContext";
 

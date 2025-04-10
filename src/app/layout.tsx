@@ -26,9 +26,9 @@ export default function RootLayout({
         <TRPCReactProvider>
           <ThemeProvider attribute="class" enableSystem>
             <ModalProvider>
-              <div className="flex h-full flex-col">
+              <div className="flex min-h-full flex-col">
                 <Navbar />
-                <div className="flex h-full">
+                <div className="flex h-full grow">
                   <div className="mx-auto h-full max-w-7xl flex-1 grow p-2 sm:py-10">
                     {children}
                     <SessionProvider>
@@ -37,6 +37,28 @@ export default function RootLayout({
                   </div>
                 </div>
                 <Toaster />
+                <footer className="mt-4 border-t py-4 text-center text-sm text-muted-foreground">
+                  <p>
+                    Created by{" "}
+                    <a
+                      href="https://github.com/jacxk"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
+                    >
+                      Jacxk
+                    </a>
+                    . View the project on{" "}
+                    <a
+                      href="https://github.com/jacxk/myxr"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
+                    >
+                      GitHub
+                    </a>
+                  </p>
+                </footer>
               </div>
             </ModalProvider>
           </ThemeProvider>

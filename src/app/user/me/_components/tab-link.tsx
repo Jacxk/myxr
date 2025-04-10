@@ -15,15 +15,14 @@ export function TabLink({
   if (!href) throw Error("No href defined");
   const pathname = usePathname();
 
-  const activeClass =
-    pathname.startsWith(href)
-      ? "bg-secondary/50"
-      : "text-primary/75";
+  const activeClass = pathname.startsWith(href)
+    ? "bg-secondary/50"
+    : "text-primary/75";
 
   return (
     <Link
       href={href}
-      className={`block rounded-md p-2 hover:bg-secondary px-4 ${activeClass} ${className}`}
+      className={`block rounded-md p-2 px-4 hover:bg-secondary ${activeClass} ${className}`}
     >
       {children}
     </Link>
