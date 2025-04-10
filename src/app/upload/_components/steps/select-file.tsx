@@ -4,6 +4,7 @@ import { UploadCloud } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useSteps } from "~/context/StepsContext";
+import { cn } from "~/lib/utils";
 
 export interface SoundUploadProps {
   file?: File;
@@ -17,6 +18,7 @@ export interface SoundUploadProps {
 export function SelectFileStep() {
   const { data, setData, nextStep } = useSteps<SoundUploadProps>();
   const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [validFileType, setValidFileType] = useState<boolean>(false);
 
   function onFileSelect(files: File[]) {
     toast("File selected " + files[0]?.name);
@@ -26,6 +28,8 @@ export function SelectFileStep() {
   const handleDragOver = (event: React.DragEvent<HTMLLabelElement>) => {
     event.preventDefault();
     event.stopPropagation();
+
+    setValidFileType(event.dataTransfer.items[0]?.type === "audio/mpeg");
     setIsDragging(true);
   };
 
@@ -33,12 +37,18 @@ export function SelectFileStep() {
     event.preventDefault();
     event.stopPropagation();
     setIsDragging(false);
+    setValidFileType(false);
   };
 
   const handleDrop = (event: React.DragEvent<HTMLLabelElement>) => {
     event.preventDefault();
     event.stopPropagation();
     setIsDragging(false);
+    setValidFileType(false);
+
+    if (!validFileType) {
+      return toast.error("Invalid file type. Please upload an audio file.");
+    }
 
     if (event.dataTransfer.files.length > 0) {
       const uploadedFiles = Array.from(event.dataTransfer.files);
@@ -58,7 +68,14 @@ export function SelectFileStep() {
   return (
     <label
       htmlFor="file-dropzone"
-      className={`flex h-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-4 transition hover:border-blue-600 hover:bg-blue-600/20 ${isDragging ? "border-green-600 bg-green-600/20" : ""}`}
+      className={cn(
+        "flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed",
+        "h-full border-gray-300 p-4 transition hover:border-blue-600 hover:bg-blue-600/20",
+        {
+          "border-green-600 bg-green-600/20": isDragging,
+          "border-red-600 bg-red-600/20": isDragging && !validFileType,
+        },
+      )}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}

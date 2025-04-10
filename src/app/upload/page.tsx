@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: "Upload a Sound - Myxr",
 };
 
-export default async function Home() {
+export default async function () {
   const session = await auth();
 
   if (!session || !session.user) {

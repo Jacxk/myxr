@@ -22,22 +22,19 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
-      <body className="h-screen">
+      <body>
         <TRPCReactProvider>
           <ThemeProvider attribute="class" enableSystem>
             <ModalProvider>
-              <div className="flex min-h-full flex-col">
+              <div className="flex h-screen flex-col">
                 <Navbar />
-                <div className="flex h-full grow">
-                  <div className="mx-auto h-full max-w-7xl flex-1 grow p-2 sm:py-10">
-                    {children}
-                    <SessionProvider>
-                      <Modal />
-                    </SessionProvider>
-                  </div>
+                <div className="mx-auto w-full max-w-7xl flex-1 grow p-2 sm:py-10">
+                  {children}
+                  <SessionProvider>
+                    <Modal />
+                  </SessionProvider>
                 </div>
-                <Toaster />
-                <footer className="mt-4 border-t py-4 text-center text-sm text-muted-foreground">
+                <footer className="grow-0 border-t py-4 text-center text-sm text-muted-foreground">
                   <p>
                     Created by{" "}
                     <a
@@ -60,6 +57,7 @@ export default function RootLayout({
                   </p>
                 </footer>
               </div>
+              <Toaster />
             </ModalProvider>
           </ThemeProvider>
         </TRPCReactProvider>
