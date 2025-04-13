@@ -1,31 +1,32 @@
 "use client";
 
-import InfiniteScroll from "react-infinite-scroll-component";
+import { InfiniteScroll } from "~/components/infinite-scroll";
 import Sound from "~/components/sound/sound";
 import { api } from "~/trpc/react";
 
 export function AllSounds() {
-  const { data, fetchNextPage, hasNextPage } =
+  const { data, fetchNextPage, hasNextPage, isLoading } =
     api.sound.getAllSounds.useInfiniteQuery(
       {},
       {
+        refetchOnWindowFocus: false,
         getNextPageParam: (lastPage) => lastPage.nextCursor,
       },
     );
 
+  const allSounds = data?.pages.flatMap((p) => p.sounds) ?? [];
+
   return (
     <InfiniteScroll
-      dataLength={data?.pages.flatMap((page) => page.sounds).length ?? 0}
-      next={fetchNextPage}
-      hasMore={!!hasNextPage}
-      loader={null}
-      className="grid w-full grid-cols-3 gap-x-2 gap-y-6 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9"
+      loadMore={fetchNextPage}
+      hasMore={hasNextPage}
+      isLoading={isLoading}
     >
-      {data?.pages.flatMap((page, pageIndex) =>
-        page.sounds.map((sound) => (
-          <Sound key={`${sound.id} - ${pageIndex}`} {...sound} />
-        )),
-      )}
+      <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9">
+        {allSounds.map((sound) => (
+          <Sound key={sound.id} {...sound} />
+        ))}
+      </div>
     </InfiniteScroll>
   );
 }

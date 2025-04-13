@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import Twemoji from "react-twemoji";
 import { useAudio } from "../../context/AudioContext";
 import { Button } from "../ui/button";
@@ -24,7 +24,7 @@ export interface SoundProperties {
   liked?: boolean;
 }
 
-export default function Sound({
+export default memo(function Sound({
   id,
   name,
   emoji,
@@ -74,4 +74,4 @@ export default function Sound({
       </div>
     </div>
   );
-}
+});
