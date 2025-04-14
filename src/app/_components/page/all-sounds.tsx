@@ -5,7 +5,7 @@ import Sound from "~/components/sound/sound";
 import { api } from "~/trpc/react";
 
 export function AllSounds() {
-  const { data, fetchNextPage, hasNextPage, isLoading } =
+  const { data, fetchNextPage, hasNextPage, isFetching } =
     api.sound.getAllSounds.useInfiniteQuery(
       {},
       {
@@ -20,7 +20,7 @@ export function AllSounds() {
     <InfiniteScroll
       loadMore={fetchNextPage}
       hasMore={hasNextPage}
-      isLoading={isLoading}
+      isLoading={isFetching}
     >
       <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9">
         {allSounds.map((sound) => (

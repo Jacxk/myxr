@@ -29,7 +29,7 @@ export function EditDetailsStep() {
     name: "",
     createdBy: { id: "", name: "" },
     emoji: "",
-    id: -1,
+    id: "",
     url: URL.createObjectURL(data.newFile as Blob),
     tags: [],
   });
@@ -67,7 +67,7 @@ export function EditDetailsStep() {
         name: session?.user.name ?? "",
       },
       emoji: "🎵",
-      id: -1,
+      id: "",
       url: URL.createObjectURL(data.newFile as Blob),
     });
   }, [data.newFile]);

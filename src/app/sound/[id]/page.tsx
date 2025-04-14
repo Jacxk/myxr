@@ -22,7 +22,7 @@ import { Guild } from "./_components/guild";
 import { SoundData } from "./_components/sound-data";
 import { auth } from "~/server/auth";
 
-export const getSound = cache(async (id: string) => {
+const getSound = cache(async (id: string) => {
   return await api.sound.getSound({ id });
 });
 

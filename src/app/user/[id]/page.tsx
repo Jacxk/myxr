@@ -5,7 +5,7 @@ import Sound from "~/components/sound/sound";
 import { AudioProvider } from "~/context/AudioContext";
 import { api } from "~/trpc/server";
 
-export const getSounds = cache(async (id: string) => {
+const getSounds = cache(async (id: string) => {
   return await api.user.getSounds(id);
 });
 
