@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { memo, useMemo } from "react";
+import { memo } from "react";
 import Twemoji from "react-twemoji";
 import { useAudio } from "../../context/AudioContext";
 import { Button } from "../ui/button";
@@ -25,6 +25,24 @@ export interface SoundProperties {
   liked?: boolean;
 }
 
+const EmojiButton = memo(
+  ({ id, url, emoji }: { id: string; url: string; emoji: string }) => {
+    const { isPlaying, currentId, play } = useAudio();
+    const currentlyPlay = isPlaying && currentId === id;
+
+    return (
+      <button
+        className={cn("flex transform cursor-pointer transition-transform", {
+          "scale-90": currentlyPlay,
+        })}
+        onClick={() => play(id, url)}
+      >
+        <Twemoji options={{ className: "twemoji w-20 h-20" }}>{emoji}</Twemoji>
+      </button>
+    );
+  },
+);
+
 export default memo(function Sound({
   id,
   name,
@@ -37,12 +55,6 @@ export default memo(function Sound({
   guildId,
   liked,
 }: Readonly<SoundProperties>) {
-  const { isPlaying, currentId, play } = useAudio();
-  const currentlyPlay = useMemo(
-    () => isPlaying && currentId === id,
-    [isPlaying, currentId],
-  );
-
   return (
     <div
       className={cn(
@@ -50,13 +62,7 @@ export default memo(function Sound({
         className,
       )}
     >
-      <button
-        className={`flex transform cursor-pointer transition-transform ${currentlyPlay ? "scale-90" : ""}`}
-        onClick={() => play(id, url)}
-      >
-        <Twemoji options={{ className: "twemoji w-20 h-20" }}>{emoji}</Twemoji>
-      </button>
-
+      <EmojiButton id={id} url={url} emoji={emoji} />
       <Button
         className="whitespace-normal break-words p-0 text-center"
         variant="link"
