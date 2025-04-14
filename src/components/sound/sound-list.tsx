@@ -7,6 +7,7 @@ import Twemoji from "react-twemoji";
 import { AudioProvider, useAudio } from "~/context/AudioContext";
 import { Button } from "../ui/button";
 import { DeleteSoundButton } from "./delete-button";
+import { cn } from "~/lib/utils";
 
 interface SoundData extends GuildSound {
   sound: SoundIncludedUser;
@@ -36,7 +37,7 @@ function SoundRow({
     <Button
       variant="ghost"
       onClick={() => play(discordSoundId, sound.url)}
-      className={`gap-0 rounded-none ${className}`}
+      className={cn("gap-0 rounded-none", className)}
       asChild
     >
       <div className="grid h-fit w-full cursor-pointer grid-cols-4 items-center">
@@ -113,7 +114,7 @@ export function SoundTableList({
               discordSoundId={guildSound.discordSoundId}
               guildId={guildSound.guildId}
               external={guildSound.external}
-              className={guildSound.external ? "bg-yellow-100/5" : ""}
+              className={cn({ "bg-yellow-100/5": guildSound.external })}
             />
           ))}
         </div>

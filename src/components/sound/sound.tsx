@@ -8,6 +8,7 @@ import { Button } from "../ui/button";
 import { AddToGuildButton } from "./add-button";
 import { DeleteSoundButton } from "./delete-button";
 import { LikeButton } from "./like-button";
+import { cn } from "~/lib/utils";
 
 export interface SoundProperties {
   id: string;
@@ -44,7 +45,10 @@ export default memo(function Sound({
 
   return (
     <div
-      className={`flex shrink flex-col items-center justify-center ${className}`}
+      className={cn(
+        "flex shrink flex-col items-center justify-center",
+        className,
+      )}
     >
       <button
         className={`flex transform cursor-pointer transition-transform ${currentlyPlay ? "scale-90" : ""}`}

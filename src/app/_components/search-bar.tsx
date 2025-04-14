@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
+import { cn } from "~/lib/utils";
 
 type SearchInputProps = {
   value: string;
@@ -23,7 +24,7 @@ function SearchInput({
 }: Readonly<SearchInputProps>) {
   return (
     <Input
-      className={`border-r-none rounded-r-none ${className}`}
+      className={cn("border-r-none rounded-r-none", className)}
       type="search"
       placeholder="Search for a sound"
       value={value}
@@ -61,7 +62,7 @@ export function SearchBar() {
     : "flex flex-1 justify-end";
 
   return (
-    <div className={`${className}`}>
+    <div className={className}>
       {!isSearchVisible && (
         <Button
           className="sm:hidden"
@@ -75,7 +76,7 @@ export function SearchBar() {
 
       <form
         onSubmit={handleSearch}
-        className={`sm:static ${isSearchVisible ? "flex" : "hidden"} sm:flex`}
+        className={cn("sm:static sm:flex", isSearchVisible ? "flex" : "hidden")}
       >
         {isSearchVisible && (
           <SearchInput {...props} onBlur={handleBlur} autoFocus />

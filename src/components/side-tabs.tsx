@@ -2,6 +2,7 @@
 
 import { createContext, ReactNode, useContext, useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
+import { cn } from "~/lib/utils";
 
 type SideTab = {
   activeTab: string | null;
@@ -23,7 +24,7 @@ export function SideTab({
 
   return (
     <SideTabContext.Provider value={value}>
-      <div className={`flex ${className}`}>{children}</div>
+      <div className={cn("flex", className)}>{children}</div>
     </SideTabContext.Provider>
   );
 }
@@ -37,7 +38,7 @@ export function SideTabTrigger({
 
   return (
     <Button
-      className={`w-full p-6 ${className}`}
+      className={cn("w-full p-6", className)}
       onClick={() => setActiveTab(id)}
       variant={activeTab === id ? "default" : "outline"}
     >
@@ -57,6 +58,6 @@ export function SideTabContent({
 }) {
   const { activeTab } = useContext(SideTabContext);
   return activeTab === id ? (
-    <div className={`flex-1 p-4 ${className}`}>{children}</div>
+    <div className={cn("flex-1 p-4", className)}>{children}</div>
   ) : null;
 }

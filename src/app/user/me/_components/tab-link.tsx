@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { cn } from "~/lib/utils";
 
 export function TabLink({
   children,
@@ -15,14 +16,16 @@ export function TabLink({
   if (!href) throw Error("No href defined");
   const pathname = usePathname();
 
-  const activeClass = pathname.startsWith(href)
-    ? "bg-secondary/50"
-    : "text-primary/75";
+  const isActive = pathname.startsWith(href);
 
   return (
     <Link
       href={href}
-      className={`block rounded-md p-2 px-4 hover:bg-secondary ${activeClass} ${className}`}
+      className={cn(
+        "block rounded-md p-2 px-4 hover:bg-secondary",
+        isActive ? "bg-secondary/50 text-primary/75" : "text-primary/50",
+        className,
+      )}
     >
       {children}
     </Link>
