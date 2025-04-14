@@ -8,15 +8,15 @@ export function TabLink({
   children,
   href,
   className = "",
+  matchExact,
 }: Readonly<{
   children: React.ReactNode;
   href: string;
   className?: string;
+  matchExact?: string;
 }>) {
-  if (!href) throw Error("No href defined");
   const pathname = usePathname();
-
-  const isActive = pathname.startsWith(href);
+  const isActive = pathname.startsWith(href) || pathname === matchExact;
 
   return (
     <Link

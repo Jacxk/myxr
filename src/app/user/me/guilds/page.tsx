@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
 import { auth } from "~/server/auth";
+import GuildsRoute from "./[id]/page";
 
 export default async function () {
   const session = await auth();
@@ -13,5 +13,5 @@ export default async function () {
       </span>
     );
 
-  redirect(`/user/me/guilds/${guild.id}`);
+  return <GuildsRoute params={Promise.resolve({ id: guild.id })} />;
 }

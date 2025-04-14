@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import SoundsRoute from "./sounds/page";
 
 export default function () {
-  redirect("/user/me/sounds");
+  return <SoundsRoute />;
 }
