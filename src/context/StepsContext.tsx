@@ -63,14 +63,14 @@ export const StepsProvider = <D,>({ children }: { children: ReactNode }) => {
   let stepCounter = 0;
 
   return (
-    <StepsContext.Provider value={value}>
+    <StepsContext value={value}>
       {stepsArray.map((child, index) => {
         if (isValidElement(child)) {
           return cloneElement(child, { step: index + 1 } as StepProps);
         }
         return child;
       })}
-    </StepsContext.Provider>
+    </StepsContext>
   );
 };
 

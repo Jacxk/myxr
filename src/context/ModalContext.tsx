@@ -61,7 +61,7 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
   );
 
   return (
-    <ModalContext.Provider value={value}>{children}</ModalContext.Provider>
+    <ModalContext value={value}>{children}</ModalContext>
   );
 };
 

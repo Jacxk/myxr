@@ -60,12 +60,12 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <AudioContext.Provider value={value}>
+    <AudioContext value={value}>
       {children}
       <audio ref={audioRef} preload="auto" controls hidden>
         <track kind="captions" />
       </audio>
-    </AudioContext.Provider>
+    </AudioContext>
   );
 };
 
