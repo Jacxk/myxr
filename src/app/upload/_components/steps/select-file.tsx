@@ -65,6 +65,11 @@ export function SelectFileStep() {
     }
   };
 
+  const textColor = cn("mt-2 text-gray-600 transition", {
+    "text-green-600": isDragging,
+    "text-red-600": isDragging && !validFileType,
+  });
+
   return (
     <label
       htmlFor="file-dropzone"
@@ -72,6 +77,7 @@ export function SelectFileStep() {
         "flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed",
         "h-full border-gray-300 p-4 transition hover:border-blue-600 hover:bg-blue-600/20",
         {
+          "animate-pulse": isDragging && !validFileType,
           "border-green-600 bg-green-600/20": isDragging,
           "border-red-600 bg-red-600/20": isDragging && !validFileType,
         },
@@ -80,8 +86,8 @@ export function SelectFileStep() {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <UploadCloud className="size-16 text-gray-600" />
-      <p className="mt-2 text-gray-600">Choose file or drag and drop</p>
+      <UploadCloud className={cn("size-16", textColor)} />
+      <p className={textColor}>Choose file or drag and drop</p>
       <input
         id="file-dropzone"
         type="file"
