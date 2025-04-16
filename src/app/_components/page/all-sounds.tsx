@@ -2,6 +2,7 @@
 
 import { InfiniteScroll } from "~/components/infinite-scroll";
 import Sound from "~/components/sound/sound";
+import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { api } from "~/trpc/react";
 
 export function AllSounds() {
@@ -9,7 +10,6 @@ export function AllSounds() {
     api.sound.getAllSounds.useInfiniteQuery(
       {},
       {
-        refetchOnWindowFocus: false,
         getNextPageParam: (lastPage) => lastPage.nextCursor,
       },
     );
@@ -22,11 +22,11 @@ export function AllSounds() {
       hasMore={hasNextPage}
       isLoading={isFetching}
     >
-      <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9">
+      <SoundsGrid>
         {allSounds.map((sound) => (
           <Sound key={sound.id} {...sound} />
         ))}
-      </div>
+      </SoundsGrid>
     </InfiniteScroll>
   );
 }

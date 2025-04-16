@@ -1,3 +1,4 @@
+import { Sound } from "@prisma/client";
 import { z } from "zod";
 
 import {
@@ -76,27 +77,49 @@ export const soundRouter = createTRPCRouter({
     .input(
       z.object({
         query: z.string(),
-        type: z.enum(["Normal", "Tag"]),
+        type: z
+          .enum(["normal", "tag"])
+          .nullish()
+          .transform((value) => value ?? "normal"),
+        limit: z.number().min(1).max(100).default(50),
+        cursor: z.string().nullish(),
+        direction: z.enum(["forward", "backward"]).default("forward"),
       }),
     )
     .query(async ({ ctx, input }) => {
-      if (input.type === "Tag") {
-        const tag = await ctx.db.tag.findFirst({
+      let sounds: Sound[] = [];
+
+      if (input.type === "normal") {
+        sounds = await ctx.db.sound.findMany({
+          take: input.limit + 1,
+          skip: input.cursor ? 1 : 0,
+          cursor: input.cursor ? { id: input.cursor } : undefined,
+          where: {
+            OR: [
+              { name: { search: input.query } },
+              { tags: { some: { name: { search: input.query } } } },
+            ],
+          },
+        });
+      } else if (input.type === "tag") {
+        const tags = await ctx.db.tag.findFirst({
           where: { name: input.query },
           include: { sounds: true },
         });
 
-        return tag?.sounds ?? [];
+        sounds = tags?.sounds ?? [];
       }
 
-      return ctx.db.sound.findMany({
-        where: {
-          OR: [
-            { name: { search: input.query } },
-            { tags: { some: { name: { search: input.query } } } },
-          ],
-        },
-      });
+      let nextCursor: typeof input.cursor | undefined = undefined;
+      if (sounds.length > input.limit) {
+        const nextItem = sounds.pop();
+        nextCursor = nextItem!.id;
+      }
+
+      return {
+        sounds,
+        nextCursor,
+      };
     }),
   likeSound: protectedProcedure
     .input(

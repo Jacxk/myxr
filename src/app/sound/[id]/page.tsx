@@ -135,7 +135,7 @@ export default async function ({
               <SoundData title="Tags">
                 {sound.tags.map((tag) => (
                   <Button key={tag.name} variant="secondary" asChild>
-                    <Link href={`/sound?tag=${tag.name}`}>{tag.name}</Link>
+                    <Link href={`/sound?query=${tag.name}&type=tag`}>{tag.name}</Link>
                   </Button>
                 ))}
               </SoundData>

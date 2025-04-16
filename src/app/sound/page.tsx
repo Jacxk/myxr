@@ -1,30 +1,53 @@
+"use client";
+
+import { useSearchParams } from "next/navigation";
+import { z } from "zod";
+import { InfiniteScroll } from "~/components/infinite-scroll";
 import Sound from "~/components/sound/sound";
+import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { AudioProvider } from "~/context/AudioContext";
-import { api } from "~/trpc/server";
+import { api } from "~/trpc/react";
 
-export default async function ({
-  searchParams,
-}: {
-  searchParams: Promise<{ [key: string]: string | undefined }>;
-}) {
-  const { page = "1", tag = "", q = "" } = await searchParams;
-  const data = await api.sound.search({
-    type: !tag ? "Normal" : "Tag",
-    query: q || tag,
-  });
+export default function () {
+  const searchParams = useSearchParams();
+  const query = searchParams.get("query");
+  const type = searchParams.get("type") as z.infer<
+    z.ZodEnum<["normal", "tag"]>
+  >;
 
-  if (data.length === 0)
-    return <span>No sounds where found matching the criteria.</span>;
+  if (!query) return <span>No query provided.</span>;
+
+  const { data, fetchNextPage, hasNextPage, isFetching } =
+    api.sound.search.useInfiniteQuery(
+      {
+        type,
+        query,
+      },
+      {
+        refetchOnWindowFocus: false,
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
+      },
+    );
+
+  const hasData = data && (data.pages[0]?.sounds?.length ?? 0) > 0;
+  const sounds = data?.pages.flatMap((p) => p.sounds) ?? [];
 
   return (
     <>
-      <title>{`${tag || q} - Search`}</title>
+      <title>{`${query} - Search`}</title>
       <AudioProvider>
-        <div className="flex flex-row flex-wrap justify-center gap-4">
-          {data.map((sound) => (
-            <Sound key={sound.id} {...sound} />
-          ))}
-        </div>
+        <InfiniteScroll
+          loadMore={fetchNextPage}
+          hasMore={hasNextPage}
+          isLoading={isFetching}
+          endMessage={!hasData ? "No sounds where found." : ""}
+        >
+          <SoundsGrid>
+            {sounds.map((sound) => (
+              <Sound key={sound.id} {...sound} />
+            ))}
+          </SoundsGrid>
+        </InfiniteScroll>
       </AudioProvider>
     </>
   );

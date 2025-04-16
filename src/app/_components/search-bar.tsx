@@ -43,7 +43,7 @@ export function SearchBar() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      router.push(`/sound?q=${encodeURIComponent(query.trim())}`);
+      router.push(`/sound?query=${encodeURIComponent(query.trim())}`);
       setIsSearchVisible(false);
     }
   };
