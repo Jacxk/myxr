@@ -30,7 +30,7 @@ export function SoundWaveForm({
   onRegionUpdate,
   onRegionCreate,
 }: Readonly<SoundWaveFromProps>) {
-  const waveSurfer = useRef<WaveSurfer>();
+  const waveSurfer = useRef<WaveSurfer>(undefined);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [region, setRegion] = useState<LocalRegion>({

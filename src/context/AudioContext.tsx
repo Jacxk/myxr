@@ -11,7 +11,7 @@ import {
 } from "react";
 
 interface AudioContextType {
-  audioRef: React.RefObject<HTMLAudioElement>;
+  audioRef: React.RefObject<HTMLAudioElement | null>;
   isPlaying: boolean;
   currentId: string | null;
   play: (id: string, src: string) => void;
