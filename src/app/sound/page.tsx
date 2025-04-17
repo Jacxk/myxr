@@ -35,20 +35,18 @@ export default function () {
   return (
     <>
       <title>{`${query} - Search`}</title>
-      <AudioProvider>
-        <InfiniteScroll
-          loadMore={fetchNextPage}
-          hasMore={hasNextPage}
-          isLoading={isFetching}
-          endMessage={!hasData ? "No sounds where found." : ""}
-        >
-          <SoundsGrid>
-            {sounds.map((sound) => (
-              <Sound key={sound.id} {...sound} />
-            ))}
-          </SoundsGrid>
-        </InfiniteScroll>
-      </AudioProvider>
+      <InfiniteScroll
+        loadMore={fetchNextPage}
+        hasMore={hasNextPage}
+        isLoading={isFetching}
+        endMessage={!hasData ? "No sounds where found." : ""}
+      >
+        <SoundsGrid>
+          {sounds.map((sound) => (
+            <Sound key={sound.id} {...sound} />
+          ))}
+        </SoundsGrid>
+      </InfiniteScroll>
     </>
   );
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Sound from "~/components/sound/sound";
-import { AudioProvider } from "~/context/AudioContext";
+import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { auth } from "~/server/auth";
 import { api } from "~/trpc/server";
 
@@ -21,12 +21,12 @@ export default async function () {
   }
 
   return (
-    <AudioProvider>
+    <SoundsGrid sm={4} md={5} lg={6} xl={8}>
       <div className="flex flex-row flex-wrap justify-center gap-2">
         {sounds.map((sound) => (
           <Sound key={sound.id} {...sound} />
         ))}
       </div>
-    </AudioProvider>
+    </SoundsGrid>
   );
 }
