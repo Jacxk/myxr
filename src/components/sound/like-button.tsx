@@ -15,15 +15,22 @@ import {
 export function LikeButton({
   soundId,
   liked,
+  isPreview,
 }: Readonly<{
   soundId: string;
   liked?: boolean;
+  isPreview?: boolean;
 }>) {
   const [isLiked, setIsLiked] = useState<boolean>(liked ?? false);
   const { mutate, isPending, isSuccess, data } =
     api.sound.likeSound.useMutation();
 
   const likeClick = () => {
+    if (isPreview) {
+      toast(`Preview Mode: Sound like ${isLiked ? "removed" : "added"}`);
+      setIsLiked((liked) => !liked)
+      return;
+    }
     mutate({ soundId, liked: !liked });
   };
 

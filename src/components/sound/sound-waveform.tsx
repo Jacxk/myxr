@@ -118,7 +118,7 @@ export function SoundWaveForm({
   }, [waveSurfer, region, isPlaying]);
 
   return (
-    <div className="w-full touch-none rounded-2xl border p-4">
+    <div className="w-full touch-none rounded-2xl border p-4 text-muted-foreground">
       <div className="flex flex-row gap-4">
         <div className="relative flex flex-col items-center justify-center">
           <Button

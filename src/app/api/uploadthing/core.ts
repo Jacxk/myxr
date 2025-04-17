@@ -16,7 +16,7 @@ export const ourFileRouter = {
       z.object({
         emoji: z.string(),
         name: z.string().max(20),
-        tags: z.array(z.string()).optional(),
+        tags: z.array(z.object({ name: z.string() })).optional(),
       }),
     )
     .middleware(async ({ input }) => {
@@ -43,7 +43,7 @@ export const ourFileRouter = {
           emoji: metadata.emoji,
           name: metadata.name,
           tags: {
-            connectOrCreate: metadata.tags?.map((name) => ({
+            connectOrCreate: metadata.tags?.map(({ name }) => ({
               create: { name },
               where: { name },
             })),

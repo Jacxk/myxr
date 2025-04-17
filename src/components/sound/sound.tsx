@@ -15,14 +15,15 @@ export interface SoundProperties {
   name: string;
   emoji: string;
   url: string;
-  tags?: string[];
-  createdBy?: { name: string | null; id: string };
+  tags?: Array<{ name: string }>;
+  createdBy?: { name: string | null; id: string, image: string | null };
   className?: string;
   displayAddButton?: boolean;
   displayDeleteButton?: boolean;
   discordSoundId?: string;
   guildId?: string;
   liked?: boolean;
+  isPreview?: boolean;
 }
 
 const EmojiButton = memo(
@@ -54,6 +55,7 @@ export default memo(function Sound({
   discordSoundId,
   guildId,
   liked,
+  isPreview,
 }: Readonly<SoundProperties>) {
   return (
     <div
@@ -68,12 +70,20 @@ export default memo(function Sound({
         variant="link"
         asChild
       >
-        <Link href={`/sound/${id}`}>{name}</Link>
+        {!isPreview ? (
+          <Link href={`/sound/${id}`}>{name}</Link>
+        ) : (
+          <span>{name}</span>
+        )}
       </Button>
 
       <div className="flex flex-row gap-2">
-        {displayAddButton ? <AddToGuildButton soundId={id} /> : null}
-        {displayAddButton ? <LikeButton soundId={id} liked={liked} /> : null}
+        {displayAddButton ? (
+          <AddToGuildButton soundId={id} isPreview={isPreview} />
+        ) : null}
+        {displayAddButton ? (
+          <LikeButton soundId={id} liked={liked} isPreview={isPreview} />
+        ) : null}
 
         {displayDeleteButton ? (
           <DeleteSoundButton

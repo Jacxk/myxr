@@ -1,5 +1,6 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { type Region } from "wavesurfer.js/dist/plugins/regions.esm.js";
@@ -24,6 +25,7 @@ type LocalRegion = {
 export function EditSoundStep() {
   const { data, reset, setData, nextStep } = useSteps<SoundUploadProps>();
 
+  const [loading, setLoading] = useState<boolean>(false);
   const [totalTime, setTotalTime] = useState<number>(0);
   const [fileChanged, setFileChanged] = useState<boolean>(false);
   const [region, setRegion] = useState<LocalRegion>({
@@ -38,7 +40,7 @@ export function EditSoundStep() {
 
   const onRegionCreate = (thisRegion: Region) => {
     setRegion(thisRegion);
-  }
+  };
 
   const onRegionUpdate = (thisRegion: Region) => {
     setFileChanged(true);
@@ -52,6 +54,8 @@ export function EditSoundStep() {
       return;
     }
     toast.loading("Editing audio file...", { id: "editingAudio" });
+    setLoading(true);
+
     trimAudioAndConvertToMp3(data.file, region.start, region.end + 0.01)
       .then((newFile) => {
         setData({ newFile, region, file: data.file });
@@ -64,6 +68,7 @@ export function EditSoundStep() {
       })
       .finally(() => {
         toast.dismiss("editingAudio");
+        setLoading(false);
       });
   }
 
@@ -102,7 +107,16 @@ export function EditSoundStep() {
         <Button variant="destructive" onClick={reset}>
           Cancel
         </Button>
-        <Button onClick={goToNextStep}>Continue</Button>
+        <Button disabled={loading} onClick={goToNextStep}>
+          {loading ? (
+            <>
+              <Loader2 className="animate-spin" />
+              Loading
+            </>
+          ) : (
+            "Continue"
+          )}
+        </Button>
       </div>
     </div>
   );

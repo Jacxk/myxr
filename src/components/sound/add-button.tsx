@@ -16,8 +16,10 @@ import {
 
 export function AddToGuildButton({
   soundId,
+  isPreview,
 }: Readonly<{
   soundId: string;
+  isPreview?: boolean;
 }>) {
   const { mutate, isPending, isSuccess, isError, error } =
     api.guild.createSound.useMutation();
@@ -28,6 +30,12 @@ export function AddToGuildButton({
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ): void {
     event.stopPropagation();
+
+    if (isPreview) {
+      toast("Preview Mode: Sound added to guild");
+      return;
+    }
+
     const guildId = localStorage.getItem("guildId");
     const guildName = localStorage.getItem("guildName")!;
 
@@ -45,7 +53,7 @@ export function AddToGuildButton({
       title: `Add sound to ${localStorage.getItem("guildName")}`,
       body: "Are you sure you want to add this sound?",
       footer: <Button onClick={onAddClick}>Add</Button>,
-      authOnly: true
+      authOnly: true,
     });
   }
 
