@@ -27,4 +27,15 @@ export const userRouter = createTRPCRouter({
 
     return { sounds, guildSounds };
   }),
+  likedSounds: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+    const sounds = await ctx.db.sound.findMany({
+      where: { likedBy: { some: { userId } } },
+      include: { likedBy: { where: { userId } } },
+    });
+    return sounds.map((sound) => ({
+      ...sound,
+      liked: sound.likedBy.length > 0,
+    }));
+  }),
 });

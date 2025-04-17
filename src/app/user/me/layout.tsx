@@ -1,4 +1,4 @@
-import { Castle, Volume2 } from "lucide-react";
+import { Castle, Heart, Volume2 } from "lucide-react";
 import { redirect } from "next/navigation";
 import { auth } from "~/server/auth";
 import { api } from "~/trpc/server";
@@ -25,10 +25,11 @@ export default async function ({ children }: { children: React.ReactNode }) {
           <Volume2 />
           <span className="hidden sm:block">My Sounds</span>
         </TabLink>
-        <TabLink
-          href="/user/me/guilds"
-          className="flex flex-row gap-2"
-        >
+        <TabLink href="/user/me/liked-sounds" className="flex flex-row gap-2">
+          <Heart />
+          <span className="hidden sm:block">Liked Sounds</span>
+        </TabLink>
+        <TabLink href="/user/me/guilds" className="flex flex-row gap-2">
           <Castle />
           <span className="hidden sm:block">Guilds</span>
         </TabLink>
