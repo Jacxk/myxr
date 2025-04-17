@@ -12,6 +12,7 @@ import {
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import { cn } from "~/lib/utils";
 
 export const Modal = () => {
   const { isOpen, content, closeModal: close } = useModal();
@@ -43,7 +44,12 @@ export const Modal = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={close}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent
+        className={cn({
+          "sm:max-w-[425px]": !content?.fullWidth,
+          "sm:min-w-[80%] sm:min-h-[80%]": content?.fullWidth,
+        })}
+      >
         <DialogHeader>
           <DialogTitle>{content?.title}</DialogTitle>
           <DialogDescription>{content?.description}</DialogDescription>

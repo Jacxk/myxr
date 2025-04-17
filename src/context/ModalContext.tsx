@@ -15,6 +15,7 @@ type ModalContent = {
   footer?: ReactNode | string;
   closeButton?: boolean;
   authOnly?: boolean;
+  fullWidth?: boolean;
 };
 
 type ModalContextProps = {
