@@ -148,4 +148,25 @@ export const soundRouter = createTRPCRouter({
 
       return { success: true, value: liked };
     }),
+  reportSound: protectedProcedure
+    .input(z.object({ id: z.string(), reason: z.string().trim().min(1) }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session?.user.id;
+      const data = {
+        userId,
+        soundId: input.id,
+        reason: input.reason,
+      };
+
+      const existingReport = await ctx.db.soundReport.findFirst({
+        where: { userId: data.userId, soundId: data.soundId },
+      });
+
+      if (existingReport) {
+        return { success: false, error: "REPORT_EXISTS" };
+      }
+
+      const report = await ctx.db.soundReport.create({ data });
+      return { success: true, value: { caseId: report.id } };
+    }),
 });

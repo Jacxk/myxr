@@ -1,21 +1,22 @@
+import { Download } from "lucide-react";
+import Link from "next/link";
+import { AddToGuildButton } from "~/components/sound/add-button";
+import { LikeButton } from "~/components/sound/like-button";
 import { SoundProperties } from "~/components/sound/sound";
-import { SoundEmoji } from "./emoji";
-import { Button } from "~/components/ui/button";
-import { Download, Flag } from "lucide-react";
+import { SoundWaveForm } from "~/components/sound/sound-waveform";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Button } from "~/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
-import { AddToGuildButton } from "~/components/sound/add-button";
-import { LikeButton } from "~/components/sound/like-button";
-import { SoundWaveForm } from "~/components/sound/sound-waveform";
+import { ReportButton } from "./action-button/report";
+import { CreatedDate } from "./created-date";
+import { SoundEmoji } from "./emoji";
 import { Guild } from "./guild";
 import { SoundData } from "./sound-data";
-import { CreatedDate } from "./created-date";
-import Link from "next/link";
 
 interface User {
   id: string;
@@ -36,7 +37,12 @@ interface SoundPageProps {
   isPreview?: boolean;
 }
 
-function Buttons({ id, sound, user, isPreview }: Readonly<SoundPageProps>) {
+function ActionButtons({
+  id,
+  sound,
+  user,
+  isPreview,
+}: Readonly<SoundPageProps>) {
   return (
     <div className="flex gap-2">
       <TooltipProvider delayDuration={0}>
@@ -57,14 +63,8 @@ function Buttons({ id, sound, user, isPreview }: Readonly<SoundPageProps>) {
           <TooltipContent>Download</TooltipContent>
         </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button size="icon" variant="destructive">
-              <Flag />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Report</TooltipContent>
-        </Tooltip>
+        <ReportButton id={id} />
+
       </TooltipProvider>
     </div>
   );
@@ -104,7 +104,12 @@ export function SoundPage({
               </Link>
             </Button>
           </div>
-          <Buttons id={id} sound={sound} user={user} isPreview={isPreview} />
+          <ActionButtons
+            id={id}
+            sound={sound}
+            user={user}
+            isPreview={isPreview}
+          />
         </div>
       </div>
       <SoundWaveForm url={sound.url} />
