@@ -91,7 +91,7 @@ export function ReportButton({ id }: Readonly<{ id: string }>) {
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Report Sound</DialogTitle>
             <DialogDescription>

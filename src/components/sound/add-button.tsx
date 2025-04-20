@@ -1,18 +1,30 @@
 "use client";
 
+import { DialogTitle } from "@radix-ui/react-dialog";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useModal } from "~/context/ModalContext";
 import { api } from "~/trpc/react";
 import { Button } from "../ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+} from "../ui/dialog";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+import { z } from "zod";
+
+const GuildSchema = z.object({
+  id: z.string().nonempty("Guild ID is required"),
+  name: z.string().nonempty("Guild name is required"),
+});
 
 export function AddToGuildButton({
   soundId,
@@ -24,7 +36,30 @@ export function AddToGuildButton({
   const { mutate, isPending, isSuccess, isError, error } =
     api.guild.createSound.useMutation();
   const router = useRouter();
-  const { openModal, closeModal } = useModal();
+  const [open, setOpen] = useState(false);
+
+  const validateGuild = () => {
+    const guildData = {
+      id: localStorage.getItem("guildId"),
+      name: localStorage.getItem("guildName"),
+    };
+    const result = GuildSchema.safeParse(guildData);
+
+    if (!result.success) {
+      toast.error("You need to select a guild first");
+      return null;
+    }
+
+    return result.data;
+  };
+
+  const onAddClick = () => {
+    const data = validateGuild();
+    if (!data) return;
+
+    mutate({ soundId, guildId: data.id, guildName: data.name });
+    setOpen(false);
+  };
 
   function addSoundToGuild(
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -36,25 +71,10 @@ export function AddToGuildButton({
       return;
     }
 
-    const guildId = localStorage.getItem("guildId");
-    const guildName = localStorage.getItem("guildName")!;
+    const data = validateGuild();
+    if (!data) return;
 
-    if (!guildId) {
-      toast.error("You need to select a guild first!");
-      return;
-    }
-
-    const onAddClick = () => {
-      mutate({ soundId, guildId, guildName });
-      closeModal();
-    };
-
-    openModal({
-      title: `Add sound to ${localStorage.getItem("guildName")}`,
-      body: "Are you sure you want to add this sound?",
-      footer: <Button onClick={onAddClick}>Add</Button>,
-      authOnly: true,
-    });
+    setOpen(true);
   }
 
   useEffect(() => {
@@ -88,20 +108,33 @@ export function AddToGuildButton({
   }, [isSuccess, isError]);
 
   return (
-    <TooltipProvider delayDuration={0}>
-      <Tooltip disableHoverableContent>
-        <TooltipTrigger asChild>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={addSoundToGuild}
-            disabled={isPending}
-          >
-            <Plus />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>Add Sound to Guild</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{`Add sound to ${localStorage.getItem("guildName")}`}</DialogTitle>
+          </DialogHeader>
+          <p>Are you sure you want to add this sound?</p>
+          <DialogFooter>
+            <Button onClick={onAddClick}>Add</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <TooltipProvider delayDuration={0}>
+        <Tooltip disableHoverableContent>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={addSoundToGuild}
+              disabled={isPending}
+            >
+              <Plus />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Add Sound to Guild</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </>
   );
 }

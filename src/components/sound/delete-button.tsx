@@ -1,9 +1,14 @@
+import { Dialog, DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import { Trash } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useModal } from "~/context/ModalContext";
 import { api } from "~/trpc/react";
 import { Button } from "../ui/button";
+import {
+  DialogContent,
+  DialogFooter,
+  DialogHeader
+} from "../ui/dialog";
 import {
   Tooltip,
   TooltipContent,
@@ -21,38 +26,23 @@ export function DeleteSoundButton({
   onDeleted?: () => void;
 }>) {
   const { mutate, isSuccess } = api.guild.deleteSound.useMutation();
-  const { openModal, closeModal } = useModal();
+  const [open, setOpen] = useState(false);
 
-  const onDeleteClickButton = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-
-    const onDeleteClick = () => {
-      mutate(
-        { soundId: discordSoundId, guildId: guildId },
-        {
-          onSuccess: () => {
-            toast("Sound deleted successfully!");
-          },
-          onError: (error) => {
-            toast.error("Failed to delete sound.", {
-              description: error.message,
-            });
-          },
+  const onConfirmDeleteClick = () => {
+    mutate(
+      { soundId: discordSoundId, guildId: guildId },
+      {
+        onSuccess: () => {
+          toast("Sound deleted successfully!");
         },
-      );
-      closeModal();
-    };
-
-    openModal({
-      title: `Delete Sound`,
-      body: "Are you sure you want to delete this sound?",
-      footer: (
-        <Button onClick={onDeleteClick} variant="destructive">
-          Delete
-        </Button>
-      ),
-      authOnly: true,
-    });
+        onError: (error) => {
+          toast.error("Failed to delete sound.", {
+            description: error.message,
+          });
+        },
+      },
+    );
+    setOpen(false);
   };
 
   useEffect(() => {
@@ -63,19 +53,37 @@ export function DeleteSoundButton({
   }, [isSuccess]);
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="destructive"
-            onClick={onDeleteClickButton}
-            size="icon"
-          >
-            <Trash />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>Remove Sound from Guild</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Sound</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this sound?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="destructive" onClick={onConfirmDeleteClick}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="destructive"
+              onClick={() => setOpen(true)}
+              size="icon"
+            >
+              <Trash />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Remove Sound from Guild</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </>
   );
 }
