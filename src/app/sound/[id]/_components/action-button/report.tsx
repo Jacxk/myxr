@@ -2,6 +2,7 @@
 
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Flag, Loader2 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
@@ -72,8 +73,21 @@ export function ReportButton({ id }: Readonly<{ id: string }>) {
       return;
     }
 
-    toast("Sound reported successfully!", {
-      description: "Thank you for your feedback.",
+    if (!data.value?.caseId) {
+      toast.error("Something went wrong");
+      return;
+    }
+
+    toast("Thank you for your feedback.", {
+      action: (
+        <Button variant="outline">
+          <Link
+            href={`/user/me/reports?id=${encodeURIComponent(data.value.caseId)}`}
+          >
+            View
+          </Link>
+        </Button>
+      ),
     });
     setReason("");
     setOpen(false);

@@ -1,8 +1,32 @@
-import { Castle, Heart, Volume2 } from "lucide-react";
+import { Castle, Flag, Heart, Volume2 } from "lucide-react";
 import { redirect } from "next/navigation";
+import { ReactNode } from "react";
 import { auth } from "~/server/auth";
 import { api } from "~/trpc/server";
 import { TabLink } from "./_components/tab-link";
+
+function Tab({
+  path,
+  exact,
+  label,
+  icon,
+}: Readonly<{
+  path: string;
+  exact?: boolean;
+  label: string;
+  icon: ReactNode;
+}>) {
+  return (
+    <TabLink
+      href={`/user/me/${path}`}
+      matchExact={exact ? "/user/me" : undefined}
+      className="flex flex-row gap-2"
+    >
+      {icon}
+      <span className="hidden sm:block">{label}</span>
+    </TabLink>
+  );
+}
 
 export default async function ({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -17,22 +41,10 @@ export default async function ({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-4 sm:flex-row">
       <div className="flex flex-row justify-center gap-2 sm:w-1/2 sm:flex-col sm:justify-start lg:w-1/4">
-        <TabLink
-          href="/user/me/sounds"
-          matchExact="/user/me"
-          className="flex flex-row gap-2"
-        >
-          <Volume2 />
-          <span className="hidden sm:block">My Sounds</span>
-        </TabLink>
-        <TabLink href="/user/me/liked-sounds" className="flex flex-row gap-2">
-          <Heart />
-          <span className="hidden sm:block">Liked Sounds</span>
-        </TabLink>
-        <TabLink href="/user/me/guilds" className="flex flex-row gap-2">
-          <Castle />
-          <span className="hidden sm:block">Guilds</span>
-        </TabLink>
+        <Tab path="sounds" label="My Sounds" icon={<Volume2 />} exact />
+        <Tab path="liked-sounds" label="Liked Sounds" icon={<Heart />} />
+        <Tab path="guilds" label="Guilds" icon={<Castle />} />
+        <Tab path="reports" label="Reports" icon={<Flag />} />
       </div>
       {children}
     </div>

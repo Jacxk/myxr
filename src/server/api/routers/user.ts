@@ -38,4 +38,12 @@ export const userRouter = createTRPCRouter({
       liked: sound.likedBy.length > 0,
     }));
   }),
+  reports: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+    return ctx.db.soundReport.findMany({
+      where: { userId },
+      include: { sound: true },
+      orderBy: { createdAt: "desc" },
+    });
+  }),
 });
