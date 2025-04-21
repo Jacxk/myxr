@@ -17,6 +17,7 @@ import { CreatedDate } from "./created-date";
 import { SoundEmoji } from "./emoji";
 import { Guild } from "./guild";
 import { SoundData } from "./sound-data";
+import { DownloadButton } from "./action-button/download";
 
 interface User {
   id: string;
@@ -54,17 +55,9 @@ function ActionButtons({
           isPreview={isPreview}
         />
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button size="icon" variant="outline">
-              <Download />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Download</TooltipContent>
-        </Tooltip>
+        <DownloadButton soundUrl={sound.url} soundName={sound.name} />
 
         <ReportButton id={id} />
-
       </TooltipProvider>
     </div>
   );
