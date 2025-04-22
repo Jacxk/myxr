@@ -1,4 +1,3 @@
-import { Download } from "lucide-react";
 import Link from "next/link";
 import { AddToGuildButton } from "~/components/sound/add-button";
 import { LikeButton } from "~/components/sound/like-button";
@@ -6,18 +5,13 @@ import { SoundProperties } from "~/components/sound/sound";
 import { SoundWaveForm } from "~/components/sound/sound-waveform";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "~/components/ui/tooltip";
+import { TooltipProvider } from "~/components/ui/tooltip";
+import { DownloadButton } from "./action-button/download";
 import { ReportButton } from "./action-button/report";
 import { CreatedDate } from "./created-date";
 import { SoundEmoji } from "./emoji";
 import { Guild } from "./guild";
 import { SoundData } from "./sound-data";
-import { DownloadButton } from "./action-button/download";
 
 interface User {
   id: string;

@@ -18,7 +18,10 @@ export const auth = betterAuth({
       guilds?.sort((a, b) => a.guild.name.localeCompare(b.guild.name));
 
       return {
-        user: { ...user, guilds: guilds?.map(({ guild }) => ({ ...guild })) },
+        user: {
+          ...user,
+          guilds: guilds?.map(({ guild }) => ({ ...guild })) || [],
+        },
         session,
       };
     }),

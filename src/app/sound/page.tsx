@@ -5,7 +5,6 @@ import { z } from "zod";
 import { InfiniteScroll } from "~/components/infinite-scroll";
 import Sound from "~/components/sound/sound";
 import { SoundsGrid } from "~/components/sound/sounds-grid";
-import { AudioProvider } from "~/context/AudioContext";
 import { api } from "~/trpc/react";
 
 export default function () {

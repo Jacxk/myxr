@@ -1,6 +1,6 @@
 "use client";
 
-import type { Guild } from "next-auth";
+import type { Guild } from "@prisma/client";
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";

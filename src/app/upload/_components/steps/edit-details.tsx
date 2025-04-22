@@ -5,7 +5,6 @@ import EmojiPicker, {
   SuggestionMode,
   Theme,
 } from "emoji-picker-react";
-import { useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -16,6 +15,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useSteps } from "~/context/StepsContext";
+import { useSession } from "~/lib/auth-client";
 import { uploadFiles } from "~/utils/uploadthing";
 import { type SoundUploadProps } from "./select-file";
 

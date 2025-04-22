@@ -1,5 +1,4 @@
 import { Upload } from "lucide-react";
-import { type Session } from "next-auth";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import {
@@ -8,7 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
-import { auth } from "~/server/auth";
+import { getServerSession } from "~/lib/auth";
 import { AccountMenu } from "./account-menu";
 import { Authenticated, NotAuthenticated } from "./authentication";
 import { SearchBar } from "./search-bar";
@@ -16,7 +15,7 @@ import { SelectGuild } from "./select-guild";
 import { SignInButton } from "./signin";
 
 export default async function Navbar() {
-  const session: Session | null = await auth();
+  const session = await getServerSession();
 
   return (
     <nav className="relative mx-auto flex w-full max-w-7xl grow-0 items-center justify-between gap-2 border-b p-6">

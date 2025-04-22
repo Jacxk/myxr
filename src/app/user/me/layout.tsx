@@ -1,7 +1,7 @@
 import { Castle, Flag, Heart, Volume2 } from "lucide-react";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
-import { auth } from "~/server/auth";
+import { getServerSession } from "~/lib/auth";
 import { api } from "~/trpc/server";
 import { TabLink } from "./_components/tab-link";
 
@@ -29,11 +29,18 @@ function Tab({
 }
 
 export default async function ({ children }: { children: React.ReactNode }) {
-  const session = await auth();
+  const session = await getServerSession();
 
   if (session?.user) {
-    void api.user.getGuildSounds.prefetch(session.user.id);
-    void api.user.getGuildSounds.prefetch(session.user.guilds[0]?.id!);
+    const {
+      user: { id: userId, guilds },
+    } = session;
+
+    void api.user.getGuildSounds.prefetch(userId);
+
+    if (guilds.length > 0 && guilds[0]?.id) {
+      void api.user.getGuildSounds.prefetch(guilds[0].id);
+    }
   } else {
     return redirect("/");
   }

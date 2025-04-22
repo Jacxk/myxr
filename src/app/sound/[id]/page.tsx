@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import { auth } from "~/server/auth";
 import { api } from "~/trpc/server";
 import { SoundPage } from "./_components/sound-page";
+import { getServerSession } from "~/lib/auth";
 
 export default async function ({
   params,
@@ -9,7 +9,7 @@ export default async function ({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const session = await auth();
+  const session = await getServerSession();
   const sound = await api.sound.getSound({ id });
 
   let user;

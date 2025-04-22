@@ -2,169 +2,170 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["fullTextSearchPostgres"]
+    provider        = "prisma-client-js"
+    previewFeatures = ["fullTextSearchPostgres"]
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+    provider  = "postgresql"
+    url       = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id            String   @id @default(cuid())
-  name          String?
-  email         String?  @unique
-  emailVerified Boolean  @default(false)
-  image         String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+    id            String   @id @default(cuid())
+    name          String?
+    email         String?  @unique
+    emailVerified Boolean  @default(false)
+    image         String?
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+    removed       Boolean? @default(false)
 
-  role         Role              @default(USER)
-  accounts     Account[]
-  sessions     Session[]
-  sounds       Sound[]
-  guilds       GuildMembership[]
-  likedSounds  LikedSound[]
-  soundReports SoundReport[]
+    role         Role              @default(USER)
+    accounts     Account[]
+    sessions     Session[]
+    sounds       Sound[]
+    guilds       GuildMembership[]
+    likedSounds  LikedSound[]
+    soundReports SoundReport[]
 
-  @@map("user")
+    @@map("user")
 }
 
 model Session {
-  id        String   @id @default(cuid())
-  userId    String
-  token     String   @unique
-  expiresAt DateTime
-  ipAddress String?
-  userAgent String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+    id        String   @id @default(cuid())
+    userId    String
+    token     String   @unique
+    expiresAt DateTime
+    ipAddress String?
+    userAgent String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("session")
+    @@map("session")
 }
 
 model Account {
-  id                    String    @id @default(cuid())
-  userId                String
-  accountId             String
-  providerId            String
-  accessToken           String?
-  refreshToken          String?
-  accessTokenExpiresAt  DateTime?
-  refreshTokenExpiresAt DateTime?
-  scope                 String?
-  idToken               String?
-  password              String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+    id                    String    @id @default(cuid())
+    userId                String
+    accountId             String
+    providerId            String
+    accessToken           String?
+    refreshToken          String?
+    accessTokenExpiresAt  DateTime?
+    refreshTokenExpiresAt DateTime?
+    scope                 String?
+    idToken               String?
+    password              String?
+    createdAt             DateTime  @default(now())
+    updatedAt             DateTime  @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([accountId, providerId])
-  @@map("account")
+    @@unique([accountId, providerId])
+    @@map("account")
 }
 
 model Verification {
-  id         String   @id @default(cuid())
-  identifier String
-  value      String
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+    id         String   @id @default(cuid())
+    identifier String
+    value      String
+    expiresAt  DateTime
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
 
-  @@map("verification")
+    @@map("verification")
 }
 
 enum Role {
-  USER
-  ADMIN
-  PRO
+    USER
+    ADMIN
+    PRO
 }
 
 model Sound {
-  id          String        @id @default(cuid())
-  name        String
-  emoji       String
-  url         String        @unique
-  usegeCount  Int           @default(0)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  createdById String
-  deletedAt   DateTime?
-  guildSounds GuildSound[]
-  createdBy   User          @relation(fields: [createdById], references: [id])
-  tags        Tag[]
-  likedBy     LikedSound[]
-  reports     SoundReport[]
+    id          String        @id @default(cuid())
+    name        String
+    emoji       String
+    url         String        @unique
+    usegeCount  Int           @default(0)
+    createdAt   DateTime      @default(now())
+    updatedAt   DateTime      @updatedAt
+    createdById String
+    deletedAt   DateTime?
+    guildSounds GuildSound[]
+    createdBy   User          @relation(fields: [createdById], references: [id])
+    tags        Tag[]
+    likedBy     LikedSound[]
+    reports     SoundReport[]
 
-  @@index([name])
+    @@index([name])
 }
 
 model Tag {
-  name   String  @id @unique
-  sounds Sound[]
+    name   String  @id @unique
+    sounds Sound[]
 }
 
 model Guild {
-  id               String            @id
-  name             String
-  sounds           GuildSound[]
-  soundMasterRoles String[]
-  users            GuildMembership[]
+    id               String            @id
+    name             String
+    sounds           GuildSound[]
+    soundMasterRoles String[]
+    users            GuildMembership[]
 }
 
 model GuildSound {
-  guildId        String
-  soundId        String
-  discordSoundId String @unique
-  guild          Guild  @relation(fields: [guildId], references: [id])
-  sound          Sound  @relation(fields: [soundId], references: [id])
+    guildId        String
+    soundId        String
+    discordSoundId String @unique
+    guild          Guild  @relation(fields: [guildId], references: [id])
+    sound          Sound  @relation(fields: [soundId], references: [id])
 
-  @@id([guildId, soundId])
+    @@id([guildId, soundId])
 }
 
 model GuildMembership {
-  userId  String
-  user    User   @relation(fields: [userId], references: [id])
-  guildId String
-  guild   Guild  @relation(fields: [guildId], references: [id])
+    userId  String
+    user    User   @relation(fields: [userId], references: [id])
+    guildId String
+    guild   Guild  @relation(fields: [guildId], references: [id])
 
-  @@id([userId, guildId])
-  @@index([guildId])
+    @@id([userId, guildId])
+    @@index([guildId])
 }
 
 model LikedSound {
-  userId  String
-  soundId String
-  user    User   @relation(fields: [userId], references: [id])
-  sound   Sound  @relation(fields: [soundId], references: [id])
+    userId  String
+    soundId String
+    user    User   @relation(fields: [userId], references: [id])
+    sound   Sound  @relation(fields: [soundId], references: [id])
 
-  @@id([userId, soundId])
+    @@id([userId, soundId])
 }
 
 enum ActionStatus {
-  DELETED
-  IN_PROGRESS
-  NO_ACTION_REQUIRED
-  FLAGGED_FOR_REVIEW
-  RESOLVED
+    DELETED
+    IN_PROGRESS
+    NO_ACTION_REQUIRED
+    FLAGGED_FOR_REVIEW
+    RESOLVED
 }
 
 model SoundReport {
-  id          String       @id @default(cuid())
-  userId      String
-  soundId     String
-  reason      String
-  createdAt   DateTime     @default(now())
-  actionTaken ActionStatus @default(IN_PROGRESS)
-  actionText  String?
-  user        User         @relation(fields: [userId], references: [id])
-  sound       Sound        @relation(fields: [soundId], references: [id])
+    id          String       @id @default(cuid())
+    userId      String
+    soundId     String
+    reason      String
+    createdAt   DateTime     @default(now())
+    actionTaken ActionStatus @default(IN_PROGRESS)
+    actionText  String?
+    user        User         @relation(fields: [userId], references: [id])
+    sound       Sound        @relation(fields: [soundId], references: [id])
 
-  @@index([userId])
-  @@index([soundId])
+    @@index([userId])
+    @@index([soundId])
 }
