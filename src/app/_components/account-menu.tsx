@@ -1,7 +1,6 @@
 "use client";
 
-import type { User } from "next-auth";
-import { signOut } from "next-auth/react";
+import type { User } from "better-auth";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useCallback } from "react";
@@ -15,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { Switch } from "~/components/ui/switch";
+import { signOut } from "~/lib/auth-client";
 
 export function AccountMenu({ user }: Readonly<{ user: User | undefined }>) {
   const { setTheme, theme } = useTheme();
@@ -31,7 +31,7 @@ export function AccountMenu({ user }: Readonly<{ user: User | undefined }>) {
         asChild
       >
         <Avatar>
-          <AvatarImage src={user?.image + "?size=40"} alt={user?.name!} />
+          <AvatarImage src={user?.image + "?size=40"} alt={user?.name} />
           <AvatarFallback delayMs={500}>{user?.name}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
@@ -56,7 +56,7 @@ export function AccountMenu({ user }: Readonly<{ user: User | undefined }>) {
           <DropdownMenuItem>Settings</DropdownMenuItem>
         </Link>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => signOut({ redirectTo: "/" })}>
+        <DropdownMenuItem onClick={() => signOut()}>
           Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>

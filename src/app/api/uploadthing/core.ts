@@ -1,7 +1,7 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
 import { z } from "zod";
-import { auth } from "~/server/auth";
+import { getServerSession } from "~/lib/auth";
 import { db } from "~/server/db";
 
 const f = createUploadthing();
@@ -20,10 +20,9 @@ export const ourFileRouter = {
       }),
     )
     .middleware(async ({ input }) => {
-      const session = await auth();
+      const session = await getServerSession();
 
-      if (!session || !session?.user)
-        throw new UploadThingError("Unauthorized");
+      if (!session?.user) throw new UploadThingError("Unauthorized");
 
       return {
         userId: session?.user.id,

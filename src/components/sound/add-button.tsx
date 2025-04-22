@@ -3,7 +3,7 @@
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { api } from "~/trpc/react";
 import { Button } from "../ui/button";
@@ -37,45 +37,32 @@ export function AddToGuildButton({
     api.guild.createSound.useMutation();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [guild, setGuild] = useState<z.infer<typeof GuildSchema>>();
 
-  const validateGuild = () => {
-    const guildData = {
-      id: localStorage.getItem("guildId"),
-      name: localStorage.getItem("guildName"),
-    };
-    const result = GuildSchema.safeParse(guildData);
-
-    if (!result.success) {
-      toast.error("You need to select a guild first");
-      return null;
-    }
-
-    return result.data;
-  };
-
-  const onAddClick = () => {
-    const data = validateGuild();
-    if (!data) return;
-
-    mutate({ soundId, guildId: data.id, guildName: data.name });
+  const onAddClick = useCallback(() => {
+    if (!guild) return;
+    mutate({ soundId, guildId: guild.id, guildName: guild.name });
     setOpen(false);
-  };
+  }, [guild]);
 
-  function addSoundToGuild(
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ): void {
-    event.stopPropagation();
+  const addSoundToGuild = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      event.stopPropagation();
 
-    if (isPreview) {
-      toast("Preview Mode: Sound added to guild");
-      return;
-    }
+      if (isPreview) {
+        toast("Preview Mode: Sound added to guild");
+        return;
+      }
 
-    const data = validateGuild();
-    if (!data) return;
+      if (!guild) {
+        toast.error("You need to select a guild first");
+        return;
+      }
 
-    setOpen(true);
-  }
+      setOpen(true);
+    },
+    [guild],
+  );
 
   useEffect(() => {
     if (isSuccess) toast("Sound added to guild");
@@ -107,12 +94,19 @@ export function AddToGuildButton({
     }
   }, [isSuccess, isError]);
 
+  useEffect(() => {
+    const guildData = JSON.parse(localStorage.getItem("selectedGuild") ?? "{}");
+    const result = GuildSchema.safeParse(guildData);
+
+    setGuild(result.data);
+  }, []);
+
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{`Add sound to ${localStorage.getItem("guildName")}`}</DialogTitle>
+            <DialogTitle>{`Add sound to ${guild?.name}`}</DialogTitle>
           </DialogHeader>
           <p>Are you sure you want to add this sound?</p>
           <DialogFooter>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Sound from "~/components/sound/sound";
 import { SoundsGrid } from "~/components/sound/sounds-grid";
-import { auth } from "~/server/auth";
+import { getServerSession } from "~/lib/auth";
 import { api } from "~/trpc/server";
 
 export const metadata: Metadata = {
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default async function () {
-  const session = await auth();
+  const session = await getServerSession();
   const sounds = await api.user.getSounds(session?.user.id!);
 
   if (sounds.length === 0) {

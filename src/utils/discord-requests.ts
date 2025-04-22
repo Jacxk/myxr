@@ -31,7 +31,10 @@ async function createDiscordRequest<T>(
 
   if (opts?.no_content_type) delete headers["Content-Type"];
 
-  const res = await fetch(`https://discord.com/api/v10/${path}`, {
+  const url = `https://discord.com/api/v10/${path}`
+
+  console.log(`[Discord Request] ${url}`)
+  const res = await fetch(url, {
     ...opts,
     headers,
   });

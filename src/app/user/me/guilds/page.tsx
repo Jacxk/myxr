@@ -1,8 +1,8 @@
-import { auth } from "~/server/auth";
+import { getServerSession } from "~/lib/auth";
 import GuildsRoute from "./[id]/page";
 
 export default async function () {
-  const session = await auth();
+  const session = await getServerSession();
   const guild = session?.user.guilds[0];
 
   if (!guild)

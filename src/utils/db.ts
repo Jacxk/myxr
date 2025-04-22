@@ -18,14 +18,10 @@ const soundInclude = {
 export const discordAuthorization = async (id: string) => {
   const user = await db.account.findFirst({
     where: { userId: id },
-    select: { access_token: true, token_type: true },
+    select: { accessToken: true },
   });
 
-  if (user?.token_type?.toLowerCase() !== "bearer") {
-    throw new Error("Invalid token type");
-  }
-
-  return `Bearer ${user?.access_token}`;
+  return `Bearer ${user?.accessToken}`;
 };
 
 export const getSounds = async ({
@@ -71,7 +67,7 @@ export const getSoundsFromUser = async (id: string) => {
     }));
 
   const user = await db.account.findFirst({
-    where: { providerAccountId: id },
+    where: { accountId: id },
   });
 
   if (user)
@@ -92,64 +88,6 @@ export const getSound = (id: string, userId?: string) => {
       tags: true,
       likedBy: true,
     },
-  });
-};
-
-export const updateAccessToken = async (
-  userId: string,
-  data: {
-    access_token: string;
-    refresh_token: string;
-    expires_at: number;
-  },
-): Promise<boolean> => {
-  const discordAccount = await db.account.findFirst({
-    where: { userId, provider: "discord" },
-  });
-
-  if (!discordAccount) return false;
-
-  await db.account.update({
-    where: {
-      provider_providerAccountId: {
-        providerAccountId: discordAccount.providerAccountId,
-        provider: "discord",
-      },
-    },
-    data,
-  });
-
-  return true;
-};
-
-export const getUserTokenAndExpiration = async (
-  userId: string,
-): Promise<{
-  expires_at?: number;
-  refresh_token?: string;
-  expired?: boolean;
-}> => {
-  const data = await db.account.findFirst({
-    where: {
-      userId,
-    },
-    select: { expires_at: true, refresh_token: true },
-  });
-
-  const expires_at = data?.expires_at!;
-  const expired = Math.floor(Date.now() / 1000) >= data?.expires_at!;
-  const refresh_token = data?.refresh_token!;
-
-  return {
-    expires_at,
-    refresh_token,
-    expired,
-  };
-};
-
-export const getDatabaseSession = (sessionId: string) => {
-  return db.session.findFirst({
-    where: { sessionToken: sessionId },
   });
 };
 

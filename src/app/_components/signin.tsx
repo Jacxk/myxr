@@ -1,8 +1,12 @@
-"use client"
+"use client";
 
-import { signIn } from "next-auth/react";
 import { Button } from "~/components/ui/button";
+import { signIn } from "~/lib/auth-client";
 
 export function SignInButton() {
-  return <Button onClick={() => signIn("discord")}>Sign in</Button>;
+  return (
+    <Button onClick={() => signIn.social({ provider: "discord" })}>
+      Sign in
+    </Button>
+  );
 }
