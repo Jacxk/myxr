@@ -22,11 +22,9 @@ export default async function () {
 
   return (
     <SoundsGrid sm={4} md={5} lg={6} xl={8}>
-      <div className="flex flex-row flex-wrap justify-center gap-2">
-        {sounds.map((sound) => (
-          <Sound key={sound.id} {...sound} />
-        ))}
-      </div>
+      {sounds.map((sound) => (
+        <Sound key={sound.id} {...sound} />
+      ))}
     </SoundsGrid>
   );
 }
