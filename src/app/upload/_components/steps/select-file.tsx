@@ -29,8 +29,13 @@ export function SelectFileStep() {
     event.preventDefault();
     event.stopPropagation();
 
-    setValidFileType(event.dataTransfer.items[0]?.type === "audio/mpeg");
     setIsDragging(true);
+
+    const file = event.dataTransfer.items[0];
+
+    setValidFileType(
+      !!file && file.kind === "file" && file.type.includes("audio/"),
+    );
   };
 
   const handleDragLeave = (event: React.DragEvent<HTMLLabelElement>) => {

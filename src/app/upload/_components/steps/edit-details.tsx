@@ -9,6 +9,7 @@ import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 import { SoundPage } from "~/app/sound/[id]/_components/sound-page";
 import { type SoundProperties } from "~/components/sound/sound";
 import { Button } from "~/components/ui/button";
@@ -18,6 +19,15 @@ import { useSteps } from "~/context/StepsContext";
 import { useSession } from "~/lib/auth-client";
 import { uploadFiles } from "~/utils/uploadthing";
 import { type SoundUploadProps } from "./select-file";
+
+const FileSchema = z.object({
+  emoji: z.string({ description: "You need to provide an emoji" }),
+  name: z
+    .string({ description: "You need to provide a name" })
+    .min(1, "Name is too short")
+    .max(20, "Name is too long"),
+  tags: z.array(z.object({ name: z.string() })).optional(),
+});
 
 export function EditDetailsStep() {
   const router = useRouter();
@@ -35,10 +45,29 @@ export function EditDetailsStep() {
   });
 
   const uploadFile = useCallback(() => {
-    toast.loading("Uploading file...", { id: "uploading", duration: 9999999 });
+    const newFile = data.newFile;
+    if (!newFile) {
+      toast.error("There was an error while uploading.");
+      return;
+    }
+    const file = new File(
+      [newFile],
+      `${session?.user.id ?? "unknown"}_${newFile.name}`,
+      { type: newFile.type },
+    );
+
+    const { success, error } = FileSchema.safeParse(fileProps);
+    if (!success) {
+      toast.error(error?.errors[0]?.message);
+      return;
+    }
+
     setUploading(true);
+
+    toast.loading("Uploading file...", { id: "uploading", duration: 9999999 });
+
     uploadFiles("soundUploader", {
-      files: [data.newFile!],
+      files: [file],
       input: {
         emoji: fileProps.emoji,
         name: fileProps.name,
@@ -57,7 +86,7 @@ export function EditDetailsStep() {
       .finally(() => {
         toast.dismiss("uploading");
       });
-  }, [data, fileProps]);
+  }, [data.newFile, fileProps]);
 
   useEffect(() => {
     setFileProps({
@@ -72,13 +101,6 @@ export function EditDetailsStep() {
       url: URL.createObjectURL(data.newFile as Blob),
     });
   }, [data.newFile]);
-
-  useEffect(() => {
-    setFileProps((props) => ({
-      ...props,
-      name: props.name ? props.name : "Enter name",
-    }));
-  }, [fileProps.name]);
 
   return (
     <div className="flex h-full flex-col justify-around gap-10 transition sm:flex-row sm:gap-0">
@@ -158,7 +180,7 @@ export function EditDetailsStep() {
             guildSounds: [],
             id: "none",
             likedBy: Array(Math.floor(Math.random() * 1000)).fill({}),
-            name: fileProps.name,
+            name: fileProps.name.length > 0 ? fileProps.name : "No name provided",
             tags: fileProps.tags,
             usegeCount: Math.floor(Math.random() * 10000),
             url: URL.createObjectURL(data.newFile as Blob),
