@@ -22,9 +22,10 @@ export default async function Home({
   const session = await getServerSession();
   const createdBy = sounds[0]?.createdBy;
   const followerCount = user.followers.length;
-  const isFollowing = user.followers.filter(
-    (follower) => follower.followerId === session?.user.id,
-  ).length === 1;
+  const isFollowing =
+    user.followers.filter(
+      (follower) => follower.followerId === session?.user.id,
+    ).length === 1;
 
   return (
     <>
@@ -42,7 +43,7 @@ export default async function Home({
               {user.name?.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <div className="flex w-full justify-between">
+          <div className="flex w-full flex-col justify-between sm:flex-row gap-4">
             <div className="flex w-full flex-col gap-2">
               <h1 className="text-4xl font-bold">{user.name}</h1>
               <div className="flex gap-6">
@@ -60,7 +61,7 @@ export default async function Home({
                 </div>
               </div>
             </div>
-            <div className="flex flex-col items-end gap-2">
+            <div className="flex flex-col sm:items-end gap-2">
               {session?.user.id !== id && (
                 <FollowButton id={id} isFollowing={isFollowing} />
               )}
