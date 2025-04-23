@@ -4,6 +4,7 @@ import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { api } from "~/trpc/server";
 import { FollowButton } from "./follow-button";
+import { getServerSession } from "~/lib/auth";
 
 export default async function Home({
   params,
@@ -11,18 +12,24 @@ export default async function Home({
   params: Promise<{ id: string }>;
 }>) {
   const { id } = await params;
-  const sounds = await api.user.getSounds(id);
 
+  const user = await api.user.getUser({ id });
+  if (!user) return notFound();
+
+  const sounds = await api.user.getSounds(id);
   if (sounds.length === 0) return notFound();
 
+  const session = await getServerSession();
   const createdBy = sounds[0]?.createdBy;
-  const name = createdBy?.name ?? "Unknown User";
-  const followerCount = 20000;
+  const followerCount = user.followers.length;
+  const isFollowing = user.followers.filter(
+    (follower) => follower.followerId === session?.user.id,
+  ).length === 1;
 
   return (
     <>
-      <title>{`${name} - User`}</title>
-      <meta name="author" content={name} />
+      <title>{`${user.name!} - User`}</title>
+      <meta name="author" content={user.name!} />
 
       <div className="flex w-full flex-col gap-20">
         <div className="flex flex-row gap-10">
@@ -32,12 +39,12 @@ export default async function Home({
               alt={createdBy?.name ?? ""}
             />
             <AvatarFallback delayMs={500}>
-              {name.charAt(0).toUpperCase()}
+              {user.name?.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div className="flex w-full justify-between">
             <div className="flex w-full flex-col gap-2">
-              <h1 className="text-4xl font-bold">{name}</h1>
+              <h1 className="text-4xl font-bold">{user.name}</h1>
               <div className="flex gap-6">
                 <div className="flex gap-1">
                   <span className="font-bold">
@@ -54,7 +61,9 @@ export default async function Home({
               </div>
             </div>
             <div className="flex flex-col items-end gap-2">
-              <FollowButton />
+              {session?.user.id !== id && (
+                <FollowButton id={id} isFollowing={isFollowing} />
+              )}
             </div>
           </div>
         </div>

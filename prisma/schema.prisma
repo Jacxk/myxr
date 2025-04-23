@@ -29,6 +29,8 @@ model User {
     guilds       GuildMembership[]
     likedSounds  LikedSound[]
     soundReports SoundReport[]
+    followers    UserFollow[]      @relation("Followers")
+    following    UserFollow[]      @relation("Following")
 
     @@map("user")
 }
@@ -168,4 +170,16 @@ model SoundReport {
 
     @@index([userId])
     @@index([soundId])
+}
+
+model UserFollow {
+    followerId  String
+    followingId String
+    createdAt   DateTime @default(now())
+
+    following User @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+    follower  User @relation("Followers", fields: [followerId], references: [id], onDelete: Cascade)
+
+    @@id([followingId, followerId])
+    @@map("user_follow")
 }

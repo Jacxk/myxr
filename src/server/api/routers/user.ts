@@ -46,4 +46,47 @@ export const userRouter = createTRPCRouter({
       orderBy: { createdAt: "desc" },
     });
   }),
+  getUser: publicProcedure
+    .input(z.object({ id: z.string().cuid() }))
+    .query(({ ctx, input }) => {
+      return ctx.db.user.findFirst({
+        where: { id: input.id },
+        include: { followers: true },
+      });
+    }),
+  followUser: protectedProcedure
+    .input(z.object({ id: z.string().cuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+      const isFollow = await ctx.db.userFollow.findFirst({
+        where: {
+          followerId: userId,
+          followingId: input.id,
+        },
+      });
+
+      let following;
+
+      if (isFollow) {
+        await ctx.db.userFollow.delete({
+          where: {
+            followingId_followerId: {
+              followerId: userId,
+              followingId: input.id,
+            },
+          },
+        });
+        following = false;
+      } else {
+        await ctx.db.userFollow.create({
+          data: {
+            followerId: userId,
+            followingId: input.id,
+          },
+        });
+        following = true;
+      }
+
+      return { success: true, value: { following } };
+    }),
 });
