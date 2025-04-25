@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
-import { useInView } from "react-intersection-observer";
+import { InView } from "react-intersection-observer";
 import { Button } from "./ui/button";
 
 type InfiniteScrollProps = {
@@ -27,21 +26,20 @@ export function InfiniteScroll({
   threshold = 0,
   manualTrigger = true,
 }: Readonly<InfiniteScrollProps>) {
-  const { ref, inView } = useInView({
-    rootMargin: `0px 0px ${offsetPx}px 0px`,
-    threshold,
-  });
-
-  useEffect(() => {
+  const onInViewChange = (inView: boolean) => {
     if (inView && hasMore && !isLoading) {
       loadMore();
     }
-  }, [inView, hasMore, isLoading, loadMore]);
+  };
 
   return (
     <>
       {children}
-      <div ref={ref} />
+      <InView
+        rootMargin={`0px 0px ${offsetPx}px 0px`}
+        threshold={threshold}
+        onChange={onInViewChange}
+      />
       <div className="py-4 text-center">
         {isLoading && loader}
         {!isLoading && !hasMore && endMessage}
