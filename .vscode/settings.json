@@ -1,0 +1,16 @@
+{
+  "editor.tabSize": 2,
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "javascript.updateImportsOnPaste.enabled": true,
+  "typescript.updateImportsOnPaste.enabled": true,
+  "eslint.lintTask.enable": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "file",
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "always"
+  },
+  "files.autoSave": "off"
+}
