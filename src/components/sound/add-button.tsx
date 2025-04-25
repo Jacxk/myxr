@@ -3,8 +3,9 @@
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 import { api } from "~/trpc/react";
 import { Button } from "../ui/button";
 import {
@@ -19,34 +20,85 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
-import { z } from "zod";
 
 const GuildSchema = z.object({
   id: z.string().nonempty("Guild ID is required"),
   name: z.string().nonempty("Guild name is required"),
 });
 
-export function AddToGuildButton({
-  soundId,
-  isPreview,
-}: Readonly<{
+interface AddToGuildButtonProps {
   soundId: string;
   isPreview?: boolean;
-}>) {
-  const { mutate, isPending, isSuccess, isError, error } =
-    api.guild.createSound.useMutation();
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const [guild, setGuild] = useState<z.infer<typeof GuildSchema>>();
+}
 
-  const onAddClick = useCallback(() => {
-    if (!guild) return;
+const handleInternalServerError = (message: string): void => {
+  switch (message) {
+    case "SOUND_EXISTS":
+      toast.error("Sound already exists in the guild");
+      break;
+    case "Unknown Guild":
+      toast.error("This guild is not valid. Is the bot inside the guild?", {
+        duration: 5000,
+      });
+      break;
+    case "SOUND_NOT_FOUND":
+      toast.error("Sound not found. Try again later.");
+      break;
+    default:
+      toast.error("There was an error!", {
+        duration: 5000,
+        description: message,
+      });
+      break;
+  }
+};
+
+const getGuildFromLocalStorage = ():
+  | z.infer<typeof GuildSchema>
+  | undefined => {
+  const savedGuild = localStorage.getItem("selectedGuild");
+  if (!savedGuild) return undefined;
+
+  const parsedGuild = JSON.parse(savedGuild) as typeof GuildSchema;
+  const result = GuildSchema.safeParse(parsedGuild);
+  return result.success ? result.data : undefined;
+};
+
+export function AddToGuildButton({
+  soundId,
+  isPreview = false,
+}: Readonly<AddToGuildButtonProps>) {
+  const router = useRouter();
+
+  const { mutate, isPending } = api.guild.createSound.useMutation({
+    onSuccess: () => {
+      toast("Sound added to guild");
+      setOpen(false);
+    },
+    onError: (error) => {
+      if (error?.data?.code === "UNAUTHORIZED") {
+        router.push("/api/auth/signin");
+      } else if (error?.data?.code === "INTERNAL_SERVER_ERROR") {
+        handleInternalServerError(error.message);
+      } else {
+        toast.error("There was an internal error!");
+      }
+    },
+  });
+
+  const [open, setOpen] = useState<boolean>(false);
+
+  const onAddClick = useCallback((): void => {
+    const guild = getGuildFromLocalStorage();
+    if (!guild) {
+      toast.error("You need to select a guild first");
+      return;
+    }
     mutate({ soundId, guildId: guild.id, guildName: guild.name });
-    setOpen(false);
-  }, [guild]);
+  }, [mutate, soundId]);
 
   const addSoundToGuild = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    (event: React.MouseEvent<HTMLButtonElement>): void => {
       event.stopPropagation();
 
       if (isPreview) {
@@ -54,6 +106,7 @@ export function AddToGuildButton({
         return;
       }
 
+      const guild = getGuildFromLocalStorage();
       if (!guild) {
         toast.error("You need to select a guild first");
         return;
@@ -61,59 +114,27 @@ export function AddToGuildButton({
 
       setOpen(true);
     },
-    [guild],
+    [isPreview],
   );
-
-  useEffect(() => {
-    if (isSuccess) toast("Sound added to guild");
-    if (isError) {
-      if (error?.data?.code === "UNAUTHORIZED") {
-        router.push("/api/auth/signin");
-      } else if (error?.data?.code === "INTERNAL_SERVER_ERROR") {
-        switch (error.message) {
-          case "SOUND_EXISTS":
-            toast.error("Sound already exists in the guild");
-            break;
-          case "Unknown Guild":
-            toast.error(
-              "This guild is not valid. Is the bot inside the guild?",
-              { duration: 5000 },
-            );
-            break;
-          case "SOUND_NOT_FOUND":
-            toast.error("Sound not found. Try again later.");
-            break;
-          default:
-            toast.error("There was an error!", {
-              duration: 5000,
-              description: error.message,
-            });
-            break;
-        }
-      } else toast.error("There was an internal error!");
-    }
-  }, [isSuccess, isError]);
-
-  useEffect(() => {
-    const guildData = JSON.parse(localStorage.getItem("selectedGuild") ?? "{}");
-    const result = GuildSchema.safeParse(guildData);
-
-    setGuild(result.data);
-  }, []);
 
   return (
     <>
+      {/* Dialog for confirming the addition of a sound */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{`Add sound to ${guild?.name}`}</DialogTitle>
+            <DialogTitle>{`Add sound to ${getGuildFromLocalStorage()?.name}`}</DialogTitle>
           </DialogHeader>
           <p>Are you sure you want to add this sound?</p>
           <DialogFooter>
-            <Button onClick={onAddClick}>Add</Button>
+            <Button onClick={onAddClick} disabled={isPending}>
+              Add
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Tooltip and button for adding a sound */}
       <TooltipProvider delayDuration={0}>
         <Tooltip disableHoverableContent>
           <TooltipTrigger asChild>
