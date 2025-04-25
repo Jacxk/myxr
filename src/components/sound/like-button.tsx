@@ -1,7 +1,7 @@
 "use client";
 
 import { Heart, HeartOff } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { api } from "~/trpc/react";
 import { Button } from "../ui/button";
@@ -22,35 +22,31 @@ export function LikeButton({
   isPreview?: boolean;
 }>) {
   const [isLiked, setIsLiked] = useState<boolean>(liked ?? false);
-  const { mutate, isPending, isSuccess, data } =
-    api.sound.likeSound.useMutation();
+  const { mutate, isPending } = api.sound.likeSound.useMutation({
+    onSuccess: (data) => {
+      if (!data.success) return;
+
+      toast(data.value ? "Sound liked" : "Liked removed");
+      setIsLiked(data.value);
+    },
+  });
 
   const likeClick = () => {
+    setIsLiked((liked) => !liked);
+
     if (isPreview) {
       toast(`Preview Mode: Sound like ${isLiked ? "removed" : "added"}`);
-      setIsLiked((liked) => !liked)
       return;
     }
-    mutate({ soundId, liked: !liked });
+
+    if (!isPending) mutate({ soundId, liked: !liked });
   };
-
-  useEffect(() => {
-    if (!data?.success) return;
-
-    toast(data.value ? "Sound liked" : "Liked removed");
-    setIsLiked(data.value);
-  }, [isSuccess, data]);
 
   return (
     <TooltipProvider delayDuration={0}>
       <Tooltip disableHoverableContent>
         <TooltipTrigger asChild>
-          <Button
-            variant="outline"
-            size="icon"
-            disabled={isPending}
-            onClick={likeClick}
-          >
+          <Button variant="outline" size="icon" onClick={likeClick}>
             {isLiked ? <HeartOff /> : <Heart />}
           </Button>
         </TooltipTrigger>
