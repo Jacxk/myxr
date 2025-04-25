@@ -30,7 +30,7 @@ const FileSchema = z.object({
 
 export function EditDetailsStep() {
   const router = useRouter();
-  const { theme } = useTheme();
+  const { resolvedTheme: theme } = useTheme();
 
   const { data, prevStep, setData } = useSteps<SoundUploadProps>();
 
@@ -116,7 +116,11 @@ export function EditDetailsStep() {
         <div className="flex flex-col gap-4">
           <div>
             <Label htmlFor="title">Title</Label>
-            <Input id="title" value={data.fileProps?.name} onChange={setSoundName} />
+            <Input
+              id="title"
+              value={data.fileProps?.name}
+              onChange={setSoundName}
+            />
           </div>
           <div>
             <Label htmlFor="tags">Tags</Label>

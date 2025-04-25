@@ -17,7 +17,7 @@ import { Switch } from "~/components/ui/switch";
 import { signOut } from "~/lib/auth-client";
 
 export function AccountMenu({ user }: Readonly<{ user: User | undefined }>) {
-  const { setTheme, theme } = useTheme();
+  const { setTheme, resolvedTheme: theme } = useTheme();
 
   const toggleTheme = useCallback(() => {
     const isDark = theme === "dark";
@@ -56,9 +56,7 @@ export function AccountMenu({ user }: Readonly<{ user: User | undefined }>) {
           <DropdownMenuItem>Settings</DropdownMenuItem>
         </Link>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => signOut()}>
-          Sign out
-        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => signOut()}>Sign out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

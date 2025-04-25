@@ -22,7 +22,7 @@ export default function RootLayout({
     <html lang="en" className={GeistSans.variable}>
       <body>
         <TRPCReactProvider>
-          <ThemeProvider attribute="class" enableSystem>
+          <ThemeProvider attribute="class">
             <HydrateClient>
               <div className="flex h-screen flex-col">
                 <Navbar />
