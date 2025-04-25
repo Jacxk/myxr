@@ -47,7 +47,7 @@ export const userRouter = createTRPCRouter({
     });
   }),
   getUser: publicProcedure
-    .input(z.object({ id: z.string().cuid() }))
+    .input(z.object({ id: z.string() }))
     .query(({ ctx, input }) => {
       return ctx.db.user.findFirst({
         where: { id: input.id },
@@ -55,7 +55,7 @@ export const userRouter = createTRPCRouter({
       });
     }),
   followUser: protectedProcedure
-    .input(z.object({ id: z.string().cuid() }))
+    .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
       const isFollow = await ctx.db.userFollow.findFirst({
