@@ -13,35 +13,30 @@ export const trimAudioAndConvertToMp3 = async (
   file: File,
   startTime: number,
   endTime: number,
-): Promise<File | null> => {
-  try {
-    const audioContext = new AudioContext();
-    const arrayBuffer = await file.arrayBuffer();
-    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+): Promise<File> => {
+  const audioContext = new AudioContext();
+  const arrayBuffer = await file.arrayBuffer();
+  const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
-    const sampleRate = audioBuffer.sampleRate;
-    const startSample = Math.floor(startTime * sampleRate);
-    const endSample = Math.floor(endTime * sampleRate);
-    const trimmedAudioBuffer = audioContext.createBuffer(
-      audioBuffer.numberOfChannels,
-      endSample - startSample,
-      sampleRate,
-    );
+  const sampleRate = audioBuffer.sampleRate;
+  const startSample = Math.floor(startTime * sampleRate);
+  const endSample = Math.floor(endTime * sampleRate);
+  const trimmedAudioBuffer = audioContext.createBuffer(
+    audioBuffer.numberOfChannels,
+    endSample - startSample,
+    sampleRate,
+  );
 
-    for (let i = 0; i < audioBuffer.numberOfChannels; i++) {
-      const oldChannelData = audioBuffer.getChannelData(i);
-      const newChannelData = trimmedAudioBuffer.getChannelData(i);
-      newChannelData.set(oldChannelData.subarray(startSample, endSample));
-    }
-
-    // Convert to MP3
-    const mp3Blob = await encodeMP3(trimmedAudioBuffer);
-    const name = `${file.name.split(".").slice(0, -1).join(".")}.mp3`;
-    return new File([mp3Blob], name, { type: "audio/mp3" });
-  } catch (error) {
-    console.error("Error during MP3 encoding:", error);
-    return null; // Or handle the error as needed
+  for (let i = 0; i < audioBuffer.numberOfChannels; i++) {
+    const oldChannelData = audioBuffer.getChannelData(i);
+    const newChannelData = trimmedAudioBuffer.getChannelData(i);
+    newChannelData.set(oldChannelData.subarray(startSample, endSample));
   }
+
+  // Convert to MP3
+  const mp3Blob = await encodeMP3(trimmedAudioBuffer);
+  const name = `${file.name.split(".").slice(0, -1).join(".")}.mp3`;
+  return new File([mp3Blob], name, { type: "audio/mp3" });
 };
 
 /**

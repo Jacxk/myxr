@@ -1,22 +1,21 @@
 "use client";
 
 import EmojiPicker, {
+  EmojiClickData,
   EmojiStyle,
   SuggestionMode,
   Theme,
 } from "emoji-picker-react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { SoundPage } from "~/app/sound/[id]/_components/sound-page";
-import { type SoundProperties } from "~/components/sound/sound";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useSteps } from "~/context/StepsContext";
-import { useSession } from "~/lib/auth-client";
 import { uploadFiles } from "~/utils/uploadthing";
 import { type SoundUploadProps } from "./select-file";
 
@@ -32,28 +31,21 @@ const FileSchema = z.object({
 export function EditDetailsStep() {
   const router = useRouter();
   const { theme } = useTheme();
-  const { data: session } = useSession();
 
-  const { data, prevStep } = useSteps<SoundUploadProps>();
+  const { data, prevStep, setData } = useSteps<SoundUploadProps>();
 
   const [uploading, setUploading] = useState<boolean>(false);
-  const [fileProps, setFileProps] = useState<SoundProperties>({
-    name: "",
-    emoji: "",
-    id: "",
-    url: URL.createObjectURL(data.newFile as Blob),
-  });
 
   const uploadFile = useCallback(() => {
-    const newFile = data.newFile;
-    if (!newFile) {
+    const { editedFile, fileProps } = data;
+    if (!editedFile) {
       toast.error("There was an error while uploading.");
       return;
     }
-    const file = new File(
-      [newFile],
-      `${session?.user.id ?? "unknown"}_${newFile.name}`,
-      { type: newFile.type },
+    const renamedFile = new File(
+      [editedFile],
+      `${fileProps?.createdBy?.id ?? "unknown"}_${editedFile.name}`,
+      { type: editedFile.type },
     );
 
     const { success, error } = FileSchema.safeParse(fileProps);
@@ -67,11 +59,11 @@ export function EditDetailsStep() {
     toast.loading("Uploading file...", { id: "uploading", duration: 9999999 });
 
     uploadFiles("soundUploader", {
-      files: [file],
+      files: [renamedFile],
       input: {
-        emoji: fileProps.emoji,
-        name: fileProps.name,
-        tags: fileProps.tags,
+        emoji: fileProps?.emoji,
+        name: fileProps?.name,
+        tags: fileProps?.tags,
       },
     })
       .then(() => {
@@ -86,21 +78,36 @@ export function EditDetailsStep() {
       .finally(() => {
         toast.dismiss("uploading");
       });
-  }, [data.newFile, fileProps]);
+  }, [data.editedFile, data.fileProps]);
 
-  useEffect(() => {
-    setFileProps({
-      name: "",
-      createdBy: {
-        id: session?.user.id ?? "",
-        name: session?.user.name ?? "",
-        image: session?.user.image ?? "",
-      },
-      emoji: "🎵",
-      id: "",
-      url: URL.createObjectURL(data.newFile as Blob),
+  const setSoundName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.value.length > 0 ? e.target.value : data.file?.name;
+    setData({
+      ...data,
+      fileProps: { ...data.fileProps, name },
     });
-  }, [data.newFile]);
+  };
+
+  const setSoundTags = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setData({
+      ...data,
+      fileProps: {
+        ...data.fileProps,
+        tags: e.target.value
+          .trim()
+          .split(" ")
+          .filter((tag) => tag !== "")
+          .map((tag) => ({ name: tag.trim() })),
+      },
+    });
+  };
+
+  const setSoundEmoji = (emojiData: EmojiClickData) => {
+    setData({
+      ...data,
+      fileProps: { ...data.fileProps, emoji: emojiData.emoji },
+    });
+  };
 
   return (
     <div className="flex h-full flex-col justify-around gap-10 transition sm:flex-row sm:gap-0">
@@ -109,28 +116,11 @@ export function EditDetailsStep() {
         <div className="flex flex-col gap-4">
           <div>
             <Label htmlFor="title">Title</Label>
-            <Input
-              id="title"
-              onChange={(e) =>
-                setFileProps((prop) => ({ ...prop, name: e.target.value }))
-              }
-            />
+            <Input id="title" value={data.fileProps?.name} onChange={setSoundName} />
           </div>
           <div>
             <Label htmlFor="tags">Tags</Label>
-            <Input
-              id="tags"
-              onChange={(e) =>
-                setFileProps((prop) => ({
-                  ...prop,
-                  tags: e.target.value
-                    .trim()
-                    .split(" ")
-                    .filter((tag) => tag !== "")
-                    .map((tag) => ({ name: tag.trim() })),
-                }))
-              }
-            />
+            <Input id="tags" onChange={setSoundTags} />
           </div>
           <div>
             <Label>Emoji</Label>
@@ -139,9 +129,7 @@ export function EditDetailsStep() {
               autoFocusSearch={false}
               suggestedEmojisMode={SuggestionMode.RECENT}
               emojiStyle={EmojiStyle.TWITTER}
-              onEmojiClick={(emoji) =>
-                setFileProps((prop) => ({ ...prop, emoji: emoji.emoji }))
-              }
+              onEmojiClick={setSoundEmoji}
               theme={theme === "dark" ? Theme.DARK : Theme.LIGHT}
             />
           </div>
@@ -170,22 +158,14 @@ export function EditDetailsStep() {
         <SoundPage
           id="none"
           sound={{
+            ...data.fileProps,
             createdAt: new Date(),
-            createdBy: {
-              id: session?.user.id ?? "",
-              name: session?.user.name ?? "Me",
-              image: session?.user.image ?? "",
-            },
-            emoji: fileProps.emoji,
             guildSounds: [],
             id: "none",
             likedBy: Array(Math.floor(Math.random() * 1000)).fill({}),
-            name: fileProps.name.length > 0 ? fileProps.name : "No name provided",
-            tags: fileProps.tags,
             usegeCount: Math.floor(Math.random() * 10000),
-            url: URL.createObjectURL(data.newFile as Blob),
           }}
-          user={session?.user}
+          user={data.fileProps?.createdBy}
           isPreview
         />
       </div>

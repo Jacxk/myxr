@@ -34,7 +34,7 @@ export function EditSoundStep() {
   });
 
   const onDecode = (time: number) => {
-    if (!data.newFile) setFileChanged(true);
+    if (!data.editedFile) setFileChanged(true);
     setTotalTime(time);
   };
 
@@ -58,7 +58,15 @@ export function EditSoundStep() {
 
     trimAudioAndConvertToMp3(data.file, region.start, region.end + 0.01)
       .then((newFile) => {
-        setData({ newFile, region, file: data.file });
+        setData({
+          editedFile: newFile,
+          region,
+          file: data.file,
+          fileProps: {
+            ...data.fileProps,
+            url: URL.createObjectURL(newFile as Blob),
+          },
+        });
         toast("Audio edited successfully!");
         nextStep();
       })
