@@ -3,45 +3,38 @@
 import Link from "next/link";
 import { memo } from "react";
 import Twemoji from "react-twemoji";
+import { cn } from "~/lib/utils";
+import type { getSound } from "~/utils/db";
 import { useAudio } from "../../context/AudioContext";
 import { Button } from "../ui/button";
 import { AddToGuildButton } from "./add-button";
 import { DeleteSoundButton } from "./delete-button";
 import { LikeButton } from "./like-button";
-import { cn } from "~/lib/utils";
 
-export interface SoundProperties {
-  id: string;
-  name: string;
-  emoji: string;
-  url: string;
-  tags?: Array<{ name: string }>;
-  createdBy?: { name: string | null; id: string, image: string | null };
+export type SoundProperties = {
   className?: string;
   displayAddButton?: boolean;
   displayDeleteButton?: boolean;
   discordSoundId?: string;
   guildId?: string;
-  liked?: boolean;
   isPreview?: boolean;
-}
+} & Awaited<ReturnType<typeof getSound>>
 
-const EmojiButton = memo(
-  ({ id, url, emoji }: { id: string; url: string; emoji: string }) => {
-    const { isPlaying, currentId, play } = useAudio();
-    const currentlyPlay = isPlaying && currentId === id;
+const EmojiButton = memo(function EmojiButtonMemoized({ id, url, emoji }: { id: string; url: string; emoji: string }) {
+  const { isPlaying, currentId, play } = useAudio();
+  const currentlyPlay = isPlaying && currentId === id;
 
-    return (
-      <button
-        className={cn("flex transform cursor-pointer transition-transform", {
-          "scale-90": currentlyPlay,
-        })}
-        onClick={() => play(id, url)}
-      >
-        <Twemoji options={{ className: "twemoji w-20 h-20" }}>{emoji}</Twemoji>
-      </button>
-    );
-  },
+  return (
+    <button
+      className={cn("flex transform cursor-pointer transition-transform", {
+        "scale-90": currentlyPlay,
+      })}
+      onClick={() => play(id, url)}
+    >
+      <Twemoji options={{ className: "twemoji w-20 h-20" }}>{emoji}</Twemoji>
+    </button>
+  );
+},
 );
 
 export default memo(function Sound({
@@ -54,7 +47,7 @@ export default memo(function Sound({
   displayDeleteButton,
   discordSoundId,
   guildId,
-  liked,
+  likedByUser,
   isPreview,
 }: Readonly<SoundProperties>) {
   return (
@@ -82,7 +75,7 @@ export default memo(function Sound({
           <AddToGuildButton soundId={id} isPreview={isPreview} />
         ) : null}
         {displayAddButton ? (
-          <LikeButton soundId={id} liked={liked} isPreview={isPreview} />
+          <LikeButton soundId={id} liked={likedByUser} isPreview={isPreview} />
         ) : null}
 
         {displayDeleteButton ? (

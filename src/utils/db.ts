@@ -1,9 +1,10 @@
+import type { GuildSound } from "@prisma/client";
 import type { APIGuild } from "discord-api-types/v10";
 import { db } from "~/server/db";
 import { getDiscordGuilds } from "./discord-requests";
-import { GuildSound } from "@prisma/client";
 
 const soundInclude = {
+  tags: true,
   createdBy: {
     select: {
       image: true,
@@ -11,6 +12,16 @@ const soundInclude = {
       role: true,
       removed: true,
       id: true,
+    },
+  },
+  guildSounds: {
+    select: {
+      guild: {
+        select: {
+          name: true,
+          id: true,
+        },
+      },
     },
   },
 };
@@ -63,7 +74,8 @@ export const getSoundsFromUser = async (id: string) => {
   if (sounds.length > 0)
     return sounds.map((sound) => ({
       ...sound,
-      liked: sound.likedBy.length > 0,
+      likes: sound.likedBy.length,
+      likedByUser: sound.likedBy.length > 0,
     }));
 
   const user = await db.account.findFirst({
@@ -73,22 +85,43 @@ export const getSoundsFromUser = async (id: string) => {
   if (user)
     return (await getData(user.userId)).map((sound) => ({
       ...sound,
-      liked: sound.likedBy.length > 0,
+      likes: sound.likedBy.length,
+      likedByUser: sound.likedBy.length > 0,
     }));
 
   return [];
 };
 
-export const getSound = (id: string, userId?: string) => {
-  return db.sound.findFirst({
+export const getSound = async (id: string, userId?: string) => {
+  const sound = await db.sound.findFirst({
     where: { id },
     include: {
-      createdBy: true,
-      guildSounds: { select: { guild: { select: { name: true, id: true } } } },
-      tags: true,
+      ...soundInclude,
       likedBy: true,
     },
   });
+
+  if (!sound) return null;
+
+  return {
+    ...sound,
+    likes: sound.likedBy.length,
+    likedByUser:
+      sound.likedBy.filter((user) => user.userId === userId).length > 0,
+  };
+};
+
+export const getUserLikedSounds = async (userId: string) => {
+  const sounds = await db.sound.findMany({
+    where: { likedBy: { some: { userId } } },
+    include: { ...soundInclude, likedBy: { where: { userId } } },
+  });
+
+  return sounds.map((sound) => ({
+    ...sound,
+    likes: sound.likedBy.length,
+    likedByUser: sound.likedBy.length > 0,
+  }));
 };
 
 export const updateGuildMemberShip = async (

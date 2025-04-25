@@ -28,7 +28,7 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const play = (id: string, src: string) => {
     if (audioRef.current) {
       audioRef.current.src = src;
-      audioRef.current.play();
+      void audioRef.current.play();
       setCurrentId(id);
     }
   };

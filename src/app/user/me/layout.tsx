@@ -1,6 +1,6 @@
 import { Castle, Flag, Heart, Volume2 } from "lucide-react";
 import { redirect } from "next/navigation";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { getServerSession } from "~/lib/auth";
 import { api } from "~/trpc/server";
 import { TabLink } from "./_components/tab-link";
@@ -10,12 +10,12 @@ function Tab({
   exact,
   label,
   icon,
-}: Readonly<{
+}: {
   path: string;
   exact?: boolean;
   label: string;
   icon: ReactNode;
-}>) {
+}) {
   return (
     <TabLink
       href={`/user/me/${path}`}
@@ -28,7 +28,7 @@ function Tab({
   );
 }
 
-export default async function ({ children }: { children: React.ReactNode }) {
+export default async function Layout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession();
 
   if (session?.user) {

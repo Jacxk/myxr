@@ -1,4 +1,4 @@
-import { Sound } from "@prisma/client";
+import type { Sound } from "@prisma/client";
 import { z } from "zod";
 
 import {

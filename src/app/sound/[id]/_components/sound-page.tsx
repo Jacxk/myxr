@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { AddToGuildButton } from "~/components/sound/add-button";
 import { LikeButton } from "~/components/sound/like-button";
-import { SoundProperties } from "~/components/sound/sound";
 import { SoundWaveForm } from "~/components/sound/sound-waveform";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { TooltipProvider } from "~/components/ui/tooltip";
+import type { getSound } from '~/utils/db';
 import { DownloadButton } from "./action-button/download";
 import { ReportButton } from "./action-button/report";
 import { CreatedDate } from "./created-date";
@@ -13,29 +13,15 @@ import { SoundEmoji } from "./emoji";
 import { Guild } from "./guild";
 import { SoundData } from "./sound-data";
 
-interface User {
+type SoundPageProps = {
   id: string;
-  name?: string | null;
-  image?: string | null;
-}
-
-interface Sound extends SoundProperties {
-  guildSounds: Array<{ guild: { id: string; name: string; image?: string } }>;
-  likedBy: Array<{ userId: string }>;
-  createdAt: Date;
-  usegeCount: number;
-}
-interface SoundPageProps {
-  id: string;
-  sound: Sound;
-  user?: User;
+  sound: NonNullable<Awaited<ReturnType<typeof getSound>>>;
   isPreview?: boolean;
 }
 
 function ActionButtons({
   id,
   sound,
-  user,
   isPreview,
 }: Readonly<SoundPageProps>) {
   return (
@@ -45,7 +31,7 @@ function ActionButtons({
 
         <LikeButton
           soundId={id}
-          liked={sound.likedBy.some((data) => data.userId === user?.id)}
+          liked={sound.likedByUser}
           isPreview={isPreview}
         />
 
@@ -60,7 +46,6 @@ function ActionButtons({
 export function SoundPage({
   id,
   sound,
-  user,
   isPreview,
 }: Readonly<SoundPageProps>) {
   return (
@@ -94,7 +79,6 @@ export function SoundPage({
           <ActionButtons
             id={id}
             sound={sound}
-            user={user}
             isPreview={isPreview}
           />
         </div>
@@ -132,7 +116,7 @@ export function SoundPage({
           <SoundData title="Likes">
             {Intl.NumberFormat(navigator.language, {
               notation: "compact",
-            }).format(sound.likedBy.length)}
+            }).format(sound.likes)}
           </SoundData>
 
           {(sound.tags?.length ?? 0) > 0 && (

@@ -1,49 +1,67 @@
 "use client";
 
-import { User } from "better-auth";
 import { UploadCloud } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { SoundProperties } from "~/components/sound/sound";
 import { useSteps } from "~/context/StepsContext";
+import { useSession } from "~/lib/auth-client";
 import { cn } from "~/lib/utils";
 
-export interface SoundUploadProps {
-  file?: File;
+type FileProps = {
+  name: string;
+  emoji: string;
+  url: string;
+  tags?: { name: string }[];
+}
+
+type UploadUser = {
+  id: string,
+  name: string,
+  image: string,
+  role: string,
+}
+
+export type SoundUploadProps = {
+  user: UploadUser;
+  file: File;
+  fileProps: FileProps;
   editedFile?: File;
-  fileProps?: SoundProperties;
   region?: {
     start: number;
     end: number;
   };
 }
 
-export function SelectFileStep({ user }: { user: User }) {
+export function SelectFileStep() {
+  const { data: session } = useSession()
   const { data, setData, nextStep } = useSteps<SoundUploadProps>();
 
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [validFileType, setValidFileType] = useState<boolean>(false);
 
-  function onFileSelect(files: File[]) {
-    const file = files[0];
-    const fileName = file?.name.split(".")[0] ?? "Unknown";
-
-    toast("File selected " + fileName);
+  function initializeData(file: File) {
+    const fileName = file.name.split(".")[0] ?? "Unknown";
+    if (!session) return;
     setData({
       ...data,
       file,
+      user: session.user as UploadUser,
       fileProps: {
         name: fileName,
         emoji: "🎵",
-        id: "",
-        createdBy: {
-          id: user.id ?? "",
-          name: user.name,
-          image: user.image,
-        },
         url: URL.createObjectURL(file as Blob),
       },
     });
+  }
+
+  function onFileSelect(files: File[]) {
+    const file = files[0];
+
+    if (!file) return;
+    const fileName = file.name.split(".")[0] ?? "Unknown";
+
+    toast("File selected " + fileName);
+    initializeData(file)
     nextStep();
   }
 
@@ -86,7 +104,9 @@ export function SelectFileStep({ user }: { user: User }) {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const selectedFiles = Array.from(event.target.files);
-      setData({ file: selectedFiles[0] });
+
+      if (!selectedFiles[0]) return;
+      setData({ ...data, file: selectedFiles[0] });
       onFileSelect(selectedFiles);
     }
   };

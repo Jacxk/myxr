@@ -1,9 +1,9 @@
-import { APISoundboardSound } from "discord-api-types/v10";
+import type { APISoundboardSound } from "discord-api-types/v10";
 import { SoundTableList } from "~/components/sound/sound-list";
 import { api } from "~/trpc/server";
 import { getSoundBoard } from "~/utils/discord-requests";
 
-export default async function ({
+export default async function MeGuildIdPage({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -62,10 +62,9 @@ export default async function ({
     <>
       <title>{`${guildSounds[0]?.sound.createdBy.name} - Guild Sounds`}</title>
       <SoundTableList
-        //@ts-ignore
-        guildSounds={allSounds.map((guildSound) => ({
+        guildSounds={allSounds.map((sound) => ({
           external: false,
-          ...guildSound,
+          sound,
         }))}
       />
     </>

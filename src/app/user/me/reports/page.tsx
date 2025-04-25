@@ -1,6 +1,6 @@
 "use client";
 
-import { Sound, SoundReport } from "@prisma/client";
+import type { Sound, SoundReport } from "@prisma/client";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -25,7 +25,7 @@ import { api } from "~/trpc/react";
 
 type Report = SoundReport & { sound: Sound };
 
-export default function () {
+export default function MeReportsPage() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
@@ -46,8 +46,8 @@ export default function () {
 
   useEffect(() => {
     const id = searchParams.get("id");
-    const report = reports?.filter((r) => r.id === id) || [];
-    
+    const report = reports?.filter((r) => r.id === id) ?? [];
+
     if (id && report?.length > 0) setSelectedReport(report[0]);
   }, [searchParams, reports]);
 

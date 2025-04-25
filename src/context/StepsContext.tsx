@@ -79,5 +79,5 @@ export function useSteps<D>(): StepsContextProps<D> {
   if (!context) {
     throw new Error("useSteps must be used within an StepsProvider");
   }
-  return context;
+  return context as StepsContextProps<D>;
 }

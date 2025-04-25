@@ -1,22 +1,20 @@
 "use client";
 
-import type { GuildSound, Sound, User } from "@prisma/client";
-import { Snowflake } from "discord-api-types/globals";
+import type { GuildSound } from "@prisma/client";
+import type { Snowflake } from "discord-api-types/globals";
 import Link from "next/link";
 import Twemoji from "react-twemoji";
 import { AudioProvider, useAudio } from "~/context/AudioContext";
+import { cn } from "~/lib/utils";
+import type { getSoundsFromUser } from "~/utils/db";
 import { Button } from "../ui/button";
 import { DeleteSoundButton } from "./delete-button";
-import { cn } from "~/lib/utils";
 
-interface SoundData extends GuildSound {
-  sound: SoundIncludedUser;
+type Sound = NonNullable<Awaited<ReturnType<typeof getSoundsFromUser>>>[number];
+type SoundData = {
+  sound: Sound;
   external: boolean;
-}
-
-interface SoundIncludedUser extends Sound {
-  createdBy: User;
-}
+} & GuildSound
 
 function SoundRow({
   sound,
@@ -24,13 +22,12 @@ function SoundRow({
   guildId,
   className = "",
   external,
-}: Readonly<{
-  sound: SoundIncludedUser;
+}: {
   discordSoundId: Snowflake;
   guildId: Snowflake;
   className?: string;
   external?: boolean;
-}>) {
+} & SoundData) {
   const { play } = useAudio();
 
   return (
@@ -110,6 +107,7 @@ export function SoundTableList({
           {guildSounds.map((guildSound) => (
             <SoundRow
               key={guildSound.soundId}
+              soundId={guildSound.soundId}
               sound={guildSound.sound}
               discordSoundId={guildSound.discordSoundId}
               guildId={guildSound.guildId}

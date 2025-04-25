@@ -27,7 +27,7 @@ export function FollowButton({
         console.error(error);
         toast.error("Something went wrong");
       });
-  }, [isPending, id]);
+  }, [isPending, id, router, mutateAsync]);
 
   return (
     <Button

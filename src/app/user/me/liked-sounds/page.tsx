@@ -2,7 +2,7 @@ import Sound from "~/components/sound/sound";
 import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { api } from "~/trpc/server";
 
-export default async function () {
+export default async function MeLikedSounds() {
   const sounds = await api.user.likedSounds();
 
   if (sounds.length === 0)

@@ -1,24 +1,14 @@
 import { notFound } from "next/navigation";
 import { api } from "~/trpc/server";
 import { SoundPage } from "./_components/sound-page";
-import { getServerSession } from "~/lib/auth";
 
-export default async function ({
+export default async function SoundIDPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const session = await getServerSession();
   const sound = await api.sound.getSound({ id });
-
-  let user;
-  if (!session)
-    user = {
-      id: "none",
-      name: "Guest",
-    };
-  else user = session.user;
 
   if (!sound) return notFound();
 
@@ -28,11 +18,6 @@ export default async function ({
       <SoundPage
         sound={sound}
         id={id}
-        user={{
-          id: user.id,
-          image: user.image,
-          name: user.name,
-        }}
       />
     </>
   );

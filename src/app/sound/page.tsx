@@ -1,13 +1,13 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { z } from "zod";
+import type { z } from "zod";
 import { InfiniteScroll } from "~/components/infinite-scroll";
 import Sound from "~/components/sound/sound";
 import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { api } from "~/trpc/react";
 
-export default function () {
+export default function SoundsHomePage() {
   const searchParams = useSearchParams();
   const query = searchParams.get("query");
   const type = searchParams.get("type") as z.infer<
