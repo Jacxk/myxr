@@ -175,7 +175,7 @@ function GuildSelect({
   const [prevGuild, setPrevGuild] = useState<GuildState>(selectedGuild);
   const [botAlreadyIn, setBotAlreadyIn] = useState(false);
 
-  const value = `${selectedGuild.id}-${selectedGuild.name}`;
+  const value = selectedGuild.id && `${selectedGuild.id}-${selectedGuild.name}`;
 
   const onGuildSelect = async (guildString: string) => {
     const [id, name] = guildString.split("-");
