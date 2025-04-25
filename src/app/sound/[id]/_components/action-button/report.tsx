@@ -3,7 +3,7 @@
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Flag, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import {
@@ -19,6 +19,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
+import { isTRPCError } from "~/lib/utils";
 import { api } from "~/trpc/react";
 
 function ReportModal({
@@ -57,54 +58,59 @@ export function ReportButton({ id }: Readonly<{ id: string }>) {
   const [open, setOpen] = useState<boolean>(false);
   const [reason, setReason] = useState("");
 
-  const { mutate, data, isPending, error, isError } =
-    api.sound.reportSound.useMutation();
+  const { mutateAsync, isPending } = api.sound.reportSound.useMutation();
 
-  const handleSubmit = () => {
-    mutate({ id, reason });
+  const onOpenChange = (open: boolean) => {
+    setOpen(open);
+    setReason("");
   };
 
-  useEffect(() => {
-    if (!data) return;
-    if (!data.success) {
-      if (data.error === "REPORT_EXISTS") {
-        toast.error("You have already reported this sound.");
-      } else toast.error("Failed to report sound");
-      return;
-    }
+  const handleSubmit = () => {
+    mutateAsync({ id, reason })
+      .then(({ success, value, error }) => {
+        if (!success) {
+          if (error === "REPORT_EXISTS") {
+            toast.error("You have already reported this sound.");
+          } else toast.error("Failed to report sound");
+          return;
+        }
 
-    if (!data.value?.caseId) {
-      toast.error("Something went wrong");
-      return;
-    }
+        if (!value?.caseId) {
+          toast.error("Something went wrong");
+          return;
+        }
 
-    toast("Thank you for your feedback.", {
-      action: (
-        <Button variant="outline">
-          <Link
-            href={`/user/me/reports?id=${encodeURIComponent(data.value.caseId)}`}
-          >
-            View
-          </Link>
-        </Button>
-      ),
-    });
-    setReason("");
-    setOpen(false);
-  }, [data?.success]);
+        toast("Thank you for your feedback.", {
+          action: (
+            <Button variant="outline">
+              <Link
+                href={`/user/me/reports?id=${encodeURIComponent(value.caseId)}`}
+              >
+                View
+              </Link>
+            </Button>
+          ),
+        });
+        setOpen(false);
+      })
+      .catch((error: Error) => {
+        if (!isTRPCError(error)) {
+          toast.error("Unexpected error: " + error.name);
+          console.error("Unexpected error:", error);
+          return;
+        }
 
-  useEffect(() => {
-    if (!isError) return;
-    if (error?.data?.code === "BAD_REQUEST") {
-      toast.error("Please provide a valid reason.");
-    } else {
-      toast.error("Failed to report sound.");
-    }
-  }, [isError, error]);
+        if (error.shape?.data.code === "BAD_REQUEST") {
+          toast.error("Please provide a valid reason.");
+        } else {
+          toast.error(error.message);
+        }
+      });
+  };
 
   return (
     <>
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Report Sound</DialogTitle>

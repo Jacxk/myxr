@@ -1,20 +1,17 @@
 import { Dialog, DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import { Trash } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { api } from "~/trpc/react";
 import { Button } from "../ui/button";
-import {
-  DialogContent,
-  DialogFooter,
-  DialogHeader
-} from "../ui/dialog";
+import { DialogContent, DialogFooter, DialogHeader } from "../ui/dialog";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+import { useRouter } from "next/navigation";
 
 export function DeleteSoundButton({
   discordSoundId,
@@ -25,32 +22,27 @@ export function DeleteSoundButton({
   guildId: string;
   onDeleted?: () => void;
 }>) {
-  const { mutate, isSuccess } = api.guild.deleteSound.useMutation();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const { mutate, isPending } = api.guild.deleteSound.useMutation({
+    onSuccess: () => {
+      toast("Sound deleted successfully!");
+      router.refresh();
+      onDeleted?.();
+    },
+    onError: (error) => {
+      toast.error("Failed to delete sound.", {
+        description: error.message,
+      });
+    },
+    onSettled: () => {
+      setOpen(false);
+    },
+  });
 
   const onConfirmDeleteClick = () => {
-    mutate(
-      { soundId: discordSoundId, guildId: guildId },
-      {
-        onSuccess: () => {
-          toast("Sound deleted successfully!");
-        },
-        onError: (error) => {
-          toast.error("Failed to delete sound.", {
-            description: error.message,
-          });
-        },
-      },
-    );
-    setOpen(false);
+    mutate({ soundId: discordSoundId, guildId: guildId });
   };
-
-  useEffect(() => {
-    if (isSuccess) {
-      toast("Sound deleted");
-      onDeleted?.();
-    }
-  }, [isSuccess]);
 
   return (
     <>
@@ -63,7 +55,11 @@ export function DeleteSoundButton({
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="destructive" onClick={onConfirmDeleteClick}>
+            <Button
+              variant="destructive"
+              disabled={isPending}
+              onClick={onConfirmDeleteClick}
+            >
               Delete
             </Button>
           </DialogFooter>

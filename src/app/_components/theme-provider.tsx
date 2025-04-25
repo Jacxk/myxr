@@ -11,6 +11,7 @@ export function ThemeProvider({
 
   useEffect(() => {
     setMounted(true);
+    return () => setMounted(false);
   }, []);
 
   if (!mounted) {

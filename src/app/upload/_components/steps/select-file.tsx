@@ -1,27 +1,49 @@
 "use client";
 
+import { User } from "better-auth";
 import { UploadCloud } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { SoundProperties } from "~/components/sound/sound";
 import { useSteps } from "~/context/StepsContext";
 import { cn } from "~/lib/utils";
 
 export interface SoundUploadProps {
   file?: File;
-  newFile?: File | null;
+  editedFile?: File;
+  fileProps?: SoundProperties;
   region?: {
     start: number;
     end: number;
   };
 }
 
-export function SelectFileStep() {
+export function SelectFileStep({ user }: { user: User }) {
   const { data, setData, nextStep } = useSteps<SoundUploadProps>();
+
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [validFileType, setValidFileType] = useState<boolean>(false);
 
   function onFileSelect(files: File[]) {
-    toast("File selected " + files[0]?.name);
+    const file = files[0];
+    const fileName = file?.name.split(".")[0] ?? "Unknown";
+
+    toast("File selected " + fileName);
+    setData({
+      ...data,
+      file,
+      fileProps: {
+        name: fileName,
+        emoji: "🎵",
+        id: "",
+        createdBy: {
+          id: user.id ?? "",
+          name: user.name,
+          image: user.image,
+        },
+        url: URL.createObjectURL(file as Blob),
+      },
+    });
     nextStep();
   }
 
@@ -57,7 +79,6 @@ export function SelectFileStep() {
 
     if (event.dataTransfer.files.length > 0) {
       const uploadedFiles = Array.from(event.dataTransfer.files);
-      setData({ file: uploadedFiles[0] });
       onFileSelect(uploadedFiles);
     }
   };
