@@ -21,7 +21,7 @@ export function LatestSounds() {
       <h1 className="col-span-full text-3xl font-bold">Latest Sounds</h1>
       <AudioProvider>
         {latestSounds.map((sound) => (
-          <Sound key={sound.id} {...sound} />
+          <Sound key={sound.id} sound={sound} />
         ))}
       </AudioProvider>
       <div className="col-span-full flex justify-center">

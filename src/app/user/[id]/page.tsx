@@ -71,7 +71,7 @@ export default async function UserPage({
           <h2 className="text-2xl font-bold">Sounds</h2>
           <SoundsGrid>
             {sounds.map((sound) => (
-              <Sound key={sound.id} {...sound} />
+              <Sound key={sound.id} sound={sound} />
             ))}
           </SoundsGrid>
         </div>

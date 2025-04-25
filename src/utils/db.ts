@@ -202,3 +202,30 @@ export const handleSoundGuildCreate = async ({
     data: { usegeCount: { increment: 1 } },
   });
 };
+
+export const getSoundsFromTag = async (tag: string) => {
+  const data = await db.tag.findFirst({
+    where: { name: tag },
+    include: { sounds: true },
+  });
+
+  return data?.sounds ?? [];
+};
+
+export const searchForSoundsInfinite = async (
+  query: string,
+  limit: number,
+  cursor?: string | null,
+) => {
+  return db.sound.findMany({
+    take: limit + 1,
+    skip: cursor ? 1 : 0,
+    cursor: cursor ? { id: cursor } : undefined,
+    where: {
+      OR: [
+        { name: { search: query } },
+        { tags: { some: { name: { search: query } } } },
+      ],
+    },
+  });
+};

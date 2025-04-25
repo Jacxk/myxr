@@ -42,7 +42,7 @@ export default function SoundsHomePage() {
       >
         <SoundsGrid>
           {sounds.map((sound) => (
-            <Sound key={sound.id} {...sound} />
+            <Sound key={sound.id} sound={sound} />
           ))}
         </SoundsGrid>
       </InfiniteScroll>

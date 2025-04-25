@@ -4,21 +4,27 @@ import Link from "next/link";
 import { memo } from "react";
 import Twemoji from "react-twemoji";
 import { cn } from "~/lib/utils";
-import type { getSound } from "~/utils/db";
+import type { getSound, searchForSoundsInfinite } from "~/utils/db";
 import { useAudio } from "../../context/AudioContext";
 import { Button } from "../ui/button";
 import { AddToGuildButton } from "./add-button";
 import { DeleteSoundButton } from "./delete-button";
 import { LikeButton } from "./like-button";
 
-export type SoundProperties = {
+type Sound = Awaited<ReturnType<typeof getSound>>
+type SearchSound = Awaited<ReturnType<typeof searchForSoundsInfinite>>[number]
+
+
+export type SoundProperties<> = {
+  sound: NonNullable<Sound | SearchSound>;
   className?: string;
   displayAddButton?: boolean;
   displayDeleteButton?: boolean;
   discordSoundId?: string;
   guildId?: string;
   isPreview?: boolean;
-} & Awaited<ReturnType<typeof getSound>>
+}
+
 
 const EmojiButton = memo(function EmojiButtonMemoized({ id, url, emoji }: { id: string; url: string; emoji: string }) {
   const { isPlaying, currentId, play } = useAudio();
@@ -38,18 +44,14 @@ const EmojiButton = memo(function EmojiButtonMemoized({ id, url, emoji }: { id: 
 );
 
 export default memo(function Sound({
-  id,
-  name,
-  emoji,
-  url,
+  sound,
   className,
   displayAddButton = true,
   displayDeleteButton,
   discordSoundId,
   guildId,
-  likedByUser,
   isPreview,
-}: Readonly<SoundProperties>) {
+}: SoundProperties) {
   return (
     <div
       className={cn(
@@ -57,25 +59,29 @@ export default memo(function Sound({
         className,
       )}
     >
-      <EmojiButton id={id} url={url} emoji={emoji} />
+      <EmojiButton id={sound.id} url={sound.url} emoji={sound.emoji} />
       <Button
         className="whitespace-normal break-words p-0 text-center"
         variant="link"
         asChild
       >
         {!isPreview ? (
-          <Link href={`/sound/${id}`}>{name}</Link>
+          <Link href={`/sound/${sound.id}`}>{sound.name}</Link>
         ) : (
-          <span>{name}</span>
+          <span>{sound.name}</span>
         )}
       </Button>
 
       <div className="flex flex-row gap-2">
         {displayAddButton ? (
-          <AddToGuildButton soundId={id} isPreview={isPreview} />
+          <AddToGuildButton soundId={sound.id} isPreview={isPreview} />
         ) : null}
         {displayAddButton ? (
-          <LikeButton soundId={id} liked={likedByUser} isPreview={isPreview} />
+          <LikeButton
+            soundId={sound.id}
+            liked={"likedByUser" in sound ? sound.likedByUser : false}
+            isPreview={isPreview}
+          />
         ) : null}
 
         {displayDeleteButton ? (

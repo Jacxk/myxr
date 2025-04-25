@@ -6,7 +6,12 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { getSound, getSounds } from "~/utils/db";
+import {
+  getSound,
+  getSounds,
+  getSoundsFromTag,
+  searchForSoundsInfinite,
+} from "~/utils/db";
 
 export const soundRouter = createTRPCRouter({
   me: protectedProcedure
@@ -86,28 +91,17 @@ export const soundRouter = createTRPCRouter({
         direction: z.enum(["forward", "backward"]).default("forward"),
       }),
     )
-    .query(async ({ ctx, input }) => {
+    .query(async ({ input }) => {
       let sounds: Sound[] = [];
 
       if (input.type === "normal") {
-        sounds = await ctx.db.sound.findMany({
-          take: input.limit + 1,
-          skip: input.cursor ? 1 : 0,
-          cursor: input.cursor ? { id: input.cursor } : undefined,
-          where: {
-            OR: [
-              { name: { search: input.query } },
-              { tags: { some: { name: { search: input.query } } } },
-            ],
-          },
-        });
+        sounds = await searchForSoundsInfinite(
+          input.query,
+          input.limit,
+          input.cursor,
+        );
       } else if (input.type === "tag") {
-        const tags = await ctx.db.tag.findFirst({
-          where: { name: input.query },
-          include: { sounds: true },
-        });
-
-        sounds = tags?.sounds ?? [];
+        sounds = await getSoundsFromTag(input.query);
       }
 
       let nextCursor: typeof input.cursor | undefined = undefined;
