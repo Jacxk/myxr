@@ -3,10 +3,10 @@
 import { Pause, Play } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
-import { Button } from "../ui/button";
 import RegionsPlugin, {
   type Region,
 } from "wavesurfer.js/dist/plugins/regions.js";
+import { Button } from "../ui/button";
 
 type SoundWaveFromProps = {
   url: string;
@@ -31,6 +31,8 @@ export function SoundWaveForm({
   onRegionCreate,
 }: Readonly<SoundWaveFromProps>) {
   const waveSurfer = useRef<WaveSurfer>(undefined);
+  const regionsPlugin =
+    useRef<ReturnType<typeof RegionsPlugin.create>>(undefined);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [region, setRegion] = useState<LocalRegion>({
@@ -38,8 +40,8 @@ export function SoundWaveForm({
     end: regionData?.end ?? 5,
   });
 
-  useEffect(() => {
-    const regionsPlugin = RegionsPlugin.create();
+  const initializeWaveSurfer = useCallback(() => {
+    regionsPlugin.current = RegionsPlugin.create();
     waveSurfer.current = WaveSurfer.create({
       container: "#waveForm",
       barGap: 4,
@@ -48,7 +50,7 @@ export function SoundWaveForm({
       minPxPerSec: 1,
       dragToSeek: true,
       normalize: true,
-      plugins: [regionsPlugin],
+      plugins: [regionsPlugin.current],
       url,
     });
 
@@ -57,7 +59,8 @@ export function SoundWaveForm({
         onDecode?.(time);
         if (time <= region.end) setRegion({ ...region, end: time });
 
-        regionsPlugin.addRegion({
+        regionsPlugin.current?.clearRegions();
+        regionsPlugin.current?.addRegion({
           ...region,
           minLength: 0.01,
           maxLength: 5,
@@ -68,11 +71,11 @@ export function SoundWaveForm({
         waveSurfer.current?.setTime(region.start);
       });
 
-      regionsPlugin.on("region-created", (region) => {
+      regionsPlugin.current?.on("region-created", (region) => {
         onRegionCreate?.(region);
       });
 
-      regionsPlugin.on("region-update", (region) => {
+      regionsPlugin.current?.on("region-update", (region) => {
         onRegionUpdate?.(region);
         setRegion({ start: region.start, end: region.end });
         waveSurfer.current?.setTime(region.start);
@@ -88,18 +91,21 @@ export function SoundWaveForm({
       setIsPlaying(false);
     });
 
-    return () => {
-      waveSurfer.current?.destroy();
-      regionsPlugin.destroy();
-    };
-  }, []);
-
-  useEffect(() => {
-    waveSurfer.current?.on("timeupdate", (time) => {
+    waveSurfer.current.on("timeupdate", (time) => {
       if (editable) setCurrentTime(Math.abs(time - region.start));
       else setCurrentTime(time);
     });
-  }, [region]);
+  }, [editable, region, url, onDecode, onRegionCreate, onRegionUpdate]);
+
+  const destroyWaveSurfer = useCallback(() => {
+    waveSurfer.current?.destroy();
+    regionsPlugin.current?.destroy();
+  }, []);
+
+  useEffect(() => {
+    initializeWaveSurfer();
+    return () => destroyWaveSurfer();
+  }, []);
 
   const playPause = useCallback(() => {
     setIsPlaying((playing) => {
@@ -111,11 +117,11 @@ export function SoundWaveForm({
         const start = currentStart >= region.end ? region.start : currentStart;
         void waveSurfer.current!.play(start, region.end);
       } else {
-        waveSurfer.current?.play();
+        void waveSurfer.current?.play();
       }
       return !playing;
     });
-  }, [waveSurfer, region, isPlaying]);
+  }, [editable, region]);
 
   return (
     <div className="w-full touch-none rounded-2xl border p-4 text-muted-foreground">
