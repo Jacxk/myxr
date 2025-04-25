@@ -1,5 +1,6 @@
-import type { GuildSound } from "@prisma/client";
+import type { GuildSound, LikedSound } from "@prisma/client";
 import type { APIGuild } from "discord-api-types/v10";
+import { z } from "zod";
 import { db } from "~/server/db";
 import { getDiscordGuilds } from "./discord-requests";
 
@@ -24,6 +25,13 @@ const soundInclude = {
       },
     },
   },
+};
+
+const populateLike = (likedBy: LikedSound[], userId?: string) => {
+  return {
+    likes: likedBy.length,
+    likedByUser: likedBy.filter((user) => user.userId === userId).length > 0,
+  };
 };
 
 export const discordAuthorization = async (id: string) => {
@@ -57,36 +65,34 @@ export const getSounds = async ({
   return (
     sounds.map((sound) => ({
       ...sound,
-      liked: sound.likedBy.length > 0,
+      ...populateLike(sound.likedBy, userId),
     })) ?? []
   );
 };
 
-export const getSoundsFromUser = async (id: string) => {
+export const getSoundsFromUser = async (userId: string) => {
   const getData = (createdById: string) =>
     db.sound.findMany({
       orderBy: { createdAt: "desc" },
       where: { createdById },
-      include: { ...soundInclude, likedBy: { where: { userId: id } } },
+      include: { ...soundInclude, likedBy: { where: { userId: userId } } },
     });
-  const sounds = await getData(id);
+  const sounds = await getData(userId);
 
   if (sounds.length > 0)
     return sounds.map((sound) => ({
       ...sound,
-      likes: sound.likedBy.length,
-      likedByUser: sound.likedBy.length > 0,
+      ...populateLike(sound.likedBy, userId),
     }));
 
   const user = await db.account.findFirst({
-    where: { accountId: id },
+    where: { accountId: userId },
   });
 
   if (user)
     return (await getData(user.userId)).map((sound) => ({
       ...sound,
-      likes: sound.likedBy.length,
-      likedByUser: sound.likedBy.length > 0,
+      ...populateLike(sound.likedBy, userId),
     }));
 
   return [];
@@ -105,9 +111,7 @@ export const getSound = async (id: string, userId?: string) => {
 
   return {
     ...sound,
-    likes: sound.likedBy.length,
-    likedByUser:
-      sound.likedBy.filter((user) => user.userId === userId).length > 0,
+    ...populateLike(sound.likedBy, userId),
   };
 };
 
@@ -119,8 +123,7 @@ export const getUserLikedSounds = async (userId: string) => {
 
   return sounds.map((sound) => ({
     ...sound,
-    likes: sound.likedBy.length,
-    likedByUser: sound.likedBy.length > 0,
+    ...populateLike(sound.likedBy, userId),
   }));
 };
 
@@ -203,29 +206,80 @@ export const handleSoundGuildCreate = async ({
   });
 };
 
-export const getSoundsFromTag = async (tag: string) => {
+export const getSoundsFromTag = async (
+  tag: string,
+  limit: number,
+  cursor?: string | null,
+  userId?: string,
+) => {
   const data = await db.tag.findFirst({
+    take: limit + 1,
+    skip: cursor ? 1 : 0,
+    cursor: cursor ? { name: cursor } : undefined,
     where: { name: tag },
-    include: { sounds: true },
+    include: { sounds: { include: { likedBy: { where: { userId } } } } },
   });
 
-  return data?.sounds ?? [];
+  return (
+    data?.sounds.map((sound) => ({
+      ...sound,
+      ...populateLike(sound.likedBy, userId),
+    })) ?? []
+  );
 };
+
+export const SearchType = z.enum(["normal", "tag"]);
 
 export const searchForSoundsInfinite = async (
   query: string,
+  type: z.infer<typeof SearchType>,
   limit: number,
   cursor?: string | null,
+  userId?: string,
 ) => {
-  return db.sound.findMany({
+  let sounds = null;
+
+  if (type === "normal") {
+    sounds = await db.sound.findMany({
+      take: limit + 1,
+      skip: cursor ? 1 : 0,
+      cursor: cursor ? { id: cursor } : undefined,
+      include: { likedBy: { where: { userId } } },
+      where: {
+        OR: [
+          { name: { search: query } },
+          { tags: { some: { name: { search: query } } } },
+        ],
+      },
+    });
+  } else {
+    sounds = await getSoundsFromTag(query, limit, cursor, userId);
+  }
+
+  return sounds.map((sound) => ({
+    ...sound,
+    ...populateLike(sound.likedBy, userId),
+  }));
+};
+
+export const getAllSounds = async (
+  limit: number,
+  cursor?: string | null,
+  userId?: string,
+) => {
+  const sounds = await db.sound.findMany({
     take: limit + 1,
     skip: cursor ? 1 : 0,
     cursor: cursor ? { id: cursor } : undefined,
-    where: {
-      OR: [
-        { name: { search: query } },
-        { tags: { some: { name: { search: query } } } },
-      ],
+    orderBy: { usegeCount: "desc" },
+    include: {
+      createdBy: true,
+      likedBy: { where: { userId } },
     },
   });
+
+  return sounds.map((sound) => ({
+    ...sound,
+    ...populateLike(sound.likedBy, userId),
+  }));
 };

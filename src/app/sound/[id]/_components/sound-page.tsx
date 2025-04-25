@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link";
 import { AddToGuildButton } from "~/components/sound/add-button";
 import { LikeButton } from "~/components/sound/like-button";

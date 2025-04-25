@@ -170,6 +170,7 @@ export function EditDetailsStep() {
             createdAt: new Date(),
             id: "none",
             createdBy: data.user as User,
+            guildSounds: [],
             likes: Array(Math.floor(Math.random() * 1000)).length,
             likedByUser: Math.random() > 0.5,
             usegeCount: Math.floor(Math.random() * 10000),

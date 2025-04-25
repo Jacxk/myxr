@@ -1,4 +1,3 @@
-import type { Sound } from "@prisma/client";
 import { z } from "zod";
 
 import {
@@ -7,10 +6,11 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import {
+  getAllSounds,
   getSound,
   getSounds,
-  getSoundsFromTag,
   searchForSoundsInfinite,
+  SearchType,
 } from "~/utils/db";
 
 export const soundRouter = createTRPCRouter({
@@ -44,16 +44,11 @@ export const soundRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const sounds = await ctx.db.sound.findMany({
-        take: input.limit + 1, // Fetch one extra to check if there's a next page
-        skip: input.cursor ? 1 : 0, // Skip the cursor if provided
-        cursor: input.cursor ? { id: input.cursor } : undefined,
-        orderBy: { usegeCount: "desc" },
-        include: {
-          createdBy: true,
-          likedBy: { where: { userId: ctx.session?.user.id } },
-        },
-      });
+      const sounds = await getAllSounds(
+        input.limit,
+        input.cursor,
+        ctx.session?.user.id,
+      );
 
       let nextCursor: typeof input.cursor | undefined = undefined;
       if (sounds.length > input.limit) {
@@ -62,10 +57,7 @@ export const soundRouter = createTRPCRouter({
       }
 
       return {
-        sounds: sounds.map((sound) => ({
-          ...sound,
-          liked: sound.likedBy.length > 0,
-        })),
+        sounds,
         nextCursor,
       };
     }),
@@ -75,34 +67,28 @@ export const soundRouter = createTRPCRouter({
         id: z.string(),
       }),
     )
-    .query(({ input }) => {
-      return getSound(input.id);
+    .query(({ input, ctx }) => {
+      return getSound(input.id, ctx.session?.user.id);
     }),
   search: publicProcedure
     .input(
       z.object({
         query: z.string(),
-        type: z
-          .enum(["normal", "tag"])
-          .nullish()
-          .transform((value) => value ?? "normal"),
+        type: SearchType.nullish().transform((value) => value ?? "normal"),
         limit: z.number().min(1).max(100).default(50),
         cursor: z.string().nullish(),
         direction: z.enum(["forward", "backward"]).default("forward"),
       }),
     )
-    .query(async ({ input }) => {
-      let sounds: Sound[] = [];
-
-      if (input.type === "normal") {
-        sounds = await searchForSoundsInfinite(
-          input.query,
-          input.limit,
-          input.cursor,
-        );
-      } else if (input.type === "tag") {
-        sounds = await getSoundsFromTag(input.query);
-      }
+    .query(async ({ input, ctx }) => {
+      const userId = ctx.session?.user.id;
+      const sounds = await searchForSoundsInfinite(
+        input.query,
+        input.type,
+        input.limit,
+        input.cursor,
+        userId,
+      );
 
       let nextCursor: typeof input.cursor | undefined = undefined;
       if (sounds.length > input.limit) {
