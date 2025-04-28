@@ -36,6 +36,7 @@ export function EditDetailsStep() {
   const { data, prevStep, setData } = useSteps<SoundUploadProps>();
 
   const [uploading, setUploading] = useState<boolean>(false);
+  const [soundInputName, setSoundInputName] = useState(data.fileProps.name)
 
   const uploadFile = useCallback(() => {
     const { editedFile, fileProps, user } = data;
@@ -82,13 +83,14 @@ export function EditDetailsStep() {
   }, [data, router]);
 
   const setSoundName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.value.length > 0 ? e.target.value : data.file?.name;
+    setSoundInputName(e.target.value);
 
+    const name = e.target.value.length > 0 ? e.target.value : data.file?.name;
     if (!name) return;
 
     setData({
       ...data,
-      fileProps: { ...data.fileProps, name },
+      fileProps: { ...data.fileProps, name: name.split(".")[0] ?? name },
     });
   };
 
@@ -122,7 +124,7 @@ export function EditDetailsStep() {
             <Label htmlFor="title">Title</Label>
             <Input
               id="title"
-              value={data.fileProps?.name}
+              value={soundInputName}
               onChange={setSoundName}
             />
           </div>
