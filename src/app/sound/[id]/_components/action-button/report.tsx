@@ -19,6 +19,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
+import { useSession } from "~/lib/auth-client";
+import { ErrorToast } from "~/lib/messages/toast.global";
 import { isTRPCError } from "~/lib/utils";
 import { api } from "~/trpc/react";
 
@@ -54,18 +56,30 @@ function PendingButton({
   );
 }
 
-export function ReportButton({ id, isPreview }: Readonly<{ id: string, isPreview: boolean }>) {
+export function ReportButton({ id, isPreview }: Readonly<{ id: string, isPreview?: boolean }>) {
+  const { data: session } = useSession();
+
   const [open, setOpen] = useState<boolean>(false);
   const [reason, setReason] = useState("");
 
   const { mutateAsync, isPending } = api.sound.reportSound.useMutation();
 
   const onOpenChange = (open: boolean) => {
+    if (open && !session) {
+      ErrorToast.login();
+      return;
+    }
+
     setOpen(open);
     setReason("");
   };
 
   const handleSubmit = () => {
+    if (!session) {
+      ErrorToast.login();
+      return;
+    }
+
     if (isPreview) {
       toast("Preview Mode: Sound Reported");
       return;
@@ -75,13 +89,13 @@ export function ReportButton({ id, isPreview }: Readonly<{ id: string, isPreview
       .then(({ success, value, error }) => {
         if (!success) {
           if (error === "REPORT_EXISTS") {
-            toast.error("You have already reported this sound.");
+            ErrorToast.soundAlreadyReported();
           } else toast.error("Failed to report sound");
           return;
         }
 
         if (!value?.caseId) {
-          toast.error("Something went wrong");
+          ErrorToast.internal();
           return;
         }
 
@@ -100,13 +114,15 @@ export function ReportButton({ id, isPreview }: Readonly<{ id: string, isPreview
       })
       .catch((error: Error) => {
         if (!isTRPCError(error)) {
-          toast.error("Unexpected error: " + error.name);
+          ErrorToast.internal();
           console.error("Unexpected error:", error);
           return;
         }
 
         if (error.shape?.data.code === "BAD_REQUEST") {
-          toast.error("Please provide a valid reason.");
+          ErrorToast.invalidReport();
+        } else if (error.data?.code === "UNAUTHORIZED") {
+          ErrorToast.login();
         } else {
           toast.error(error.message);
         }
@@ -143,7 +159,7 @@ export function ReportButton({ id, isPreview }: Readonly<{ id: string, isPreview
           <Button
             size="icon"
             variant="destructive"
-            onClick={() => setOpen(true)}
+            onClick={() => onOpenChange(true)}
           >
             <Flag />
           </Button>

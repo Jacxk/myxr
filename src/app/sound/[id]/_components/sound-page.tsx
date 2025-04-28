@@ -39,7 +39,7 @@ function ActionButtons({
 
         <DownloadButton soundUrl={sound.url} soundName={sound.name} />
 
-        <ReportButton id={id} isPreview />
+        <ReportButton id={id} isPreview={isPreview} />
       </TooltipProvider>
     </div>
   );

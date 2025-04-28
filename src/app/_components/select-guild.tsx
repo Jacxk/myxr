@@ -22,6 +22,7 @@ import {
 } from "~/components/ui/select";
 import { StepsProvider, useSteps } from "~/context/StepsContext";
 import { useSession } from "~/lib/auth-client";
+import { ErrorToast } from "~/lib/messages/toast.global";
 import { api } from "~/trpc/react";
 
 type InviteButtonProps = {
@@ -192,7 +193,7 @@ function GuildSelect({
       onDialogOpenChange(true);
       return;
     } else if (!success) {
-      toast.error("Something went wrong...");
+      ErrorToast.internal()
       setSelectedGuild(prevGuild);
       return;
     }

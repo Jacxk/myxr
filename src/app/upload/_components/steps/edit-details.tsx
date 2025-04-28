@@ -17,6 +17,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useSteps } from "~/context/StepsContext";
+import { ErrorToast } from "~/lib/messages/toast.global";
 import { uploadFiles } from "~/utils/uploadthing";
 import { type SoundUploadProps } from "./select-file";
 
@@ -41,7 +42,7 @@ export function EditDetailsStep() {
   const uploadFile = useCallback(() => {
     const { editedFile, fileProps, user } = data;
     if (!editedFile) {
-      toast.error("There was an error while uploading.");
+      ErrorToast.internal()
       return;
     }
     const renamedFile = new File(
@@ -73,7 +74,7 @@ export function EditDetailsStep() {
         router.push("/");
       })
       .catch((error) => {
-        toast.error("There was an error while uploading.");
+        ErrorToast.internal()
         console.error(error);
         setUploading(false);
       })

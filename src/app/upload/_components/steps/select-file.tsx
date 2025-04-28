@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import type { Region } from "wavesurfer.js/dist/plugins/regions.js";
 import { useSteps } from "~/context/StepsContext";
 import { useSession } from "~/lib/auth-client";
+import { ErrorToast } from "~/lib/messages/toast.global";
 import { cn } from "~/lib/utils";
 
 type FileProps = {
@@ -90,7 +91,7 @@ export function SelectFileStep() {
     setValidFileType(false);
 
     if (!validFileType) {
-      return toast.error("Invalid file type. Please upload an audio file.");
+      return ErrorToast.invalidAudioFile()
     }
 
     if (event.dataTransfer.files.length > 0) {

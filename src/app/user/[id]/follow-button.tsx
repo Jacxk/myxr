@@ -3,8 +3,8 @@
 import { Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
-import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
+import { ErrorToast } from "~/lib/messages/toast.global";
 import { api } from "~/trpc/react";
 
 export function FollowButton({
@@ -25,7 +25,7 @@ export function FollowButton({
       })
       .catch((error) => {
         console.error(error);
-        toast.error("Something went wrong");
+        ErrorToast.internal()
       });
   }, [isPending, id, router, mutateAsync]);
 

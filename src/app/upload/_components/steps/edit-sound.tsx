@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { useSteps } from "~/context/StepsContext";
+import { ErrorToast } from "~/lib/messages/toast.global";
 import { trimAudioAndConvertToMp3 } from "~/utils/audioTrimmer";
 import { type SoundUploadProps } from "./select-file";
 
@@ -78,7 +79,7 @@ export function EditSoundStep() {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Something went wrong.");
+        ErrorToast.internal()
       })
       .finally(() => {
         toast.dismiss("editingAudio");

@@ -2,10 +2,11 @@
 
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useSession } from "~/lib/auth-client";
+import { ErrorToast } from "~/lib/messages/toast.global";
 import { api } from "~/trpc/react";
 import { Button } from "../ui/button";
 import {
@@ -34,21 +35,16 @@ interface AddToGuildButtonProps {
 const handleInternalServerError = (message: string): void => {
   switch (message) {
     case "SOUND_EXISTS":
-      toast.error("Sound already exists in the guild");
+      ErrorToast.soundExistsInGuild()
       break;
     case "Unknown Guild":
-      toast.error("This guild is not valid. Is the bot inside the guild?", {
-        duration: 5000,
-      });
+      ErrorToast.guildNotFound()
       break;
     case "SOUND_NOT_FOUND":
-      toast.error("Sound not found. Try again later.");
+      ErrorToast.soundNotFound()
       break;
     default:
-      toast.error("There was an error!", {
-        duration: 5000,
-        description: message,
-      });
+      ErrorToast.internal(message);
       break;
   }
 };
@@ -68,7 +64,7 @@ export function AddToGuildButton({
   soundId,
   isPreview = false,
 }: Readonly<AddToGuildButtonProps>) {
-  const router = useRouter();
+  const { data: session } = useSession();
 
   const { mutate, isPending } = api.guild.createSound.useMutation({
     onSuccess: () => {
@@ -77,11 +73,11 @@ export function AddToGuildButton({
     },
     onError: (error) => {
       if (error?.data?.code === "UNAUTHORIZED") {
-        router.push("/api/auth/signin");
+        ErrorToast.login();
       } else if (error?.data?.code === "INTERNAL_SERVER_ERROR") {
         handleInternalServerError(error.message);
       } else {
-        toast.error("There was an internal error!");
+        ErrorToast.internal()
       }
     },
   });
@@ -89,17 +85,26 @@ export function AddToGuildButton({
   const [open, setOpen] = useState<boolean>(false);
 
   const onAddClick = useCallback((): void => {
+    if (!session) {
+      ErrorToast.login();
+      return;
+    }
+
     const guild = getGuildFromLocalStorage();
     if (!guild) {
-      toast.error("You need to select a guild first");
+      ErrorToast.selectGuild();
       return;
     }
     mutate({ soundId, guildId: guild.id, guildName: guild.name });
-  }, [mutate, soundId]);
+  }, [mutate, soundId, session]);
 
   const addSoundToGuild = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>): void => {
       event.stopPropagation();
+      if (!session) {
+        ErrorToast.login();
+        return;
+      }
 
       if (isPreview) {
         toast("Preview Mode: Sound added to guild");
@@ -108,13 +113,13 @@ export function AddToGuildButton({
 
       const guild = getGuildFromLocalStorage();
       if (!guild) {
-        toast.error("You need to select a guild first");
+        ErrorToast.selectGuild();
         return;
       }
 
       setOpen(true);
     },
-    [isPreview],
+    [isPreview, session],
   );
 
   return (
