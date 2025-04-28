@@ -59,6 +59,7 @@ export async function getDiscordGuilds(id: string) {
 
   return data.filter(
     (guild: APIGuild) =>
+      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
       guild.owner ||
       hasPermission(
         guild.permissions!,

@@ -1,6 +1,7 @@
 import { Dialog, DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import { Trash } from "lucide-react";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { type MouseEvent, useState } from "react";
 import { toast } from "sonner";
 import { api } from "~/trpc/react";
 import { Button } from "../ui/button";
@@ -11,7 +12,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
-import { useRouter } from "next/navigation";
 
 export function DeleteSoundButton({
   discordSoundId,
@@ -40,9 +40,15 @@ export function DeleteSoundButton({
     },
   });
 
-  const onConfirmDeleteClick = () => {
+  const onConfirmDeleteClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
     mutate({ soundId: discordSoundId, guildId: guildId });
   };
+
+  const onDeleteClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    setOpen(true)
+  }
 
   return (
     <>
@@ -71,7 +77,7 @@ export function DeleteSoundButton({
           <TooltipTrigger asChild>
             <Button
               variant="destructive"
-              onClick={() => setOpen(true)}
+              onClick={onDeleteClick}
               size="icon"
             >
               <Trash />
