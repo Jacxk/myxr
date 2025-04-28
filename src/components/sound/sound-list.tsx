@@ -16,12 +16,12 @@ export type SoundListData = {
   guildId: Snowflake;
   discordSoundId: Snowflake;
   external?: boolean;
-}
+};
 
 type SoundTableListProps = {
   className?: string;
   data: SoundListData[];
-}
+};
 
 function SoundRow({
   sound,
@@ -96,9 +96,7 @@ function SoundTableHeader() {
   );
 }
 
-export function SoundTableList({
-  data,
-}: SoundTableListProps) {
+export function SoundTableList({ data }: SoundTableListProps) {
   return (
     <AudioProvider>
       <div className="flex w-full flex-col">

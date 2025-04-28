@@ -10,7 +10,8 @@
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file",
   "editor.codeActionsOnSave": {
-    "source.organizeImports": "always"
+    "source.organizeImports": "always",
+    "source.fixAll.eslint": "always"
   },
   "files.autoSave": "off",
   "workbench.editor.customLabels.patterns": {
@@ -19,5 +20,15 @@
     "**/app/**/error.tsx": "${dirname} [error.tsx]",
     "**/app/**/not-found.tsx": "${dirname} [not-found.tsx]",
     "**/app/**/loading.tsx": "${dirname} [loading.tsx]"
+  },
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  },
+  "eslint.validate": ["typescript"],
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }

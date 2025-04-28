@@ -11,9 +11,8 @@ import { AddToGuildButton } from "./add-button";
 import { DeleteSoundButton } from "./delete-button";
 import { LikeButton } from "./like-button";
 
-type Sound = Awaited<ReturnType<typeof getSound>>
-type SearchSound = Awaited<ReturnType<typeof searchForSoundsInfinite>>[number]
-
+type Sound = Awaited<ReturnType<typeof getSound>>;
+type SearchSound = Awaited<ReturnType<typeof searchForSoundsInfinite>>[number];
 
 export type SoundProperties<> = {
   sound: NonNullable<Sound | SearchSound>;
@@ -23,10 +22,17 @@ export type SoundProperties<> = {
   discordSoundId?: string;
   guildId?: string;
   isPreview?: boolean;
-}
+};
 
-
-const EmojiButton = memo(function EmojiButtonMemoized({ id, url, emoji }: { id: string; url: string; emoji: string }) {
+const EmojiButton = memo(function EmojiButtonMemoized({
+  id,
+  url,
+  emoji,
+}: {
+  id: string;
+  url: string;
+  emoji: string;
+}) {
   const { isPlaying, currentId, play } = useAudio();
   const currentlyPlay = isPlaying && currentId === id;
 
@@ -40,8 +46,7 @@ const EmojiButton = memo(function EmojiButtonMemoized({ id, url, emoji }: { id: 
       <Twemoji options={{ className: "twemoji w-20 h-20" }}>{emoji}</Twemoji>
     </button>
   );
-},
-);
+});
 
 export default memo(function Sound({
   sound,

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default async function UploadPage() {
   const session = await getServerSession();
-  if (!session) return notFound()
+  if (!session) return notFound();
 
   return (
     <StepsProvider>

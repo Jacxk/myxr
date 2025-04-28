@@ -56,7 +56,13 @@ function PendingButton({
   );
 }
 
-export function ReportButton({ id, isPreview }: Readonly<{ id: string, isPreview?: boolean }>) {
+export function ReportButton({
+  id,
+  isPreview,
+}: {
+  id: string;
+  isPreview?: boolean;
+}) {
   const { data: session } = useSession();
 
   const [open, setOpen] = useState<boolean>(false);

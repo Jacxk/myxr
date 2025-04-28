@@ -37,12 +37,12 @@ export function EditDetailsStep() {
   const { data, prevStep, setData } = useSteps<SoundUploadProps>();
 
   const [uploading, setUploading] = useState<boolean>(false);
-  const [soundInputName, setSoundInputName] = useState(data.fileProps.name)
+  const [soundInputName, setSoundInputName] = useState(data.fileProps.name);
 
   const uploadFile = useCallback(() => {
     const { editedFile, fileProps, user } = data;
     if (!editedFile) {
-      ErrorToast.internal()
+      ErrorToast.internal();
       return;
     }
     const renamedFile = new File(
@@ -74,7 +74,7 @@ export function EditDetailsStep() {
         router.push("/");
       })
       .catch((error) => {
-        ErrorToast.internal()
+        ErrorToast.internal();
         console.error(error);
         setUploading(false);
       })
@@ -123,11 +123,7 @@ export function EditDetailsStep() {
         <div className="flex flex-col gap-4">
           <div>
             <Label htmlFor="title">Title</Label>
-            <Input
-              id="title"
-              value={soundInputName}
-              onChange={setSoundName}
-            />
+            <Input id="title" value={soundInputName} onChange={setSoundName} />
           </div>
           <div>
             <Label htmlFor="tags">Tags</Label>

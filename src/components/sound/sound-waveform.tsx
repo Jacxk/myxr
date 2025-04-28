@@ -16,7 +16,7 @@ type SoundWaveFromProps = {
   onDecode?: (time: number) => void;
   onRegionUpdate?: (region: Region) => void;
   onRegionCreate?: (region: Region) => void;
-  onError?: (error: Error) => void
+  onError?: (error: Error) => void;
 };
 
 export function SoundWaveForm({
@@ -95,8 +95,16 @@ export function SoundWaveForm({
 
     waveSurfer.current.on("ready", () => {
       setIsReady(true);
-    })
-  }, [editable, url, regionData, onDecode, onRegionCreate, onRegionUpdate, onError]);
+    });
+  }, [
+    editable,
+    url,
+    regionData,
+    onDecode,
+    onRegionCreate,
+    onRegionUpdate,
+    onError,
+  ]);
 
   const destroyWaveSurfer = () => {
     waveSurfer.current?.destroy();
@@ -113,10 +121,10 @@ export function SoundWaveForm({
       if (playing) {
         waveSurfer.current?.pause();
       } else if (editable) {
-        const regions = regionsPlugin.current?.getRegions()
+        const regions = regionsPlugin.current?.getRegions();
         const singleRegion = regions?.[0];
 
-        if (singleRegion) singleRegion.play(true)
+        if (singleRegion) singleRegion.play(true);
       } else {
         void waveSurfer.current?.play();
       }
@@ -140,15 +148,13 @@ export function SoundWaveForm({
           </span>
         </div>
         <div
-          className={cn(
-            "w-full transition-all duration-500 overflow-hidden",
-            {
-              "animate-pulse bg-muted": !isReady,
-              "scale-100 opacity-100": isReady,
-              "scale-95 opacity-50": !isReady,
-            }
-          )}
-          id="waveForm"></div>
+          className={cn("w-full overflow-hidden transition-all duration-500", {
+            "animate-pulse bg-muted": !isReady,
+            "scale-100 opacity-100": isReady,
+            "scale-95 opacity-50": !isReady,
+          })}
+          id="waveForm"
+        ></div>
       </div>
     </div>
   );

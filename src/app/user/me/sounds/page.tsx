@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default async function MeSoundsPage() {
   const session = await getServerSession();
 
-  if (!session) return redirect("/")
+  if (!session) return redirect("/");
 
   const sounds = await api.user.getSounds(session.user.id);
 

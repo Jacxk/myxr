@@ -193,7 +193,7 @@ function GuildSelect({
       onDialogOpenChange(true);
       return;
     } else if (!success) {
-      ErrorToast.internal()
+      ErrorToast.internal();
       setSelectedGuild(prevGuild);
       return;
     }
@@ -220,10 +220,10 @@ function GuildSelect({
             {guild.name}
           </SelectItem>
         )) ?? (
-            <SelectItem value="none" disabled>
-              No guilds found
-            </SelectItem>
-          )}
+          <SelectItem value="none" disabled>
+            No guilds found
+          </SelectItem>
+        )}
       </SelectContent>
     </Select>
   );

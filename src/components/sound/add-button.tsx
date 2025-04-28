@@ -35,13 +35,13 @@ interface AddToGuildButtonProps {
 const handleInternalServerError = (message: string): void => {
   switch (message) {
     case "SOUND_EXISTS":
-      ErrorToast.soundExistsInGuild()
+      ErrorToast.soundExistsInGuild();
       break;
     case "Unknown Guild":
-      ErrorToast.guildNotFound()
+      ErrorToast.guildNotFound();
       break;
     case "SOUND_NOT_FOUND":
-      ErrorToast.soundNotFound()
+      ErrorToast.soundNotFound();
       break;
     default:
       ErrorToast.internal(message);
@@ -77,7 +77,7 @@ export function AddToGuildButton({
       } else if (error?.data?.code === "INTERNAL_SERVER_ERROR") {
         handleInternalServerError(error.message);
       } else {
-        ErrorToast.internal()
+        ErrorToast.internal();
       }
     },
   });

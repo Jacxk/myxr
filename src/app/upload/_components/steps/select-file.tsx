@@ -14,14 +14,14 @@ type FileProps = {
   emoji: string;
   url: string;
   tags?: { name: string }[];
-}
+};
 
 type UploadUser = {
-  id: string,
-  name: string,
-  image: string,
-  role: string,
-}
+  id: string;
+  name: string;
+  image: string;
+  role: string;
+};
 
 export type SoundUploadProps = {
   user: UploadUser;
@@ -29,10 +29,10 @@ export type SoundUploadProps = {
   fileProps: FileProps;
   editedFile?: File;
   region?: Region;
-}
+};
 
 export function SelectFileStep() {
-  const { data: session } = useSession()
+  const { data: session } = useSession();
   const { data, setData, nextStep } = useSteps<SoundUploadProps>();
 
   const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -60,7 +60,7 @@ export function SelectFileStep() {
     const fileName = file.name.split(".")[0] ?? "Unknown";
 
     toast("File selected " + fileName, { id: "fileSelected" });
-    initializeData(file)
+    initializeData(file);
     nextStep();
   }
 
@@ -91,7 +91,7 @@ export function SelectFileStep() {
     setValidFileType(false);
 
     if (!validFileType) {
-      return ErrorToast.invalidAudioFile()
+      return ErrorToast.invalidAudioFile();
     }
 
     if (event.dataTransfer.files.length > 0) {

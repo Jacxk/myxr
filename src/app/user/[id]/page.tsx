@@ -22,9 +22,10 @@ export default async function UserPage({
   const session = await getServerSession();
   const createdBy = sounds[0]?.createdBy;
   const followerCount = user.followers.length;
-  const isFollowing = user.followers.filter(
-    (follower) => follower.followerId === session?.user.id,
-  ).length === 1;
+  const isFollowing =
+    user.followers.filter(
+      (follower) => follower.followerId === session?.user.id,
+    ).length === 1;
 
   return (
     <>

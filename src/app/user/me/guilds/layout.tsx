@@ -2,13 +2,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { getServerSession } from "~/lib/auth";
 import { TabLink } from "../_components/tab-link";
 
-export default async function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const session = await getServerSession();
   const guilds = session?.user.guilds;
 
   return (
     <div className="flex w-full flex-col">
-      <div className="flex flex-row gap-1 border-b overflow-x-auto sm:justify-center">
+      <div className="flex flex-row gap-1 overflow-x-auto border-b sm:justify-center">
         {guilds?.map((guild, i) => (
           <TabLink
             className="rounded-b-none"

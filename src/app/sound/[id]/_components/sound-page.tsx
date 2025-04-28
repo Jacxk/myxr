@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Link from "next/link";
 import { AddToGuildButton } from "~/components/sound/add-button";
@@ -7,7 +7,7 @@ import { SoundWaveForm } from "~/components/sound/sound-waveform";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { TooltipProvider } from "~/components/ui/tooltip";
-import type { getSound } from '~/utils/db';
+import type { getSound } from "~/utils/db";
 import { DownloadButton } from "./action-button/download";
 import { ReportButton } from "./action-button/report";
 import { CreatedDate } from "./created-date";
@@ -19,13 +19,9 @@ type SoundPageProps = {
   id: string;
   sound: NonNullable<Awaited<ReturnType<typeof getSound>>>;
   isPreview?: boolean;
-}
+};
 
-function ActionButtons({
-  id,
-  sound,
-  isPreview,
-}: Readonly<SoundPageProps>) {
+function ActionButtons({ id, sound, isPreview }: SoundPageProps) {
   return (
     <div className="flex gap-2">
       <TooltipProvider delayDuration={0}>
@@ -45,11 +41,7 @@ function ActionButtons({
   );
 }
 
-export function SoundPage({
-  id,
-  sound,
-  isPreview,
-}: Readonly<SoundPageProps>) {
+export function SoundPage({ id, sound, isPreview }: Readonly<SoundPageProps>) {
   return (
     <div className="flex w-full flex-col gap-4">
       <div className="flex w-full flex-row gap-4">
@@ -78,11 +70,7 @@ export function SoundPage({
               </Link>
             </Button>
           </div>
-          <ActionButtons
-            id={id}
-            sound={sound}
-            isPreview={isPreview}
-          />
+          <ActionButtons id={id} sound={sound} isPreview={isPreview} />
         </div>
       </div>
       <SoundWaveForm url={sound.url} />

@@ -37,7 +37,7 @@ export function LikeButton({
       if (error.data?.code === "UNAUTHORIZED") {
         ErrorToast.login();
       }
-      setIsLiked(false)
+      setIsLiked(false);
     },
   });
 

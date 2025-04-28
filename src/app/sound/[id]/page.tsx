@@ -15,10 +15,7 @@ export default async function SoundIDPage({
   return (
     <>
       <title>{`${sound.name} - Sound`}</title>
-      <SoundPage
-        sound={sound}
-        id={id}
-      />
+      <SoundPage sound={sound} id={id} />
     </>
   );
 }

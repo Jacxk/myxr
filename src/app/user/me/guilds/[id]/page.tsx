@@ -1,8 +1,10 @@
 import type { APISoundboardSound } from "discord-api-types/v10";
-import { type SoundListData, SoundTableList } from "~/components/sound/sound-list";
+import {
+  type SoundListData,
+  SoundTableList,
+} from "~/components/sound/sound-list";
 import { api } from "~/trpc/server";
 import { getSoundBoard } from "~/utils/discord-requests";
-
 
 const getEmoji = (sound: APISoundboardSound) => {
   if (sound.emoji_id) {
@@ -39,32 +41,38 @@ export default async function MeGuildIdPage({
     .filter(
       (externalSound) =>
         !guildSounds.some(
-          (guildSound) =>
-            guildSound.discordSoundId === externalSound.sound_id,
+          (guildSound) => guildSound.discordSoundId === externalSound.sound_id,
         ),
-    ).map(sound => ({
-      discordSoundId: sound.sound_id,
-      guildId: sound.guild_id,
-      external: true,
-      sound: {
-        id: sound.sound_id,
-        name: sound.name,
-        createdById: sound.user?.id,
-        emoji: getEmoji(sound),
-        createdBy: {
-          name: sound.user?.global_name ?? sound.user?.username,
-        },
-        url: `https://cdn.discordapp.com/soundboard-sounds/${sound.sound_id}`,
-      },
-    }) as SoundListData)
+    )
+    .map(
+      (sound) =>
+        ({
+          discordSoundId: sound.sound_id,
+          guildId: sound.guild_id,
+          external: true,
+          sound: {
+            id: sound.sound_id,
+            name: sound.name,
+            createdById: sound.user?.id,
+            emoji: getEmoji(sound),
+            createdBy: {
+              name: sound.user?.global_name ?? sound.user?.username,
+            },
+            url: `https://cdn.discordapp.com/soundboard-sounds/${sound.sound_id}`,
+          },
+        }) as SoundListData,
+    );
 
   return (
     <>
       <title>{`${guild?.name} - Guild Sounds`}</title>
-      <div className="flex flex-col w-full items-center">
+      <div className="flex w-full flex-col items-center">
         <h2 className="text-xl text-muted-foreground">{guild?.name}</h2>
         <SoundTableList
-          data={[guildSounds as unknown as SoundListData, convertedExternalSound].flat()}
+          data={[
+            guildSounds as unknown as SoundListData,
+            convertedExternalSound,
+          ].flat()}
         />
       </div>
     </>

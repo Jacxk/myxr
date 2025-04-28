@@ -25,7 +25,7 @@ export function FollowButton({
       })
       .catch((error) => {
         console.error(error);
-        ErrorToast.internal()
+        ErrorToast.internal();
       });
   }, [isPending, id, router, mutateAsync]);
 

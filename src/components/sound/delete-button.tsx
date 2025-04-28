@@ -47,8 +47,8 @@ export function DeleteSoundButton({
 
   const onDeleteClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    setOpen(true)
-  }
+    setOpen(true);
+  };
 
   return (
     <>
@@ -75,11 +75,7 @@ export function DeleteSoundButton({
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
-              variant="destructive"
-              onClick={onDeleteClick}
-              size="icon"
-            >
+            <Button variant="destructive" onClick={onDeleteClick} size="icon">
               <Trash />
             </Button>
           </TooltipTrigger>

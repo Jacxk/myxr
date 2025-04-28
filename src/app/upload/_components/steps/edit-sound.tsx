@@ -21,8 +21,8 @@ import { type SoundUploadProps } from "./select-file";
 export function EditSoundStep() {
   const { data, reset, setData, nextStep } = useSteps<SoundUploadProps>();
 
-  const region = useRef<Region>(data.region)
-  const fileChanged = useRef<boolean>(false)
+  const region = useRef<Region>(data.region);
+  const fileChanged = useRef<boolean>(false);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [totalTime, setTotalTime] = useState<number>(0);
@@ -39,15 +39,15 @@ export function EditSoundStep() {
   };
 
   const onRegionUpdate = (thisRegion: Region) => {
-    fileChanged.current = true
+    fileChanged.current = true;
     region.current = thisRegion;
     setSelectedTime(Math.abs(thisRegion.start - thisRegion.end));
   };
 
   const onError = () => {
-    toast.dismiss("fileSelected")
+    toast.dismiss("fileSelected");
     toast.error("Something went wrong, check the file and try again!");
-  }
+  };
 
   function goToNextStep() {
     const currentRegion = region.current;
@@ -57,7 +57,7 @@ export function EditSoundStep() {
       return;
     }
 
-    toast.dismiss("fileSelected")
+    toast.dismiss("fileSelected");
     toast.loading("Editing audio file...", { id: "editingAudio" });
 
     setLoading(true);
@@ -79,7 +79,7 @@ export function EditSoundStep() {
       })
       .catch((error) => {
         console.log(error);
-        ErrorToast.internal()
+        ErrorToast.internal();
       })
       .finally(() => {
         toast.dismiss("editingAudio");
