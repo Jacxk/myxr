@@ -25,6 +25,7 @@ export function EditSoundStep() {
 
   const [loading, setLoading] = useState<boolean>(false);
   const [totalTime, setTotalTime] = useState<number>(0);
+  const [selectedTime, setSelectedTime] = useState<number>(0);
 
   const onDecode = (time: number) => {
     if (!data.editedFile) fileChanged.current = true;
@@ -33,11 +34,13 @@ export function EditSoundStep() {
 
   const onRegionCreate = (thisRegion: Region) => {
     region.current = thisRegion;
+    setSelectedTime(Math.abs(thisRegion.start - thisRegion.end));
   };
 
   const onRegionUpdate = (thisRegion: Region) => {
     fileChanged.current = true
     region.current = thisRegion;
+    setSelectedTime(Math.abs(thisRegion.start - thisRegion.end));
   };
 
   const onError = () => {
@@ -102,6 +105,7 @@ export function EditSoundStep() {
             <div className="flex flex-col">
               <span>Name: {data.file?.name}</span>
               <span>Audio Length: {totalTime.toFixed(2)}s</span>
+              <span>Selected Length: {selectedTime.toFixed(2)}s</span>
             </div>
           </CardContent>
         </Card>

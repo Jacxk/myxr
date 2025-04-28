@@ -88,11 +88,7 @@ export function SoundWaveForm({
     });
 
     waveSurfer.current.on("timeupdate", (time) => {
-      const region = regionsPlugin.current?.getRegions()[0]
-      if (region) {
-        const regionTime = Math.abs(region.end - region.start);
-        if (editable) setCurrentTime(regionTime);
-      } else setCurrentTime(time);
+      setCurrentTime(time);
     });
   }, [editable, url, regionData, onDecode, onRegionCreate, onRegionUpdate]);
 
