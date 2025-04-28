@@ -99,7 +99,7 @@ export function SoundPage({
               <Guild
                 key={guildSound.guild.id}
                 name={guildSound.guild.name}
-                image=""
+                image={guildSound.guild.image}
               />
             ))}
           </div>

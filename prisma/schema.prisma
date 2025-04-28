@@ -115,6 +115,7 @@ model Tag {
 model Guild {
     id               String            @id
     name             String
+    image            String?
     sounds           GuildSound[]
     soundMasterRoles String[]
     users            GuildMembership[]

@@ -1,7 +1,8 @@
 import type { APISoundboardSound } from "discord-api-types/v10";
-import { SoundListData, SoundTableList } from "~/components/sound/sound-list";
+import { type SoundListData, SoundTableList } from "~/components/sound/sound-list";
 import { api } from "~/trpc/server";
 import { getSoundBoard } from "~/utils/discord-requests";
+
 
 const getEmoji = (sound: APISoundboardSound) => {
   if (sound.emoji_id) {
@@ -24,11 +25,15 @@ export default async function MeGuildIdPage({
 
   if (externalSounds.length + guildSounds.length === 0) {
     return (
-      <div className="flex w-full flex-wrap items-center justify-center">
-        <span>No sounds found for this Guild...</span>
-      </div>
+      <>
+        <div className="flex w-full flex-wrap items-center justify-center">
+          <span>No sounds found for this Guild...</span>
+        </div>
+      </>
     );
   }
+
+  const guild = guildSounds[0]?.guild;
 
   const convertedExternalSound = externalSounds
     .filter(
@@ -42,6 +47,7 @@ export default async function MeGuildIdPage({
       guildId: sound.guild_id,
       external: true,
       sound: {
+        id: sound.sound_id,
         name: sound.name,
         createdById: sound.user?.id,
         emoji: getEmoji(sound),
@@ -54,10 +60,13 @@ export default async function MeGuildIdPage({
 
   return (
     <>
-      <title>{`${guildSounds[0]?.sound.createdBy.name} - Guild Sounds`}</title>
-      <SoundTableList
-        data={[guildSounds as unknown as SoundListData, convertedExternalSound].flat()}
-      />
+      <title>{`${guild?.name} - Guild Sounds`}</title>
+      <div className="flex flex-col w-full items-center">
+        <h2 className="text-xl text-muted-foreground">{guild?.name}</h2>
+        <SoundTableList
+          data={[guildSounds as unknown as SoundListData, convertedExternalSound].flat()}
+        />
+      </div>
     </>
   );
 }

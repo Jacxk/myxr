@@ -21,6 +21,7 @@ const soundInclude = {
         select: {
           name: true,
           id: true,
+          image: true,
         },
       },
     },
@@ -174,10 +175,12 @@ export const getUserGuilds = async (userId: string) => {
 };
 
 export const upsertGuild = async (guild: APIGuild) => {
+  const image = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`;
+
   await db.guild.upsert({
     where: { id: guild.id },
-    create: { id: guild.id, name: guild.name },
-    update: { name: guild.name },
+    create: { id: guild.id, name: guild.name, image },
+    update: { name: guild.name, image },
   });
 };
 
