@@ -54,7 +54,7 @@ function PendingButton({
   );
 }
 
-export function ReportButton({ id }: Readonly<{ id: string }>) {
+export function ReportButton({ id, isPreview }: Readonly<{ id: string, isPreview: boolean }>) {
   const [open, setOpen] = useState<boolean>(false);
   const [reason, setReason] = useState("");
 
@@ -66,6 +66,11 @@ export function ReportButton({ id }: Readonly<{ id: string }>) {
   };
 
   const handleSubmit = () => {
+    if (isPreview) {
+      toast("Preview Mode: Sound Reported");
+      return;
+    }
+
     mutateAsync({ id, reason })
       .then(({ success, value, error }) => {
         if (!success) {
