@@ -167,15 +167,19 @@ export function EditDetailsStep() {
           id="none"
           sound={{
             ...data.fileProps,
+            tags: data.fileProps.tags || [],
             createdAt: new Date(),
-            id: "none",
+            updatedAt: new Date(),
+            createdById: data.user.id,
             createdBy: data.user as User,
-            guildSounds: [],
             likes: Array(Math.floor(Math.random() * 1000)).length,
             likedByUser: Math.random() > 0.5,
             usegeCount: Math.floor(Math.random() * 10000),
+            id: "none",
+            guildSounds: [],
+            deletedAt: null,
+            likedBy: [],
           }}
-          likedByUser={Math.random() > 0.5}
           isPreview
         />
       </div>
