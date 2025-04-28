@@ -59,7 +59,7 @@ export async function getDiscordGuilds(id: string) {
 
   return data.filter(
     (guild: APIGuild) =>
-      guild.owner ??
+      guild.owner ||
       hasPermission(
         guild.permissions!,
         DiscordPermission.MANAGE_GUILD_EXPRESSIONS,
