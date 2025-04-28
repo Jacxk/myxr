@@ -6,6 +6,7 @@ import WaveSurfer from "wavesurfer.js";
 import RegionsPlugin, {
   type Region,
 } from "wavesurfer.js/dist/plugins/regions.js";
+import { cn } from "~/lib/utils";
 import { Button } from "../ui/button";
 
 type SoundWaveFromProps = {
@@ -32,6 +33,7 @@ export function SoundWaveForm({
     useRef<ReturnType<typeof RegionsPlugin.create>>(undefined);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
+  const [isReady, setIsReady] = useState<boolean>(false);
 
   const initializeWaveSurfer = useCallback(() => {
     regionsPlugin.current = RegionsPlugin.create();
@@ -90,7 +92,11 @@ export function SoundWaveForm({
     waveSurfer.current.on("timeupdate", (time) => {
       setCurrentTime(time);
     });
-  }, [editable, url, regionData, onDecode, onRegionCreate, onRegionUpdate]);
+
+    waveSurfer.current.on("ready", () => {
+      setIsReady(true);
+    })
+  }, [editable, url, regionData, onDecode, onRegionCreate, onRegionUpdate, onError]);
 
   const destroyWaveSurfer = () => {
     waveSurfer.current?.destroy();
@@ -133,7 +139,16 @@ export function SoundWaveForm({
             {currentTime.toFixed(2)}s
           </span>
         </div>
-        <div className="w-full" id="waveForm"></div>
+        <div
+          className={cn(
+            "w-full transition-all duration-500 overflow-hidden",
+            {
+              "animate-pulse bg-muted": !isReady,
+              "scale-100 opacity-100": isReady,
+              "scale-95 opacity-50": !isReady,
+            }
+          )}
+          id="waveForm"></div>
       </div>
     </div>
   );

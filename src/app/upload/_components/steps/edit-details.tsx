@@ -169,7 +169,7 @@ export function EditDetailsStep() {
           id="none"
           sound={{
             ...data.fileProps,
-            tags: data.fileProps.tags || [],
+            tags: data.fileProps.tags ?? [],
             createdAt: new Date(),
             updatedAt: new Date(),
             createdById: data.user.id,
