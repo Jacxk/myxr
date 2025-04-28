@@ -11,15 +11,10 @@ import { Button } from "../ui/button";
 type SoundWaveFromProps = {
   url: string;
   editable?: boolean;
-  regionData?: LocalRegion;
+  regionData?: Region;
   onDecode?: (time: number) => void;
   onRegionUpdate?: (region: Region) => void;
   onRegionCreate?: (region: Region) => void;
-};
-
-type LocalRegion = {
-  start: number;
-  end: number;
 };
 
 export function SoundWaveForm({
@@ -35,10 +30,6 @@ export function SoundWaveForm({
     useRef<ReturnType<typeof RegionsPlugin.create>>(undefined);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
-  const [region, setRegion] = useState<LocalRegion>({
-    start: regionData?.start ?? 0,
-    end: regionData?.end ?? 5,
-  });
 
   const initializeWaveSurfer = useCallback(() => {
     regionsPlugin.current = RegionsPlugin.create();
@@ -57,18 +48,21 @@ export function SoundWaveForm({
     if (editable) {
       waveSurfer.current.on("decode", (time) => {
         onDecode?.(time);
-        if (time <= region.end) setRegion({ ...region, end: time });
 
-        regionsPlugin.current?.clearRegions();
+        const currentRegion = regionsPlugin.current;
+
+        if (currentRegion && currentRegion.getRegions().length > 0) return;
+
         regionsPlugin.current?.addRegion({
-          ...region,
+          start: 0,
+          end: time > 5 ? 5 : time,
+          ...regionData,
           minLength: 0.01,
           maxLength: 5,
           drag: true,
           color: "rgb(37 99 235 / 0.2)",
           resize: true,
         });
-        waveSurfer.current?.setTime(region.start);
       });
 
       regionsPlugin.current?.on("region-created", (region) => {
@@ -77,7 +71,6 @@ export function SoundWaveForm({
 
       regionsPlugin.current?.on("region-update", (region) => {
         onRegionUpdate?.(region);
-        setRegion({ start: region.start, end: region.end });
         waveSurfer.current?.setTime(region.start);
       });
     }
@@ -92,15 +85,18 @@ export function SoundWaveForm({
     });
 
     waveSurfer.current.on("timeupdate", (time) => {
-      if (editable) setCurrentTime(Math.abs(time - region.start));
-      else setCurrentTime(time);
+      const region = regionsPlugin.current?.getRegions()[0]
+      if (region) {
+        const regionTime = Math.abs(region.end - region.start);
+        if (editable) setCurrentTime(regionTime);
+      } else setCurrentTime(time);
     });
-  }, [editable, region, url, onDecode, onRegionCreate, onRegionUpdate]);
+  }, [editable, url, regionData, onDecode, onRegionCreate, onRegionUpdate]);
 
-  const destroyWaveSurfer = useCallback(() => {
+  const destroyWaveSurfer = () => {
     waveSurfer.current?.destroy();
     regionsPlugin.current?.destroy();
-  }, []);
+  };
 
   useEffect(() => {
     initializeWaveSurfer();
@@ -112,16 +108,16 @@ export function SoundWaveForm({
       if (playing) {
         waveSurfer.current?.pause();
       } else if (editable) {
-        const currentStart =
-          waveSurfer.current?.getCurrentTime() ?? region.start;
-        const start = currentStart >= region.end ? region.start : currentStart;
-        void waveSurfer.current!.play(start, region.end);
+        const regions = regionsPlugin.current?.getRegions()
+        const singleRegion = regions?.[0];
+
+        if (singleRegion) singleRegion.play(true)
       } else {
         void waveSurfer.current?.play();
       }
       return !playing;
     });
-  }, [editable, region]);
+  }, [editable]);
 
   return (
     <div className="w-full touch-none rounded-2xl border p-4 text-muted-foreground">

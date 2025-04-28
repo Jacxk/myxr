@@ -3,6 +3,7 @@
 import { UploadCloud } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import type { Region } from "wavesurfer.js/dist/plugins/regions.js";
 import { useSteps } from "~/context/StepsContext";
 import { useSession } from "~/lib/auth-client";
 import { cn } from "~/lib/utils";
@@ -26,10 +27,7 @@ export type SoundUploadProps = {
   file: File;
   fileProps: FileProps;
   editedFile?: File;
-  region?: {
-    start: number;
-    end: number;
-  };
+  region?: Region;
 }
 
 export function SelectFileStep() {

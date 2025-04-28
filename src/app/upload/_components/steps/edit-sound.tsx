@@ -1,7 +1,7 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { type Region } from "wavesurfer.js/dist/plugins/regions.esm.js";
 import { SoundWaveForm } from "~/components/sound/sound-waveform";
@@ -17,51 +17,45 @@ import { useSteps } from "~/context/StepsContext";
 import { trimAudioAndConvertToMp3 } from "~/utils/audioTrimmer";
 import { type SoundUploadProps } from "./select-file";
 
-type LocalRegion = {
-  start: number;
-  end: number;
-};
-
 export function EditSoundStep() {
   const { data, reset, setData, nextStep } = useSteps<SoundUploadProps>();
 
+  const region = useRef<Region>(data.region)
+  const fileChanged = useRef<boolean>(false)
+
   const [loading, setLoading] = useState<boolean>(false);
   const [totalTime, setTotalTime] = useState<number>(0);
-  const [fileChanged, setFileChanged] = useState<boolean>(false);
-  const [region, setRegion] = useState<LocalRegion>({
-    start: data.region?.start ?? 0,
-    end: data.region?.end ?? 5,
-  });
 
   const onDecode = (time: number) => {
-    if (!data.editedFile) setFileChanged(true);
+    if (!data.editedFile) fileChanged.current = true;
     setTotalTime(time);
   };
 
   const onRegionCreate = (thisRegion: Region) => {
-    setRegion(thisRegion);
+    region.current = thisRegion;
   };
 
   const onRegionUpdate = (thisRegion: Region) => {
-    setFileChanged(true);
-    setRegion(thisRegion);
+    fileChanged.current = true
+    region.current = thisRegion;
   };
 
   function goToNextStep() {
-    if (!data.file) return;
-    if (!fileChanged) {
+    const currentRegion = region.current;
+    if (!data.file || !currentRegion) return;
+    if (!fileChanged.current) {
       nextStep();
       return;
     }
     toast.loading("Editing audio file...", { id: "editingAudio" });
     setLoading(true);
 
-    trimAudioAndConvertToMp3(data.file, region.start, region.end + 0.01)
+    trimAudioAndConvertToMp3(data.file, currentRegion.start, currentRegion.end)
       .then((newFile) => {
         setData({
           ...data,
           editedFile: newFile,
-          region,
+          region: region.current,
           file: data.file,
           fileProps: {
             ...data.fileProps,
@@ -106,7 +100,7 @@ export function EditSoundStep() {
       </div>
       <SoundWaveForm
         url={URL.createObjectURL(data.file as Blob)}
-        regionData={data.region}
+        regionData={region.current}
         onDecode={onDecode}
         onRegionCreate={onRegionCreate}
         onRegionUpdate={onRegionUpdate}
