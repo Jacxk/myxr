@@ -12,5 +12,12 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": "always"
   },
-  "files.autoSave": "off"
+  "files.autoSave": "off",
+  "workbench.editor.customLabels.patterns": {
+    "**/app/**/page.tsx": "${dirname} [page.tsx]",
+    "**/app/**/layout.tsx": "${dirname} [layout.tsx]",
+    "**/app/**/error.tsx": "${dirname} [error.tsx]",
+    "**/app/**/not-found.tsx": "${dirname} [not-found.tsx]",
+    "**/app/**/loading.tsx": "${dirname} [loading.tsx]"
+  }
 }
