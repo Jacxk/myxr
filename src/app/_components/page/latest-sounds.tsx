@@ -1,20 +1,11 @@
-"use client";
-
 import Link from "next/link";
 import Sound from "~/components/sound/sound";
 import { Button } from "~/components/ui/button";
 import { AudioProvider } from "~/context/AudioContext";
-import { api } from "~/trpc/react";
+import { api } from "~/trpc/server";
 
-export function LatestSounds() {
-  const [latestSounds] = api.sound.getLatests.useSuspenseQuery(
-    { limit: 9 },
-    { refetchOnWindowFocus: false },
-  );
-
-  if (!latestSounds) {
-    return null;
-  }
+export async function LatestSounds() {
+  const latestSounds = await api.sound.getLatests({ limit: 9 });
 
   return (
     <div className="grid w-full grid-cols-3 gap-x-2 gap-y-6 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9">
