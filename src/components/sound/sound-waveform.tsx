@@ -15,6 +15,7 @@ type SoundWaveFromProps = {
   onDecode?: (time: number) => void;
   onRegionUpdate?: (region: Region) => void;
   onRegionCreate?: (region: Region) => void;
+  onError?: (error: Error) => void
 };
 
 export function SoundWaveForm({
@@ -24,6 +25,7 @@ export function SoundWaveForm({
   onDecode,
   onRegionUpdate,
   onRegionCreate,
+  onError,
 }: Readonly<SoundWaveFromProps>) {
   const waveSurfer = useRef<WaveSurfer>(undefined);
   const regionsPlugin =
@@ -77,6 +79,7 @@ export function SoundWaveForm({
 
     waveSurfer.current.on("error", (e) => {
       setIsPlaying(false);
+      onError?.(e);
       console.error(e);
     });
 

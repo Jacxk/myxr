@@ -58,7 +58,7 @@ export function SelectFileStep() {
     if (!file) return;
     const fileName = file.name.split(".")[0] ?? "Unknown";
 
-    toast("File selected " + fileName);
+    toast("File selected " + fileName, { id: "fileSelected" });
     initializeData(file)
     nextStep();
   }

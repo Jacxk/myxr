@@ -40,6 +40,11 @@ export function EditSoundStep() {
     region.current = thisRegion;
   };
 
+  const onError = () => {
+    toast.dismiss("fileSelected")
+    toast.error("Something went wrong, check the file and try again!");
+  }
+
   function goToNextStep() {
     const currentRegion = region.current;
     if (!data.file || !currentRegion) return;
@@ -47,7 +52,10 @@ export function EditSoundStep() {
       nextStep();
       return;
     }
+
+    toast.dismiss("fileSelected")
     toast.loading("Editing audio file...", { id: "editingAudio" });
+
     setLoading(true);
 
     trimAudioAndConvertToMp3(data.file, currentRegion.start, currentRegion.end)
@@ -104,6 +112,7 @@ export function EditSoundStep() {
         onDecode={onDecode}
         onRegionCreate={onRegionCreate}
         onRegionUpdate={onRegionUpdate}
+        onError={onError}
         editable
       />
       <div className="flex w-full justify-end gap-4">
