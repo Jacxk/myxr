@@ -22,19 +22,18 @@ interface AudioContextType {
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
 
 export const AudioProvider = ({ children }: { children: ReactNode }) => {
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(new Audio());
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentId, setCurrentId] = useState<string | null>(null);
 
   const play = (id: string, src: string) => {
-    if (audioRef.current) {
-      audioRef.current.src = src;
-      void audioRef.current.play();
-      setCurrentId(id);
-    }
+    audioRef.current.src = src;
+    void audioRef.current.play();
+    setCurrentId(id);
   };
+
   const pause = () => {
-    audioRef.current?.pause();
+    audioRef.current.pause();
   };
 
   const value = useMemo(
@@ -44,7 +43,7 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio) return;
+    audioRef.current.load();
 
     const handlePlay = () => setIsPlaying(true);
     const handleStop = () => setIsPlaying(false);
@@ -60,14 +59,7 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  return (
-    <AudioContext value={value}>
-      {children}
-      <audio ref={audioRef} preload="auto" controls hidden>
-        <track kind="captions" />
-      </audio>
-    </AudioContext>
-  );
+  return <AudioContext value={value}>{children}</AudioContext>;
 };
 
 export const useAudio = () => {
