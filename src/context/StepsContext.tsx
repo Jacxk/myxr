@@ -12,7 +12,7 @@ import {
 } from "react";
 import { type StepProps } from "~/components/step";
 
-interface StepsContextProps<D = unknown> {
+interface StepsContextProps<D> {
   currentStep: number;
   data: D;
   totalSteps: number;
@@ -24,6 +24,7 @@ interface StepsContextProps<D = unknown> {
   prevStep: () => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const StepsContext = createContext<StepsContextProps<any> | undefined>(
   undefined,
 );
@@ -34,12 +35,11 @@ export const StepsProvider = <D,>({ children }: { children: ReactNode }) => {
 
   const stepsArray = Children.toArray(children);
   const totalSteps = stepsArray.length;
+  let stepCounter = 0;
 
   function reset() {
-    setTimeout(() => {
-      setCurrentStep(1);
-      setData({} as D);
-    }, 100);
+    setCurrentStep(1);
+    setData({} as D);
   }
   const registerStep = () => ++stepCounter;
   const nextStep = () => setCurrentStep((currentStep) => currentStep + 1);
@@ -57,10 +57,8 @@ export const StepsProvider = <D,>({ children }: { children: ReactNode }) => {
       nextStep,
       prevStep,
     }),
-    [currentStep, data],
+    [currentStep, data, totalSteps],
   );
-
-  let stepCounter = 0;
 
   return (
     <StepsContext value={value}>
@@ -74,7 +72,7 @@ export const StepsProvider = <D,>({ children }: { children: ReactNode }) => {
   );
 };
 
-export function useSteps<D>(): StepsContextProps<D> {
+export function useSteps<D>() {
   const context = useContext(StepsContext);
   if (!context) {
     throw new Error("useSteps must be used within an StepsProvider");

@@ -1,6 +1,5 @@
 "use client";
 
-import type { GuildSound } from "@prisma/client";
 import type { Snowflake } from "discord-api-types/globals";
 import Link from "next/link";
 import Twemoji from "react-twemoji";
@@ -11,23 +10,26 @@ import { Button } from "../ui/button";
 import { DeleteSoundButton } from "./delete-button";
 
 type Sound = NonNullable<Awaited<ReturnType<typeof getSoundsFromUser>>>[number];
-type SoundData = {
+
+export type SoundListData = {
   sound: Sound;
-  external: boolean;
-} & GuildSound
+  guildId: Snowflake;
+  discordSoundId: Snowflake;
+  external?: boolean;
+}
+
+type SoundTableListProps = {
+  className?: string;
+  data: SoundListData[];
+}
 
 function SoundRow({
   sound,
   discordSoundId,
   guildId,
-  className = "",
   external,
-}: {
-  discordSoundId: Snowflake;
-  guildId: Snowflake;
-  className?: string;
-  external?: boolean;
-} & SoundData) {
+  className,
+}: SoundListData & { className: string }) {
   const { play } = useAudio();
 
   return (
@@ -68,7 +70,7 @@ function SoundRow({
             <Button className="p-0" variant="link" asChild>
               <Link
                 onClick={(e) => e.stopPropagation()}
-                href={`/user/${sound.createdById}`}
+                href={`/user/${sound.createdBy.id}`}
               >
                 {sound.createdBy.name}
               </Link>
@@ -95,19 +97,16 @@ function SoundTableHeader() {
 }
 
 export function SoundTableList({
-  guildSounds,
-}: Readonly<{
-  guildSounds: SoundData[];
-}>) {
+  data,
+}: SoundTableListProps) {
   return (
     <AudioProvider>
       <div className="flex w-full flex-col">
         <SoundTableHeader />
         <div className="divide-y">
-          {guildSounds.map((guildSound) => (
+          {data.map((guildSound) => (
             <SoundRow
-              key={guildSound.soundId}
-              soundId={guildSound.soundId}
+              key={guildSound.sound.id}
               sound={guildSound.sound}
               discordSoundId={guildSound.discordSoundId}
               guildId={guildSound.guildId}

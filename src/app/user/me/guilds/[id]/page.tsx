@@ -1,7 +1,17 @@
 import type { APISoundboardSound } from "discord-api-types/v10";
-import { SoundTableList } from "~/components/sound/sound-list";
+import { SoundListData, SoundTableList } from "~/components/sound/sound-list";
 import { api } from "~/trpc/server";
 import { getSoundBoard } from "~/utils/discord-requests";
+
+const getEmoji = (sound: APISoundboardSound) => {
+  if (sound.emoji_id) {
+    return `https://cdn.discordapp.com/emojis/${sound.emoji_id}.png`;
+  } else if (sound.emoji_name) {
+    return sound.emoji_name;
+  } else {
+    return "🔊";
+  }
+};
 
 export default async function MeGuildIdPage({
   params,
@@ -20,52 +30,33 @@ export default async function MeGuildIdPage({
     );
   }
 
-  const getEmoji = (sound: APISoundboardSound) => {
-    if (sound.emoji_id) {
-      return `https://cdn.discordapp.com/emojis/${sound.emoji_id}.png`;
-    } else if (sound.emoji_name) {
-      return sound.emoji_name;
-    } else {
-      return "🔊";
-    }
-  };
-
-  const allSounds = [
-    ...guildSounds,
-    ...externalSounds
-      .filter(
-        (externalSound) =>
-          !guildSounds.some(
-            (guildSound) =>
-              guildSound.discordSoundId === externalSound.sound_id,
-          ),
-      )
-      .map((externalSound) => ({
-        discordSoundId: externalSound.sound_id,
-        guildId: id,
-        sound: {
-          name: externalSound.name,
-          createdById: externalSound.user?.id,
-          emoji: getEmoji(externalSound),
-          createdBy: {
-            name:
-              externalSound.user?.global_name ?? externalSound.user?.username,
-          },
-          url: `https://cdn.discordapp.com/soundboard-sounds/${externalSound.sound_id}`,
+  const convertedExternalSound = externalSounds
+    .filter(
+      (externalSound) =>
+        !guildSounds.some(
+          (guildSound) =>
+            guildSound.discordSoundId === externalSound.sound_id,
+        ),
+    ).map(sound => ({
+      discordSoundId: sound.sound_id,
+      guildId: sound.guild_id,
+      external: true,
+      sound: {
+        name: sound.name,
+        createdById: sound.user?.id,
+        emoji: getEmoji(sound),
+        createdBy: {
+          name: sound.user?.global_name ?? sound.user?.username,
         },
-        soundId: externalSound.sound_id,
-        external: true,
-      })),
-  ];
+        url: `https://cdn.discordapp.com/soundboard-sounds/${sound.sound_id}`,
+      },
+    }) as SoundListData)
 
   return (
     <>
       <title>{`${guildSounds[0]?.sound.createdBy.name} - Guild Sounds`}</title>
       <SoundTableList
-        guildSounds={allSounds.map((sound) => ({
-          external: false,
-          sound,
-        }))}
+        data={[guildSounds as unknown as SoundListData, convertedExternalSound].flat()}
       />
     </>
   );

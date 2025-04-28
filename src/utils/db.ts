@@ -283,3 +283,10 @@ export const getAllSounds = async (
     ...populateLike(sound.likedBy, userId),
   }));
 };
+
+export const getGuildSounds = async (guildId: string) => {
+  return await db.guildSound.findMany({
+    where: { guildId },
+    include: { sound: { include: { createdBy: true } }, guild: true },
+  });
+};
