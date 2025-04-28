@@ -1,7 +1,7 @@
 import { getServerSession } from "~/lib/auth";
 import { TabLink } from "../_components/tab-link";
 
-export default async function ({ children }: { children: React.ReactNode }) {
+export default async function Layout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession();
   const guilds = session?.user.guilds;
 

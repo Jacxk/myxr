@@ -24,7 +24,7 @@ export function AllSounds() {
     >
       <SoundsGrid>
         {allSounds.map((sound) => (
-          <Sound key={sound.id} {...sound} />
+          <Sound key={sound.id} sound={sound} />
         ))}
       </SoundsGrid>
     </InfiniteScroll>

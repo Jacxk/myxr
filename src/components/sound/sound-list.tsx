@@ -1,36 +1,35 @@
 "use client";
 
-import type { GuildSound, Sound, User } from "@prisma/client";
-import { Snowflake } from "discord-api-types/globals";
+import type { Snowflake } from "discord-api-types/globals";
 import Link from "next/link";
 import Twemoji from "react-twemoji";
 import { AudioProvider, useAudio } from "~/context/AudioContext";
+import { cn } from "~/lib/utils";
+import type { getSoundsFromUser } from "~/utils/db";
 import { Button } from "../ui/button";
 import { DeleteSoundButton } from "./delete-button";
-import { cn } from "~/lib/utils";
 
-interface SoundData extends GuildSound {
-  sound: SoundIncludedUser;
-  external: boolean;
+type Sound = NonNullable<Awaited<ReturnType<typeof getSoundsFromUser>>>[number];
+
+export type SoundListData = {
+  sound: Sound;
+  guildId: Snowflake;
+  discordSoundId: Snowflake;
+  external?: boolean;
 }
 
-interface SoundIncludedUser extends Sound {
-  createdBy: User;
+type SoundTableListProps = {
+  className?: string;
+  data: SoundListData[];
 }
 
 function SoundRow({
   sound,
   discordSoundId,
   guildId,
-  className = "",
   external,
-}: Readonly<{
-  sound: SoundIncludedUser;
-  discordSoundId: Snowflake;
-  guildId: Snowflake;
-  className?: string;
-  external?: boolean;
-}>) {
+  className,
+}: SoundListData & { className: string }) {
   const { play } = useAudio();
 
   return (
@@ -71,7 +70,7 @@ function SoundRow({
             <Button className="p-0" variant="link" asChild>
               <Link
                 onClick={(e) => e.stopPropagation()}
-                href={`/user/${sound.createdById}`}
+                href={`/user/${sound.createdBy.id}`}
               >
                 {sound.createdBy.name}
               </Link>
@@ -98,18 +97,16 @@ function SoundTableHeader() {
 }
 
 export function SoundTableList({
-  guildSounds,
-}: Readonly<{
-  guildSounds: SoundData[];
-}>) {
+  data,
+}: SoundTableListProps) {
   return (
     <AudioProvider>
       <div className="flex w-full flex-col">
         <SoundTableHeader />
         <div className="divide-y">
-          {guildSounds.map((guildSound) => (
+          {data.map((guildSound) => (
             <SoundRow
-              key={guildSound.soundId}
+              key={guildSound.sound.id}
               sound={guildSound.sound}
               discordSoundId={guildSound.discordSoundId}
               guildId={guildSound.guildId}

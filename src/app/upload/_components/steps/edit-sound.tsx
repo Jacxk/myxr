@@ -59,6 +59,7 @@ export function EditSoundStep() {
     trimAudioAndConvertToMp3(data.file, region.start, region.end + 0.01)
       .then((newFile) => {
         setData({
+          ...data,
           editedFile: newFile,
           region,
           file: data.file,

@@ -3,6 +3,7 @@
 import {
   createContext,
   type ReactNode,
+  type RefObject,
   useContext,
   useEffect,
   useMemo,
@@ -11,7 +12,7 @@ import {
 } from "react";
 
 interface AudioContextType {
-  audioRef: React.RefObject<HTMLAudioElement | null>;
+  audioRef: RefObject<HTMLAudioElement | null>;
   isPlaying: boolean;
   currentId: string | null;
   play: (id: string, src: string) => void;
@@ -28,7 +29,7 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const play = (id: string, src: string) => {
     if (audioRef.current) {
       audioRef.current.src = src;
-      audioRef.current.play();
+      void audioRef.current.play();
       setCurrentId(id);
     }
   };

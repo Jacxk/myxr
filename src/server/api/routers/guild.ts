@@ -57,7 +57,7 @@ export const guildRouter = createTRPCRouter({
     }),
   getSoundBoard: protectedProcedure
     .input(z.string())
-    .query(async ({ input, ctx }) => {
+    .query(async ({ input }) => {
       return await getSoundBoard(input);
     }),
   deleteSound: protectedProcedure

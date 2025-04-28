@@ -2,11 +2,11 @@ import { notFound } from "next/navigation";
 import Sound from "~/components/sound/sound";
 import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { getServerSession } from "~/lib/auth";
 import { api } from "~/trpc/server";
 import { FollowButton } from "./follow-button";
-import { getServerSession } from "~/lib/auth";
 
-export default async function Home({
+export default async function UserPage({
   params,
 }: Readonly<{
   params: Promise<{ id: string }>;
@@ -71,7 +71,7 @@ export default async function Home({
           <h2 className="text-2xl font-bold">Sounds</h2>
           <SoundsGrid>
             {sounds.map((sound) => (
-              <Sound key={sound.id} {...sound} />
+              <Sound key={sound.id} sound={sound} />
             ))}
           </SoundsGrid>
         </div>

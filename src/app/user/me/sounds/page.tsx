@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import Sound from "~/components/sound/sound";
 import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { getServerSession } from "~/lib/auth";
@@ -8,9 +9,12 @@ export const metadata: Metadata = {
   title: "My Sounds - Myxr",
 };
 
-export default async function () {
+export default async function MeSoundsPage() {
   const session = await getServerSession();
-  const sounds = await api.user.getSounds(session?.user.id!);
+
+  if (!session) return redirect("/")
+
+  const sounds = await api.user.getSounds(session.user.id);
 
   if (sounds.length === 0) {
     return (
@@ -23,7 +27,7 @@ export default async function () {
   return (
     <SoundsGrid sm={4} md={5} lg={6} xl={8}>
       {sounds.map((sound) => (
-        <Sound key={sound.id} {...sound} />
+        <Sound key={sound.id} sound={sound} />
       ))}
     </SoundsGrid>
   );

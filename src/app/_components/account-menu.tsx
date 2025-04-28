@@ -1,6 +1,5 @@
 "use client";
 
-import type { User } from "better-auth";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useCallback } from "react";
@@ -14,15 +13,20 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { Switch } from "~/components/ui/switch";
-import { signOut } from "~/lib/auth-client";
+import { signOut, useSession } from "~/lib/auth-client";
 
-export function AccountMenu({ user }: Readonly<{ user: User | undefined }>) {
+export function AccountMenu() {
+  const { data: session } = useSession();
   const { setTheme, resolvedTheme: theme } = useTheme();
 
   const toggleTheme = useCallback(() => {
     const isDark = theme === "dark";
     setTheme(!isDark ? "dark" : "light");
-  }, [theme]);
+  }, [theme, setTheme]);
+
+  if (!session) return;
+
+  const user = session.user;
 
   return (
     <DropdownMenu>
@@ -31,8 +35,8 @@ export function AccountMenu({ user }: Readonly<{ user: User | undefined }>) {
         asChild
       >
         <Avatar>
-          <AvatarImage src={user?.image + "?size=40"} alt={user?.name} />
-          <AvatarFallback delayMs={500}>{user?.name}</AvatarFallback>
+          <AvatarImage src={user.image + "?size=40"} alt={user.name} />
+          <AvatarFallback delayMs={500}>{user.name}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-40" align="end">

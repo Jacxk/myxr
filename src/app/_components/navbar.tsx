@@ -7,7 +7,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
-import { getServerSession } from "~/lib/auth";
 import { AccountMenu } from "./account-menu";
 import { Authenticated, NotAuthenticated } from "./authentication";
 import { SearchBar } from "./search-bar";
@@ -15,8 +14,6 @@ import { SelectGuild } from "./select-guild";
 import { SignInButton } from "./signin";
 
 export default async function Navbar() {
-  const session = await getServerSession();
-
   return (
     <nav className="relative mx-auto flex w-full max-w-7xl grow-0 items-center justify-between gap-2 border-b p-6">
       <Link href="/" className="text-4xl font-bold">
@@ -25,7 +22,7 @@ export default async function Navbar() {
       <SearchBar />
       <Authenticated>
         <div className="flex items-center gap-4">
-          <SelectGuild guilds={session?.user.guilds} />
+          <SelectGuild />
         </div>
         <Link href="/upload">
           <TooltipProvider>
@@ -39,7 +36,7 @@ export default async function Navbar() {
             </Tooltip>
           </TooltipProvider>
         </Link>
-        <AccountMenu user={session?.user} />
+        <AccountMenu />
       </Authenticated>
 
       <NotAuthenticated>

@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { StepsProvider, useSteps } from "~/context/StepsContext";
+import { useSession } from "~/lib/auth-client";
 import { api } from "~/trpc/react";
 
 type InviteButtonProps = {
@@ -218,16 +219,19 @@ function GuildSelect({
             {guild.name}
           </SelectItem>
         )) ?? (
-          <SelectItem value="none" disabled>
-            No guilds found
-          </SelectItem>
-        )}
+            <SelectItem value="none" disabled>
+              No guilds found
+            </SelectItem>
+          )}
       </SelectContent>
     </Select>
   );
 }
 
-export function SelectGuild({ guilds }: Readonly<{ guilds?: Guild[] }>) {
+export function SelectGuild() {
+  const { data: session } = useSession();
+
+  const guilds = session ? session.user.guilds : [];
   const storedGuild = localStorage.getItem("selectedGuild");
 
   const [tries, setTries] = useState(0);

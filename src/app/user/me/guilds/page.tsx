@@ -1,7 +1,7 @@
 import { getServerSession } from "~/lib/auth";
 import GuildsRoute from "./[id]/page";
 
-export default async function () {
+export default async function MeGuildsPage() {
   const session = await getServerSession();
   const guild = session?.user.guilds[0];
 

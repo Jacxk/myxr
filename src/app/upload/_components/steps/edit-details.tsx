@@ -1,7 +1,8 @@
 "use client";
 
+import type { User } from "@prisma/client";
 import EmojiPicker, {
-  EmojiClickData,
+  type EmojiClickData,
   EmojiStyle,
   SuggestionMode,
   Theme,
@@ -37,14 +38,14 @@ export function EditDetailsStep() {
   const [uploading, setUploading] = useState<boolean>(false);
 
   const uploadFile = useCallback(() => {
-    const { editedFile, fileProps } = data;
+    const { editedFile, fileProps, user } = data;
     if (!editedFile) {
       toast.error("There was an error while uploading.");
       return;
     }
     const renamedFile = new File(
       [editedFile],
-      `${fileProps?.createdBy?.id ?? "unknown"}_${editedFile.name}`,
+      `${user.id}_${editedFile.name}`,
       { type: editedFile.type },
     );
 
@@ -61,9 +62,9 @@ export function EditDetailsStep() {
     uploadFiles("soundUploader", {
       files: [renamedFile],
       input: {
-        emoji: fileProps?.emoji,
-        name: fileProps?.name,
-        tags: fileProps?.tags,
+        emoji: fileProps.emoji,
+        name: fileProps.name,
+        tags: fileProps.tags,
       },
     })
       .then(() => {
@@ -78,10 +79,13 @@ export function EditDetailsStep() {
       .finally(() => {
         toast.dismiss("uploading");
       });
-  }, [data.editedFile, data.fileProps]);
+  }, [data, router]);
 
   const setSoundName = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value.length > 0 ? e.target.value : data.file?.name;
+
+    if (!name) return;
+
     setData({
       ...data,
       fileProps: { ...data.fileProps, name },
@@ -164,12 +168,14 @@ export function EditDetailsStep() {
           sound={{
             ...data.fileProps,
             createdAt: new Date(),
-            guildSounds: [],
             id: "none",
-            likedBy: Array(Math.floor(Math.random() * 1000)).fill({}),
+            createdBy: data.user as User,
+            guildSounds: [],
+            likes: Array(Math.floor(Math.random() * 1000)).length,
+            likedByUser: Math.random() > 0.5,
             usegeCount: Math.floor(Math.random() * 10000),
           }}
-          user={data.fileProps?.createdBy}
+          likedByUser={Math.random() > 0.5}
           isPreview
         />
       </div>
