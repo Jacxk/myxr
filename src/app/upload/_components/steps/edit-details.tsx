@@ -114,7 +114,7 @@ export function EditDetailsStep() {
   };
 
   return (
-    <div className="flex h-full flex-col justify-around gap-10 transition sm:flex-row sm:gap-0">
+    <div className="flex h-full flex-col justify-around gap-10 transition sm:flex-row sm:gap-4">
       <div className="flex flex-col items-center gap-4">
         <h1>Edit details</h1>
         <div className="flex flex-col gap-4">
