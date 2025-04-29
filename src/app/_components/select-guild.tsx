@@ -2,6 +2,7 @@
 
 import type { Guild } from "@prisma/client";
 import type { Snowflake } from "discord-api-types/globals";
+import { usePostHog } from "posthog-js/react";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
@@ -115,11 +116,12 @@ function StepComponent({
 function BotCheckIn({
   check,
   tries,
-  setTries,
   guild,
+  setTries,
   onSuccess,
 }: BotCheckInProps) {
   const { mutateAsync } = api.guild.isBotIn.useMutation();
+  const posthog = usePostHog();
   const { currentStep, setCurrentStep } = useSteps();
 
   const maxTries = 3;
@@ -127,8 +129,15 @@ function BotCheckIn({
   const checkBotJoined = useCallback(() => {
     if (currentStep === 1) return;
 
+    // TODO: Move to useMutation
     mutateAsync(guild.id!)
       .then(({ success, value }) => {
+        posthog.capture("Check bot in guild", {
+          guildId: guild.id,
+          tries,
+          value,
+        });
+
         if (success && value) return onSuccess?.(guild, true);
 
         if (tries >= maxTries) {
@@ -146,6 +155,7 @@ function BotCheckIn({
     currentStep,
     tries,
     guild,
+    posthog,
     setTries,
     setCurrentStep,
     mutateAsync,

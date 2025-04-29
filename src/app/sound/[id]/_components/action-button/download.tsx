@@ -1,6 +1,7 @@
 "use client";
 
 import { Download } from "lucide-react";
+import { usePostHog } from "posthog-js/react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import {
@@ -29,17 +30,26 @@ async function downloadFile(url: string, filename: string) {
 export function DownloadButton({
   soundUrl,
   soundName,
+  soundId,
 }: Readonly<{
   soundUrl: string;
   soundName: string;
+  soundId: string;
 }>) {
+  const posthog = usePostHog();
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
           size="icon"
           variant="outline"
-          onClick={() => downloadFile(soundUrl, soundName)}
+          onClick={async () => {
+            await downloadFile(soundUrl, soundName);
+            posthog.capture("Sound downloaded", {
+              soundId,
+            });
+          }}
         >
           <Download />
         </Button>

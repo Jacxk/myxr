@@ -1,6 +1,7 @@
 "use client";
 
 import { Heart, HeartOff } from "lucide-react";
+import { usePostHog } from "posthog-js/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useSession } from "~/lib/auth-client";
@@ -24,10 +25,16 @@ export function LikeButton({
   isPreview?: boolean;
 }>) {
   const { data: session } = useSession();
+  const posthog = usePostHog();
 
   const [isLiked, setIsLiked] = useState<boolean>(liked ?? false);
   const { mutate, isPending } = api.sound.likeSound.useMutation({
-    onSuccess(data) {
+    onSuccess(data, variables) {
+      posthog.capture("User like sound", {
+        soundId: variables.soundId,
+        liked: variables.liked,
+      });
+
       if (!data.success) return;
 
       toast(data.value ? "Sound liked" : "Liked removed");

@@ -1,6 +1,7 @@
 import { Dialog, DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { usePostHog } from "posthog-js/react";
 import { type MouseEvent, useState } from "react";
 import { toast } from "sonner";
 import { api } from "~/trpc/react";
@@ -22,13 +23,21 @@ export function DeleteSoundButton({
   guildId: string;
   onDeleted?: () => void;
 }>) {
+  const posthog = usePostHog();
   const router = useRouter();
+
   const [open, setOpen] = useState(false);
+
   const { mutate, isPending } = api.guild.deleteSound.useMutation({
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
+      posthog.capture("Sound removed from guild", {
+        soundId: variables.soundId,
+        guildId: variables.guildId,
+      });
+
       toast("Sound deleted successfully!");
-      router.refresh();
       onDeleted?.();
+      router.refresh();
     },
     onError: (error) => {
       toast.error("Failed to delete sound.", {

@@ -9,6 +9,7 @@ import EmojiPicker, {
 } from "emoji-picker-react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
+import { usePostHog } from "posthog-js/react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -32,6 +33,7 @@ const FileSchema = z.object({
 
 export function EditDetailsStep() {
   const router = useRouter();
+  const posthog = usePostHog();
   const { resolvedTheme: theme } = useTheme();
 
   const { data, prevStep, setData } = useSteps<SoundUploadProps>();
@@ -70,6 +72,9 @@ export function EditDetailsStep() {
       },
     })
       .then(() => {
+        posthog.capture("Sound create - uploaded", {
+          fileName: data.file.name,
+        });
         toast("File uploaded successfully!");
         router.push("/");
       })
@@ -81,7 +86,7 @@ export function EditDetailsStep() {
       .finally(() => {
         toast.dismiss("uploading");
       });
-  }, [data, router]);
+  }, [data, router, posthog]);
 
   const setSoundName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSoundInputName(e.target.value);

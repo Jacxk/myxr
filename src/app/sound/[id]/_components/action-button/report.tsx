@@ -3,6 +3,7 @@
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Flag, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { usePostHog } from "posthog-js/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
@@ -64,6 +65,7 @@ export function ReportButton({
   isPreview?: boolean;
 }) {
   const { data: session } = useSession();
+  const posthog = usePostHog();
 
   const [open, setOpen] = useState<boolean>(false);
   const [reason, setReason] = useState("");
@@ -91,8 +93,16 @@ export function ReportButton({
       return;
     }
 
+    // TODO: Move this to useMutation
     mutateAsync({ id, reason })
       .then(({ success, value, error }) => {
+        posthog.capture("Sound reported", {
+          soundId: id,
+          success,
+          error,
+          ...value,
+        });
+
         if (!success) {
           if (error === "REPORT_EXISTS") {
             ErrorToast.soundAlreadyReported();

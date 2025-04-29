@@ -1,6 +1,7 @@
 "use client";
 
 import { UploadCloud } from "lucide-react";
+import { usePostHog } from "posthog-js/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { Region } from "wavesurfer.js/dist/plugins/regions.js";
@@ -32,6 +33,7 @@ export type SoundUploadProps = {
 };
 
 export function SelectFileStep() {
+  const posthog = usePostHog();
   const { data: session } = useSession();
   const { data, setData, nextStep } = useSteps<SoundUploadProps>();
 
@@ -39,8 +41,14 @@ export function SelectFileStep() {
   const [validFileType, setValidFileType] = useState<boolean>(false);
 
   function initializeData(file: File) {
-    const fileName = file.name.split(".")[0] ?? "Unknown";
     if (!session) return;
+    const fileName = file.name.split(".")[0] ?? "Unknown";
+
+    posthog.capture("Sound create - started", {
+      fileName: file.name,
+    });
+
+    toast("File selected " + fileName, { id: "fileSelected" });
     setData({
       ...data,
       file,
@@ -55,11 +63,8 @@ export function SelectFileStep() {
 
   function onFileSelect(files: File[]) {
     const file = files[0];
-
     if (!file) return;
-    const fileName = file.name.split(".")[0] ?? "Unknown";
 
-    toast("File selected " + fileName, { id: "fileSelected" });
     initializeData(file);
     nextStep();
   }

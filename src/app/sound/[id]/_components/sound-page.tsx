@@ -33,7 +33,11 @@ function ActionButtons({ id, sound, isPreview }: SoundPageProps) {
           isPreview={isPreview}
         />
 
-        <DownloadButton soundUrl={sound.url} soundName={sound.name} />
+        <DownloadButton
+          soundUrl={sound.url}
+          soundName={sound.name}
+          soundId={sound.id}
+        />
 
         <ReportButton id={id} isPreview={isPreview} />
       </TooltipProvider>

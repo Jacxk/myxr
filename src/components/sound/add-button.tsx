@@ -2,6 +2,7 @@
 
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Plus } from "lucide-react";
+import { usePostHog } from "posthog-js/react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -65,9 +66,15 @@ export function AddToGuildButton({
   isPreview = false,
 }: Readonly<AddToGuildButtonProps>) {
   const { data: session } = useSession();
+  const posthog = usePostHog();
 
   const { mutate, isPending } = api.guild.createSound.useMutation({
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
+      posthog.capture("Sound added to guild", {
+        soundId: variables.soundId,
+        guildId: variables.guildId,
+      });
+
       toast("Sound added to guild");
       setOpen(false);
     },
@@ -95,6 +102,7 @@ export function AddToGuildButton({
       ErrorToast.selectGuild();
       return;
     }
+
     mutate({ soundId, guildId: guild.id, guildName: guild.name });
   }, [mutate, soundId, session]);
 
