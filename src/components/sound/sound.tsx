@@ -4,17 +4,17 @@ import Link from "next/link";
 import { memo } from "react";
 import Twemoji from "react-twemoji";
 import { cn } from "~/lib/utils";
-import type { getSound, searchForSoundsInfinite } from "~/utils/db";
+import type { RouterOutputs } from "~/trpc/react";
 import { useAudio } from "../../context/AudioContext";
 import { Button } from "../ui/button";
 import { AddToGuildButton } from "./add-button";
 import { DeleteSoundButton } from "./delete-button";
 import { LikeButton } from "./like-button";
 
-type Sound = Awaited<ReturnType<typeof getSound>>;
-type SearchSound = Awaited<ReturnType<typeof searchForSoundsInfinite>>[number];
+type Sound = RouterOutputs["sound"]["getSound"];
+type SearchSound = RouterOutputs["sound"]["search"]["sounds"][number];
 
-export type SoundProperties<> = {
+export type SoundProperties = {
   sound: NonNullable<Sound | SearchSound>;
   className?: string;
   displayAddButton?: boolean;

@@ -3,7 +3,7 @@
 import { InfiniteScroll } from "~/components/infinite-scroll";
 import Sound from "~/components/sound/sound";
 import { SoundsGrid } from "~/components/sound/sounds-grid";
-import { api, RouterOutputs } from "~/trpc/react";
+import { api, type RouterOutputs } from "~/trpc/react";
 
 type AllSoundsClient = {
   initialData: RouterOutputs["sound"]["getAllSounds"];

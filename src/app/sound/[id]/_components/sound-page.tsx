@@ -7,7 +7,7 @@ import { SoundWaveForm } from "~/components/sound/sound-waveform";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { TooltipProvider } from "~/components/ui/tooltip";
-import type { getSound } from "~/utils/db";
+import type { RouterOutputs } from "~/trpc/react";
 import { DownloadButton } from "./action-button/download";
 import { ReportButton } from "./action-button/report";
 import { CreatedDate } from "./created-date";
@@ -17,7 +17,7 @@ import { SoundData } from "./sound-data";
 
 type SoundPageProps = {
   id: string;
-  sound: NonNullable<Awaited<ReturnType<typeof getSound>>>;
+  sound: NonNullable<RouterOutputs["sound"]["getSound"]>;
   isPreview?: boolean;
 };
 

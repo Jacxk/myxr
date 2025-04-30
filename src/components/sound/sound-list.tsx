@@ -5,11 +5,11 @@ import Link from "next/link";
 import Twemoji from "react-twemoji";
 import { AudioProvider, useAudio } from "~/context/AudioContext";
 import { cn } from "~/lib/utils";
-import type { getSoundsFromUser } from "~/utils/db";
+import type { RouterOutputs } from "~/trpc/react";
 import { Button } from "../ui/button";
 import { DeleteSoundButton } from "./delete-button";
 
-type Sound = NonNullable<Awaited<ReturnType<typeof getSoundsFromUser>>>[number];
+type Sound = NonNullable<RouterOutputs["user"]["getSounds"]>[number];
 
 export type SoundListData = {
   sound: Sound;
