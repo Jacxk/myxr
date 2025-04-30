@@ -241,6 +241,13 @@ export const searchForSoundsInfinite = async (
   userId?: string,
 ) => {
   let sounds = null;
+  const formattedQuery = query
+    .trim()
+    .split(/\s+/)
+    .map((word) => word + ":*");
+
+  const soundSearch = formattedQuery.join(" & ");
+  const tagSearch = formattedQuery.join(" | ");
 
   if (type === "normal") {
     sounds = await db.sound.findMany({
@@ -250,8 +257,8 @@ export const searchForSoundsInfinite = async (
       include: { likedBy: { where: { userId } } },
       where: {
         OR: [
-          { name: { search: query } },
-          { tags: { some: { name: { search: query } } } },
+          { name: { search: soundSearch } },
+          { tags: { some: { name: { search: tagSearch } } } },
         ],
       },
     });
