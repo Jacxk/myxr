@@ -14,7 +14,7 @@ import { LikeButton } from "./like-button";
 type Sound = RouterOutputs["sound"]["getSound"];
 type SearchSound = RouterOutputs["sound"]["search"]["sounds"][number];
 
-export type SoundProperties<> = {
+export type SoundProperties = {
   sound: NonNullable<Sound | SearchSound>;
   className?: string;
   displayAddButton?: boolean;
