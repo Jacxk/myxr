@@ -17,10 +17,12 @@ import {
 
 export function LikeButton({
   soundId,
+  likes,
   liked,
   isPreview,
 }: Readonly<{
   soundId: string;
+  likes?: number;
   liked?: boolean;
   isPreview?: boolean;
 }>) {
@@ -65,8 +67,13 @@ export function LikeButton({
     <TooltipProvider delayDuration={0}>
       <Tooltip disableHoverableContent>
         <TooltipTrigger asChild>
-          <Button variant="outline" size="icon" onClick={likeClick}>
+          <Button variant="outline" onClick={likeClick}>
             {isLiked ? <HeartOff /> : <Heart />}
+
+            {likes &&
+              Intl.NumberFormat(navigator.language, {
+                notation: "compact",
+              }).format(likes)}
           </Button>
         </TooltipTrigger>
         <TooltipContent>{isLiked ? "UnLike" : "Like"}</TooltipContent>

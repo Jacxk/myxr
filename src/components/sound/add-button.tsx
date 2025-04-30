@@ -30,6 +30,7 @@ const GuildSchema = z.object({
 
 interface AddToGuildButtonProps {
   soundId: string;
+  usage?: number;
   isPreview?: boolean;
 }
 
@@ -63,6 +64,7 @@ const getGuildFromLocalStorage = ():
 
 export function AddToGuildButton({
   soundId,
+  usage,
   isPreview = false,
 }: Readonly<AddToGuildButtonProps>) {
   const api = useTRPC();
@@ -149,11 +151,14 @@ export function AddToGuildButton({
           <TooltipTrigger asChild>
             <Button
               variant="outline"
-              size="icon"
               onClick={addSoundToGuild}
               disabled={isPending}
             >
               <Plus />
+              {usage &&
+                Intl.NumberFormat(navigator.language, {
+                  notation: "compact",
+                }).format(usage)}
             </Button>
           </TooltipTrigger>
           <TooltipContent>Add Sound to Guild</TooltipContent>

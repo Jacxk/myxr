@@ -25,15 +25,25 @@ function ActionButtons({ id, sound, isPreview }: SoundPageProps) {
   return (
     <div className="flex gap-2">
       <TooltipProvider delayDuration={0}>
-        <AddToGuildButton soundId={id} isPreview={isPreview} />
+        <AddToGuildButton
+          soundId={id}
+          isPreview={isPreview}
+          usage={sound.usegeCount}
+        />
 
         <LikeButton
           soundId={id}
           liked={sound.likedByUser}
           isPreview={isPreview}
+          likes={sound.likes}
         />
 
-        <DownloadButton soundUrl={sound.url} soundName={sound.name} />
+        <DownloadButton
+          soundUrl={sound.url}
+          soundId={sound.id}
+          soundName={sound.name}
+          downloads={sound.downloadCount as number}
+        />
 
         <ReportButton id={id} isPreview={isPreview} />
       </TooltipProvider>
@@ -95,18 +105,6 @@ export function SoundPage({ id, sound, isPreview }: Readonly<SoundPageProps>) {
         <div className="flex flex-col gap-4 sm:w-1/5">
           <SoundData title="Created">
             <CreatedDate date={sound.createdAt} />
-          </SoundData>
-
-          <SoundData title="Usage">
-            {Intl.NumberFormat(navigator.language, {
-              notation: "compact",
-            }).format(sound.usegeCount)}
-          </SoundData>
-
-          <SoundData title="Likes">
-            {Intl.NumberFormat(navigator.language, {
-              notation: "compact",
-            }).format(sound.likes)}
           </SoundData>
 
           {(sound.tags?.length ?? 0) > 0 && (
