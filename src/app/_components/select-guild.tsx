@@ -121,16 +121,9 @@ function BotCheckIn({
   onSuccess,
 }: BotCheckInProps) {
   const api = useTRPC();
-  const { mutateAsync } = useMutation(api.guild.isBotIn.mutationOptions());
-  const { currentStep, setCurrentStep } = useSteps();
-
-  const maxTries = 3;
-
-  const checkBotJoined = useCallback(() => {
-    if (currentStep === 1) return;
-
-    mutateAsync(guild.id!)
-      .then(({ success, value }) => {
+  const { mutate } = useMutation(
+    api.guild.isBotIn.mutationOptions({
+      onSuccess({ success, value }) {
         if (success && value) return onSuccess?.(guild, true);
 
         if (tries >= maxTries) {
@@ -140,19 +133,22 @@ function BotCheckIn({
         }
 
         setTries(tries + 1);
-      })
-      .catch((error) => {
+      },
+      onError(error) {
+        ErrorToast.internal();
         console.error(error);
-      });
-  }, [
-    currentStep,
-    tries,
-    guild,
-    setTries,
-    setCurrentStep,
-    mutateAsync,
-    onSuccess,
-  ]);
+      },
+    }),
+  );
+  const { currentStep, setCurrentStep } = useSteps();
+
+  const maxTries = 3;
+
+  const checkBotJoined = useCallback(() => {
+    if (currentStep === 1) return;
+
+    mutate(guild.id!);
+  }, [currentStep, guild, mutate]);
 
   useEffect(() => {
     if (check) window.addEventListener("focus", checkBotJoined);
@@ -175,7 +171,19 @@ function GuildSelect({
   onSuccess,
 }: GuildSelectProps) {
   const api = useTRPC();
-  const { mutateAsync } = useMutation(api.guild.isBotIn.mutationOptions());
+  const { mutate } = useMutation(
+    api.guild.isBotIn.mutationOptions({
+      onSuccess({ success, value }) {
+        setBotAlreadyIn(success && value);
+        if (success && !value) {
+          onDialogOpenChange(true);
+        } else if (!success) {
+          ErrorToast.internal();
+          setSelectedGuild(prevGuild);
+        } else onSuccess?.(selectedGuild, false);
+      },
+    }),
+  );
 
   const [prevGuild, setPrevGuild] = useState<GuildState>(selectedGuild);
   const [botAlreadyIn, setBotAlreadyIn] = useState(false);
@@ -186,23 +194,12 @@ function GuildSelect({
     const [id, name] = guildString.split("-");
     const prevGuild = selectedGuild;
 
+    if (!id || !name) return;
+
     setSelectedGuild({ id, name });
     setPrevGuild(prevGuild);
 
-    // TODO: Move to useMutation
-    const { success, value } = await mutateAsync(id!);
-
-    setBotAlreadyIn(success && value);
-    if (success && !value) {
-      onDialogOpenChange(true);
-      return;
-    } else if (!success) {
-      ErrorToast.internal();
-      setSelectedGuild(prevGuild);
-      return;
-    }
-
-    onSuccess?.({ id, name }, false);
+    mutate(id);
   };
 
   useEffect(() => {

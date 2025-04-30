@@ -25,6 +25,28 @@ import { useTRPC } from "~/trpc/react";
 
 import { useMutation } from "@tanstack/react-query";
 
+function handleNotSuccess(error?: string) {
+  if (error === "REPORT_EXISTS") {
+    ErrorToast.soundAlreadyReported();
+  } else toast.error("Failed to report sound");
+}
+
+function handleError(error: unknown) {
+  if (!isTRPCError(error)) {
+    ErrorToast.internal();
+    console.error("Unexpected error:", error);
+    return;
+  }
+
+  if (error.shape?.data.code === "BAD_REQUEST") {
+    ErrorToast.invalidReport();
+  } else if (error.data?.code === "UNAUTHORIZED") {
+    ErrorToast.login();
+  } else {
+    toast.error(error.message);
+  }
+}
+
 function ReportModal({
   reason,
   setReason,
@@ -70,8 +92,36 @@ export function ReportButton({
   const [open, setOpen] = useState<boolean>(false);
   const [reason, setReason] = useState("");
 
-  const { mutateAsync, isPending } = useMutation(
-    api.sound.reportSound.mutationOptions(),
+  const { mutate, isPending } = useMutation(
+    api.sound.reportSound.mutationOptions({
+      onSuccess({ success, value, error }) {
+        if (!success) {
+          handleNotSuccess(error);
+          return;
+        }
+
+        if (!value?.caseId) {
+          ErrorToast.internal();
+          return;
+        }
+
+        toast("Thank you for your feedback.", {
+          action: (
+            <Button variant="outline">
+              <Link
+                href={`/user/me/reports?id=${encodeURIComponent(value.caseId)}`}
+              >
+                View
+              </Link>
+            </Button>
+          ),
+        });
+        setOpen(false);
+      },
+      onError(error) {
+        handleError(error);
+      },
+    }),
   );
 
   const onOpenChange = (open: boolean) => {
@@ -95,49 +145,7 @@ export function ReportButton({
       return;
     }
 
-    // TODO: Move to useMutation
-    mutateAsync({ id, reason })
-      .then(({ success, value, error }) => {
-        if (!success) {
-          if (error === "REPORT_EXISTS") {
-            ErrorToast.soundAlreadyReported();
-          } else toast.error("Failed to report sound");
-          return;
-        }
-
-        if (!value?.caseId) {
-          ErrorToast.internal();
-          return;
-        }
-
-        toast("Thank you for your feedback.", {
-          action: (
-            <Button variant="outline">
-              <Link
-                href={`/user/me/reports?id=${encodeURIComponent(value.caseId)}`}
-              >
-                View
-              </Link>
-            </Button>
-          ),
-        });
-        setOpen(false);
-      })
-      .catch((error: Error) => {
-        if (!isTRPCError(error)) {
-          ErrorToast.internal();
-          console.error("Unexpected error:", error);
-          return;
-        }
-
-        if (error.shape?.data.code === "BAD_REQUEST") {
-          ErrorToast.invalidReport();
-        } else if (error.data?.code === "UNAUTHORIZED") {
-          ErrorToast.login();
-        } else {
-          toast.error(error.message);
-        }
-      });
+    mutate({ id, reason });
   };
 
   return (

@@ -14,25 +14,27 @@ export function FollowButton({
 }: Readonly<{ id: string; isFollowing: boolean }>) {
   const api = useTRPC();
   const router = useRouter();
+
   const [following, setFollowing] = useState(isFollowing);
-  const { mutateAsync, isPending } = useMutation(
-    api.user.followUser.mutationOptions(),
+
+  const { mutate, isPending } = useMutation(
+    api.user.followUser.mutationOptions({
+      onSuccess({ value }) {
+        setFollowing(value.following);
+        router.refresh();
+      },
+      onError(error) {
+        console.error(error);
+        ErrorToast.internal();
+      },
+    }),
   );
 
   const onFollowButtonClick = useCallback(() => {
     if (isPending) return;
     setFollowing((following) => !following);
-    // TODO: Move to useMutation
-    mutateAsync({ id })
-      .then((data) => {
-        setFollowing(data.value.following);
-        router.refresh();
-      })
-      .catch((error) => {
-        console.error(error);
-        ErrorToast.internal();
-      });
-  }, [isPending, id, router, mutateAsync]);
+    mutate({ id });
+  }, [id, isPending, mutate]);
 
   return (
     <Button
