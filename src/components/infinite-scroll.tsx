@@ -8,6 +8,7 @@ type InfiniteScrollProps = {
   hasMore: boolean;
   isLoading: boolean;
   children: React.ReactNode;
+  title?: React.ReactNode;
   loader?: React.ReactNode;
   endMessage?: React.ReactNode;
   offsetPx?: number;
@@ -20,6 +21,7 @@ export function InfiniteScroll({
   hasMore,
   isLoading,
   children,
+  title,
   loader = <p className="text-center text-gray-500">Loading...</p>,
   endMessage = <p className="text-center text-gray-500">No more results.</p>,
   offsetPx = 300,
@@ -34,6 +36,7 @@ export function InfiniteScroll({
 
   return (
     <>
+      {title}
       {children}
       <InView
         rootMargin={`0px 0px ${offsetPx}px 0px`}

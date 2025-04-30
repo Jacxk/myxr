@@ -32,6 +32,9 @@ export function AllSoundsClient({ initialData }: AllSoundsClient) {
       loadMore={fetchNextPage}
       hasMore={hasNextPage}
       isLoading={isPending}
+      title={
+        <h1 className="col-span-full text-3xl font-bold">Trending Sounds</h1>
+      }
     >
       <SoundsGrid>
         {allSounds.map((sound) => (
