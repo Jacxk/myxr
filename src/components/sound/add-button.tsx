@@ -70,6 +70,9 @@ export function AddToGuildButton({
   const api = useTRPC();
   const { data: session } = useSession();
 
+  const [open, setOpen] = useState<boolean>(false);
+  const [usageCount, setUsageCount] = useState(usage ?? 0);
+
   const { mutate, isPending } = useMutation(
     api.guild.createSound.mutationOptions({
       onSuccess: () => {
@@ -84,11 +87,11 @@ export function AddToGuildButton({
         } else {
           ErrorToast.internal();
         }
+
+        setUsageCount((usage) => usage - 1);
       },
     }),
   );
-
-  const [open, setOpen] = useState<boolean>(false);
 
   const onAddClick = useCallback((): void => {
     if (!session) {
@@ -101,6 +104,8 @@ export function AddToGuildButton({
       ErrorToast.selectGuild();
       return;
     }
+
+    setUsageCount((usage) => usage + 1);
     mutate({ soundId, guildId: guild.id, guildName: guild.name });
   }, [mutate, soundId, session]);
 
@@ -158,7 +163,7 @@ export function AddToGuildButton({
               {usage &&
                 Intl.NumberFormat(navigator.language, {
                   notation: "compact",
-                }).format(usage)}
+                }).format(usageCount)}
             </Button>
           </TooltipTrigger>
           <TooltipContent>Add Sound to Guild</TooltipContent>

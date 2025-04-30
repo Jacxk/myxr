@@ -30,6 +30,8 @@ export function LikeButton({
   const { data: session } = useSession();
 
   const [isLiked, setIsLiked] = useState<boolean>(liked ?? false);
+  const [likeCount, setLikeCount] = useState(likes ?? 0);
+
   const { mutate, isPending } = useMutation(
     api.sound.likeSound.mutationOptions({
       onSuccess(data) {
@@ -54,6 +56,7 @@ export function LikeButton({
     }
 
     setIsLiked((liked) => !liked);
+    setLikeCount((likes) => likes + (!isLiked ? 1 : -1));
 
     if (isPreview) {
       toast(`Preview Mode: Sound like ${isLiked ? "removed" : "added"}`);
@@ -73,7 +76,7 @@ export function LikeButton({
             {likes &&
               Intl.NumberFormat(navigator.language, {
                 notation: "compact",
-              }).format(likes)}
+              }).format(likeCount)}
           </Button>
         </TooltipTrigger>
         <TooltipContent>{isLiked ? "UnLike" : "Like"}</TooltipContent>

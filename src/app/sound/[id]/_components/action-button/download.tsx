@@ -53,7 +53,10 @@ export function DownloadButton({
   const onDownloadClick = async () => {
     mutate({ soundId });
     setCurrentDownloads((currentDownloads) => currentDownloads + 1);
-    await downloadFile(soundUrl, soundName);
+
+    await downloadFile(soundUrl, soundName).catch(() => {
+      setCurrentDownloads((currentDownloads) => currentDownloads - 1);
+    });
   };
 
   return (
@@ -62,7 +65,7 @@ export function DownloadButton({
         <Button variant="outline" onClick={() => onDownloadClick()}>
           <Download />
 
-          {currentDownloads &&
+          {downloads &&
             Intl.NumberFormat(navigator.language, {
               notation: "compact",
             }).format(currentDownloads)}
