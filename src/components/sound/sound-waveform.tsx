@@ -96,6 +96,10 @@ export function SoundWaveForm({
     waveSurfer.current.on("ready", () => {
       setIsReady(true);
     });
+
+    waveSurfer.current.on("finish", () => {
+      waveSurfer.current?.seekTo(0);
+    });
   }, [
     editable,
     url,
