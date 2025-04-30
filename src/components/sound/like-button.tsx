@@ -1,11 +1,10 @@
 "use client";
-
 import { Heart, HeartOff } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useSession } from "~/lib/auth-client";
 import { ErrorToast } from "~/lib/messages/toast.global";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 import { Button } from "../ui/button";
 import {
   Tooltip,
@@ -13,6 +12,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+
+import { useMutation } from "@tanstack/react-query";
 
 export function LikeButton({
   soundId,
@@ -23,23 +24,26 @@ export function LikeButton({
   liked?: boolean;
   isPreview?: boolean;
 }>) {
+  const api = useTRPC();
   const { data: session } = useSession();
 
   const [isLiked, setIsLiked] = useState<boolean>(liked ?? false);
-  const { mutate, isPending } = api.sound.likeSound.useMutation({
-    onSuccess(data) {
-      if (!data.success) return;
+  const { mutate, isPending } = useMutation(
+    api.sound.likeSound.mutationOptions({
+      onSuccess(data) {
+        if (!data.success) return;
 
-      toast(data.value ? "Sound liked" : "Liked removed");
-      setIsLiked(data.value);
-    },
-    onError(error) {
-      if (error.data?.code === "UNAUTHORIZED") {
-        ErrorToast.login();
-      }
-      setIsLiked(false);
-    },
-  });
+        toast(data.value ? "Sound liked" : "Liked removed");
+        setIsLiked(data.value);
+      },
+      onError(error) {
+        if (error.data?.code === "UNAUTHORIZED") {
+          ErrorToast.login();
+        }
+        setIsLiked(false);
+      },
+    }),
+  );
 
   const likeClick = () => {
     if (!session) {

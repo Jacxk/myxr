@@ -1,5 +1,4 @@
 "use client";
-
 import type { Guild } from "@prisma/client";
 import type { Snowflake } from "discord-api-types/globals";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
@@ -23,7 +22,9 @@ import {
 import { StepsProvider, useSteps } from "~/context/StepsContext";
 import { useSession } from "~/lib/auth-client";
 import { ErrorToast } from "~/lib/messages/toast.global";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
+
+import { useMutation } from "@tanstack/react-query";
 
 type InviteButtonProps = {
   guildId: string;
@@ -119,7 +120,8 @@ function BotCheckIn({
   guild,
   onSuccess,
 }: BotCheckInProps) {
-  const { mutateAsync } = api.guild.isBotIn.useMutation();
+  const api = useTRPC();
+  const { mutateAsync } = useMutation(api.guild.isBotIn.mutationOptions());
   const { currentStep, setCurrentStep } = useSteps();
 
   const maxTries = 3;
@@ -172,7 +174,8 @@ function GuildSelect({
   onDialogOpenChange,
   onSuccess,
 }: GuildSelectProps) {
-  const { mutateAsync } = api.guild.isBotIn.useMutation();
+  const api = useTRPC();
+  const { mutateAsync } = useMutation(api.guild.isBotIn.mutationOptions());
 
   const [prevGuild, setPrevGuild] = useState<GuildState>(selectedGuild);
   const [botAlreadyIn, setBotAlreadyIn] = useState(false);
@@ -186,6 +189,7 @@ function GuildSelect({
     setSelectedGuild({ id, name });
     setPrevGuild(prevGuild);
 
+    // TODO: Move to useMutation
     const { success, value } = await mutateAsync(id!);
 
     setBotAlreadyIn(success && value);

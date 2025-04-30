@@ -3,7 +3,7 @@ import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type MouseEvent, useState } from "react";
 import { toast } from "sonner";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 import { Button } from "../ui/button";
 import { DialogContent, DialogFooter, DialogHeader } from "../ui/dialog";
 import {
@@ -12,6 +12,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+
+import { useMutation } from "@tanstack/react-query";
 
 export function DeleteSoundButton({
   discordSoundId,
@@ -22,23 +24,26 @@ export function DeleteSoundButton({
   guildId: string;
   onDeleted?: () => void;
 }>) {
+  const api = useTRPC();
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const { mutate, isPending } = api.guild.deleteSound.useMutation({
-    onSuccess: () => {
-      toast("Sound deleted successfully!");
-      router.refresh();
-      onDeleted?.();
-    },
-    onError: (error) => {
-      toast.error("Failed to delete sound.", {
-        description: error.message,
-      });
-    },
-    onSettled: () => {
-      setOpen(false);
-    },
-  });
+  const { mutate, isPending } = useMutation(
+    api.guild.deleteSound.mutationOptions({
+      onSuccess: () => {
+        toast("Sound deleted successfully!");
+        router.refresh();
+        onDeleted?.();
+      },
+      onError: (error) => {
+        toast.error("Failed to delete sound.", {
+          description: error.message,
+        });
+      },
+      onSettled: () => {
+        setOpen(false);
+      },
+    }),
+  );
 
   const onConfirmDeleteClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();

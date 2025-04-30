@@ -1,5 +1,4 @@
 "use client";
-
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Flag, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -22,7 +21,9 @@ import {
 import { useSession } from "~/lib/auth-client";
 import { ErrorToast } from "~/lib/messages/toast.global";
 import { isTRPCError } from "~/lib/utils";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
+
+import { useMutation } from "@tanstack/react-query";
 
 function ReportModal({
   reason,
@@ -63,12 +64,15 @@ export function ReportButton({
   id: string;
   isPreview?: boolean;
 }) {
+  const api = useTRPC();
   const { data: session } = useSession();
 
   const [open, setOpen] = useState<boolean>(false);
   const [reason, setReason] = useState("");
 
-  const { mutateAsync, isPending } = api.sound.reportSound.useMutation();
+  const { mutateAsync, isPending } = useMutation(
+    api.sound.reportSound.mutationOptions(),
+  );
 
   const onOpenChange = (open: boolean) => {
     if (open && !session) {
@@ -91,6 +95,7 @@ export function ReportButton({
       return;
     }
 
+    // TODO: Move to useMutation
     mutateAsync({ id, reason })
       .then(({ success, value, error }) => {
         if (!success) {

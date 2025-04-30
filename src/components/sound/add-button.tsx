@@ -1,5 +1,4 @@
 "use client";
-
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Plus } from "lucide-react";
 import { useCallback, useState } from "react";
@@ -7,7 +6,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { useSession } from "~/lib/auth-client";
 import { ErrorToast } from "~/lib/messages/toast.global";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -21,6 +20,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+
+import { useMutation } from "@tanstack/react-query";
 
 const GuildSchema = z.object({
   id: z.string().nonempty("Guild ID is required"),
@@ -64,23 +65,26 @@ export function AddToGuildButton({
   soundId,
   isPreview = false,
 }: Readonly<AddToGuildButtonProps>) {
+  const api = useTRPC();
   const { data: session } = useSession();
 
-  const { mutate, isPending } = api.guild.createSound.useMutation({
-    onSuccess: () => {
-      toast("Sound added to guild");
-      setOpen(false);
-    },
-    onError: (error) => {
-      if (error?.data?.code === "UNAUTHORIZED") {
-        ErrorToast.login();
-      } else if (error?.data?.code === "INTERNAL_SERVER_ERROR") {
-        handleInternalServerError(error.message);
-      } else {
-        ErrorToast.internal();
-      }
-    },
-  });
+  const { mutate, isPending } = useMutation(
+    api.guild.createSound.mutationOptions({
+      onSuccess: () => {
+        toast("Sound added to guild");
+        setOpen(false);
+      },
+      onError: (error) => {
+        if (error?.data?.code === "UNAUTHORIZED") {
+          ErrorToast.login();
+        } else if (error?.data?.code === "INTERNAL_SERVER_ERROR") {
+          handleInternalServerError(error.message);
+        } else {
+          ErrorToast.internal();
+        }
+      },
+    }),
+  );
 
   const [open, setOpen] = useState<boolean>(false);
 
