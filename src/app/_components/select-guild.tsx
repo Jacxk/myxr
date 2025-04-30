@@ -1,5 +1,7 @@
 "use client";
+
 import type { Guild } from "@prisma/client";
+import { useMutation } from "@tanstack/react-query";
 import type { Snowflake } from "discord-api-types/globals";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -23,8 +25,6 @@ import { StepsProvider, useSteps } from "~/context/StepsContext";
 import { useSession } from "~/lib/auth-client";
 import { ErrorToast } from "~/lib/messages/toast.global";
 import { useTRPC } from "~/trpc/react";
-
-import { useMutation } from "@tanstack/react-query";
 
 type InviteButtonProps = {
   guildId: string;

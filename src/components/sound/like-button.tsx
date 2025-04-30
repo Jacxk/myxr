@@ -1,4 +1,6 @@
 "use client";
+
+import { useMutation } from "@tanstack/react-query";
 import { Heart, HeartOff } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -12,8 +14,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
-
-import { useMutation } from "@tanstack/react-query";
 
 export function LikeButton({
   soundId,

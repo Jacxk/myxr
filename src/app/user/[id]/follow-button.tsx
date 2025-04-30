@@ -1,12 +1,12 @@
 "use client";
+
+import { useMutation } from "@tanstack/react-query";
 import { Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { ErrorToast } from "~/lib/messages/toast.global";
 import { useTRPC } from "~/trpc/react";
-
-import { useMutation } from "@tanstack/react-query";
 
 export function FollowButton({
   id,

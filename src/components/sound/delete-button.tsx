@@ -1,4 +1,7 @@
+"use client";
+
 import { Dialog, DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
+import { useMutation } from "@tanstack/react-query";
 import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type MouseEvent, useState } from "react";
@@ -12,8 +15,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
-
-import { useMutation } from "@tanstack/react-query";
 
 export function DeleteSoundButton({
   discordSoundId,
