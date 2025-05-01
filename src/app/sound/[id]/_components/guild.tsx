@@ -12,10 +12,7 @@ export function Guild({
           src={image + "?size=32"}
           alt={name}
         />
-        <AvatarFallback
-          delayMs={500}
-          className="flex items-center justify-center text-xs"
-        >
+        <AvatarFallback className="flex items-center justify-center text-xs">
           {name[0]?.toUpperCase()}
         </AvatarFallback>
       </Avatar>

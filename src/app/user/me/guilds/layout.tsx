@@ -26,10 +26,7 @@ export default async function Layout({
                 src={guild.image + "?size=32"}
                 alt={guild.name}
               />
-              <AvatarFallback
-                delayMs={500}
-                className="flex items-center justify-center text-xs"
-              >
+              <AvatarFallback className="flex items-center justify-center text-xs">
                 {guild.name.slice(0, 1).toUpperCase()}
               </AvatarFallback>
             </Avatar>
