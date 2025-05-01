@@ -26,7 +26,7 @@ export default function RootLayout({
             <HydrateClient>
               <div className="flex h-screen flex-col">
                 <Navbar />
-                <div className="mx-auto w-full max-w-7xl flex-1 grow p-2 sm:py-10">
+                <div className="mx-auto w-full max-w-7xl flex-1 grow p-4 sm:py-10">
                   {children}
                 </div>
                 <footer className="grow-0 border-t py-4 text-center text-sm text-muted-foreground">
