@@ -35,11 +35,6 @@ export function DeleteSoundButton({
         router.refresh();
         onDeleted?.();
       },
-      onError: (error) => {
-        toast.error("Failed to delete sound.", {
-          description: error.message,
-        });
-      },
       onSettled: () => {
         setOpen(false);
       },

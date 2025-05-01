@@ -134,10 +134,6 @@ function BotCheckIn({
 
         setTries(tries + 1);
       },
-      onError(error) {
-        ErrorToast.internal();
-        console.error(error);
-      },
     }),
   );
   const { currentStep, setCurrentStep } = useSteps();

@@ -40,10 +40,7 @@ export function LikeButton({
         toast(data.value ? "Sound liked" : "Liked removed");
         setIsLiked(data.value);
       },
-      onError(error) {
-        if (error.data?.code === "UNAUTHORIZED") {
-          ErrorToast.login();
-        }
+      onError() {
         setIsLiked(false);
       },
     }),

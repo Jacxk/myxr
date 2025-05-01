@@ -40,10 +40,6 @@ function handleError(error: unknown) {
 
   if (error.shape?.data.code === "BAD_REQUEST") {
     ErrorToast.invalidReport();
-  } else if (error.data?.code === "UNAUTHORIZED") {
-    ErrorToast.login();
-  } else {
-    toast.error(error.message);
   }
 }
 

@@ -5,6 +5,7 @@ import { Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { Button } from "~/components/ui/button";
+import { useSession } from "~/lib/auth-client";
 import { ErrorToast } from "~/lib/messages/toast.global";
 import { useTRPC } from "~/trpc/react";
 
@@ -14,6 +15,7 @@ export function FollowButton({
 }: Readonly<{ id: string; isFollowing: boolean }>) {
   const api = useTRPC();
   const router = useRouter();
+  const { data: session } = useSession();
 
   const [following, setFollowing] = useState(isFollowing);
 
@@ -23,18 +25,21 @@ export function FollowButton({
         setFollowing(value.following);
         router.refresh();
       },
-      onError(error) {
-        console.error(error);
-        ErrorToast.internal();
+      onError() {
+        setFollowing(false);
       },
     }),
   );
 
   const onFollowButtonClick = useCallback(() => {
     if (isPending) return;
+    if (!session) {
+      ErrorToast.login();
+      return;
+    }
     setFollowing((following) => !following);
     mutate({ id });
-  }, [id, isPending, mutate]);
+  }, [id, isPending, session, mutate]);
 
   return (
     <Button

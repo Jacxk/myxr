@@ -84,8 +84,6 @@ export function AddToGuildButton({
           ErrorToast.login();
         } else if (error?.data?.code === "INTERNAL_SERVER_ERROR") {
           handleInternalServerError(error.message);
-        } else {
-          ErrorToast.internal();
         }
 
         setUsageCount((usage) => usage - 1);

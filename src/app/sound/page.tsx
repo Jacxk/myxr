@@ -35,6 +35,7 @@ export default function SoundsHomePage() {
   return (
     <>
       <title>{`${query} - Search`}</title>
+      <h1 className="mb-4 text-xl">Searching Sounds: {query}</h1>
       <InfiniteScroll
         loadMore={fetchNextPage}
         hasMore={hasNextPage}
