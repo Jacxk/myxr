@@ -3,6 +3,7 @@ import "~/styles/globals.css";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 
+import NextTopLoader from "nextjs-toploader";
 import { Toaster } from "~/components/ui/sonner";
 import { TRPCReactProvider } from "~/trpc/react";
 import { HydrateClient } from "~/trpc/server";
@@ -26,6 +27,12 @@ export default function RootLayout({
             <HydrateClient>
               <div className="flex h-screen flex-col">
                 <Navbar />
+                <NextTopLoader
+                  showSpinner={false}
+                  speed={600}
+                  initialPosition={0.2}
+                  crawlSpeed={100}
+                />
                 <div className="mx-auto w-full max-w-7xl flex-1 grow p-4 sm:py-10">
                   {children}
                 </div>
