@@ -42,7 +42,7 @@ function ActionButtons({ id, sound, isPreview }: SoundPageProps) {
           soundUrl={sound.url}
           soundId={sound.id}
           soundName={sound.name}
-          downloads={sound.downloadCount as number}
+          downloads={sound.downloadCount}
         />
 
         <ReportButton id={id} isPreview={isPreview} />

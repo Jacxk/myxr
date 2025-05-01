@@ -163,7 +163,7 @@ export const soundRouter = createTRPCRouter({
 
       return {
         success: true,
-        value: { downloadCount: downloadCount as number },
+        value: { downloadCount: downloadCount },
       };
     }),
 });
