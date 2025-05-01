@@ -174,6 +174,7 @@ export function EditDetailsStep() {
             likes: Array(Math.floor(Math.random() * 1000)).length,
             likedByUser: Math.random() > 0.5,
             usegeCount: Math.floor(Math.random() * 10000),
+            downloadCount: Math.floor(Math.random() * 10000),
             id: "none",
             guildSounds: [],
             deletedAt: null,
