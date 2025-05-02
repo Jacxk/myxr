@@ -3,24 +3,24 @@ import "~/styles/globals.css";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 
+import { ThemeProvider } from "next-themes";
 import NextTopLoader from "nextjs-toploader";
 import { Toaster } from "~/components/ui/sonner";
 import { TRPCReactProvider } from "~/trpc/react";
 import { HydrateClient } from "~/trpc/server";
 import Navbar from "./_components/navbar";
-import { ThemeProvider } from "./_components/theme-provider";
 
 export const metadata: Metadata = {
   title: "Myxr",
   description: "Upload sounds to Discord with ease",
-  icons: { icon: "/favicon.svg" },
+  icons: { icon: "/favicon.ico" },
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={GeistSans.variable}>
+    <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
       <body>
         <TRPCReactProvider>
           <ThemeProvider attribute="class">
