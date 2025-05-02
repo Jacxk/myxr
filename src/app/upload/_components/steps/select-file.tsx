@@ -53,10 +53,23 @@ export function SelectFileStep() {
     });
   }
 
+  function validateFile(file: File | DataTransferItem | null | undefined) {
+    const valid = !!file && file.type.includes("audio/");
+
+    setValidFileType(valid);
+
+    return valid;
+  }
+
   function onFileSelect(files: File[]) {
     const file = files[0];
 
     if (!file) return;
+
+    if (!validateFile(file)) {
+      return ErrorToast.invalidAudioFile();
+    }
+
     const fileName = file.name.split(".")[0] ?? "Unknown";
 
     toast("File selected " + fileName, { id: "fileSelected" });
@@ -72,9 +85,7 @@ export function SelectFileStep() {
 
     const file = event.dataTransfer.items[0];
 
-    setValidFileType(
-      !!file && file.kind === "file" && file.type.includes("audio/"),
-    );
+    validateFile(file);
   };
 
   const handleDragLeave = (event: React.DragEvent<HTMLLabelElement>) => {
@@ -89,10 +100,6 @@ export function SelectFileStep() {
     event.stopPropagation();
     setIsDragging(false);
     setValidFileType(false);
-
-    if (!validFileType) {
-      return ErrorToast.invalidAudioFile();
-    }
 
     if (event.dataTransfer.files.length > 0) {
       const uploadedFiles = Array.from(event.dataTransfer.files);
