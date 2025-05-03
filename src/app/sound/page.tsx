@@ -1,4 +1,5 @@
 "use client";
+
 import { useSearchParams } from "next/navigation";
 import type { z } from "zod";
 import { InfiniteScroll } from "~/components/infinite-scroll";
@@ -7,8 +8,17 @@ import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { useTRPC } from "~/trpc/react";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { Suspense } from "react";
 
 export default function SoundsHomePage() {
+  return (
+    <Suspense>
+      <SoundsHomePageSuspended />
+    </Suspense>
+  );
+}
+
+function SoundsHomePageSuspended() {
   const api = useTRPC();
   const searchParams = useSearchParams();
   const query = searchParams.get("query") ?? "";
@@ -16,7 +26,7 @@ export default function SoundsHomePage() {
     z.ZodEnum<["normal", "tag"]>
   >;
 
-  const { data, fetchNextPage, hasNextPage, isFetching } = useInfiniteQuery(
+  const { data, fetchNextPage, hasNextPage, isPending } = useInfiniteQuery(
     api.sound.search.infiniteQueryOptions(
       {
         type,
@@ -39,7 +49,7 @@ export default function SoundsHomePage() {
       <InfiniteScroll
         loadMore={fetchNextPage}
         hasMore={hasNextPage}
-        isLoading={isFetching}
+        isLoading={isPending}
         endMessage={!hasData ? "No sounds where found." : ""}
       >
         <SoundsGrid>
