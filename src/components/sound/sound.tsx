@@ -33,7 +33,7 @@ const EmojiButton = memo(function EmojiButtonMemoized({
   url: string;
   emoji: string;
 }) {
-  const { isPlaying, currentId, play } = useAudio();
+  const { isPlaying, currentId, play, preload } = useAudio();
   const currentlyPlay = isPlaying && currentId === id;
 
   return (
@@ -41,6 +41,7 @@ const EmojiButton = memo(function EmojiButtonMemoized({
       className={cn("flex transform cursor-pointer transition-transform", {
         "scale-90": currentlyPlay,
       })}
+      onMouseOver={() => preload(url)}
       onClick={() => play(id, url)}
     >
       <Twemoji options={{ className: "twemoji w-20 h-20" }}>{emoji}</Twemoji>

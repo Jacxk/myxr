@@ -3,7 +3,6 @@
 import {
   createContext,
   type ReactNode,
-  type RefObject,
   useContext,
   useEffect,
   useMemo,
@@ -12,10 +11,11 @@ import {
 } from "react";
 
 interface AudioContextType {
-  audioRef: RefObject<HTMLAudioElement | null>;
+  audio: HTMLAudioElement;
   isPlaying: boolean;
-  currentId: string | null;
-  play: (id: string, src: string) => void;
+  currentId: string;
+  play: (id: string, src: string, fromStart?: boolean) => void;
+  preload: (src: string) => void;
   pause: () => void;
 }
 
@@ -23,13 +23,31 @@ const AudioContext = createContext<AudioContextType | undefined>(undefined);
 
 export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const audioRef = useRef<HTMLAudioElement>(new Audio());
+  const preloadAudioRef = useRef<HTMLAudioElement>(new Audio());
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentId, setCurrentId] = useState<string | null>(null);
+  const [currentId, setCurrentId] = useState<string>("");
 
   const play = (id: string, src: string) => {
-    audioRef.current.src = src;
-    void audioRef.current.play();
+    const audio = audioRef.current;
+
+    audio.pause();
+    audio.currentTime = 0;
+
+    if (audio.src !== src) {
+      audio.src = src;
+      audio.load();
+    }
+
     setCurrentId(id);
+    void audio.play();
+  };
+
+  const preload = (src: string) => {
+    const preloadAudio = preloadAudioRef.current;
+    if (preloadAudio.src !== src) {
+      preloadAudio.src = src;
+      preloadAudio.load();
+    }
   };
 
   const pause = () => {
@@ -37,13 +55,19 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const value = useMemo(
-    () => ({ audioRef, isPlaying, currentId, play, pause }),
-    [audioRef, isPlaying, currentId],
+    () => ({
+      audio: audioRef.current,
+      isPlaying,
+      currentId,
+      play,
+      pause,
+      preload,
+    }),
+    [isPlaying, currentId],
   );
 
   useEffect(() => {
     const audio = audioRef.current;
-    audioRef.current.load();
 
     const handlePlay = () => setIsPlaying(true);
     const handleStop = () => setIsPlaying(false);
