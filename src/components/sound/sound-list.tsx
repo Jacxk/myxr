@@ -1,37 +1,41 @@
 "use client";
 
-import type { GuildSound, Sound, User } from "@prisma/client";
-import { Snowflake } from "discord-api-types/globals";
+import type { Snowflake } from "discord-api-types/globals";
+import Image from "next/image";
 import Link from "next/link";
-import Twemoji from "react-twemoji";
 import { AudioProvider, useAudio } from "~/context/AudioContext";
+import { cn } from "~/lib/utils";
+import type { RouterOutputs } from "~/trpc/react";
 import { Button } from "../ui/button";
 import { DeleteSoundButton } from "./delete-button";
-import { cn } from "~/lib/utils";
+import { getEmojiUrl } from "./sound";
 
-interface SoundData extends GuildSound {
-  sound: SoundIncludedUser;
-  external: boolean;
-}
+type Sound = NonNullable<RouterOutputs["user"]["getSounds"]>[number];
 
-interface SoundIncludedUser extends Sound {
-  createdBy: User;
-}
+export type SoundListData = {
+  sound: Sound;
+  guildId: Snowflake;
+  discordSoundId: Snowflake;
+  external?: boolean;
+};
+
+type SoundTableListProps = {
+  className?: string;
+  data: SoundListData[];
+};
 
 function SoundRow({
   sound,
   discordSoundId,
   guildId,
-  className = "",
   external,
-}: Readonly<{
-  sound: SoundIncludedUser;
-  discordSoundId: Snowflake;
-  guildId: Snowflake;
-  className?: string;
-  external?: boolean;
-}>) {
+  className,
+}: SoundListData & { className: string }) {
   const { play } = useAudio();
+  const size = 34;
+  const emoji = sound.emoji.startsWith("http")
+    ? sound.emoji
+    : getEmojiUrl(sound.emoji);
 
   return (
     <Button
@@ -42,13 +46,7 @@ function SoundRow({
     >
       <div className="grid h-fit w-full cursor-pointer grid-cols-4 items-center">
         <div>
-          {sound.emoji.startsWith("http") ? (
-            <img src={sound.emoji} alt="emoji" className="twemoji-list" />
-          ) : (
-            <Twemoji options={{ className: "twemoji-list" }}>
-              {sound.emoji}
-            </Twemoji>
-          )}
+          <Image src={emoji} alt={sound.emoji} width={size} height={size} />
         </div>
         <div className="col-span-2">
           {external ? (
@@ -71,7 +69,7 @@ function SoundRow({
             <Button className="p-0" variant="link" asChild>
               <Link
                 onClick={(e) => e.stopPropagation()}
-                href={`/user/${sound.createdById}`}
+                href={`/user/${sound.createdBy.id}`}
               >
                 {sound.createdBy.name}
               </Link>
@@ -97,19 +95,15 @@ function SoundTableHeader() {
   );
 }
 
-export function SoundTableList({
-  guildSounds,
-}: Readonly<{
-  guildSounds: SoundData[];
-}>) {
+export function SoundTableList({ data }: SoundTableListProps) {
   return (
     <AudioProvider>
       <div className="flex w-full flex-col">
         <SoundTableHeader />
         <div className="divide-y">
-          {guildSounds.map((guildSound) => (
+          {data.map((guildSound) => (
             <SoundRow
-              key={guildSound.soundId}
+              key={guildSound.sound.id}
               sound={guildSound.sound}
               discordSoundId={guildSound.discordSoundId}
               guildId={guildSound.guildId}

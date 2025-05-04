@@ -1,9 +1,12 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
 import { Heart, HeartOff } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { api } from "~/trpc/react";
+import { useSession } from "~/lib/auth-client";
+import { ErrorToast } from "~/lib/messages/toast.global";
+import { useTRPC } from "~/trpc/react";
 import { Button } from "../ui/button";
 import {
   Tooltip,
@@ -14,44 +17,63 @@ import {
 
 export function LikeButton({
   soundId,
+  likes,
   liked,
   isPreview,
 }: Readonly<{
   soundId: string;
+  likes?: number;
   liked?: boolean;
   isPreview?: boolean;
 }>) {
+  const api = useTRPC();
+  const { data: session } = useSession();
+
   const [isLiked, setIsLiked] = useState<boolean>(liked ?? false);
-  const { mutate, isPending, isSuccess, data } =
-    api.sound.likeSound.useMutation();
+  const [likeCount, setLikeCount] = useState(likes ?? 0);
+
+  const { mutate, isPending } = useMutation(
+    api.sound.likeSound.mutationOptions({
+      onSuccess(data) {
+        if (!data.success) return;
+
+        toast(data.value ? "Sound liked" : "Liked removed");
+        setIsLiked(data.value);
+      },
+      onError() {
+        setIsLiked(false);
+      },
+    }),
+  );
 
   const likeClick = () => {
-    if (isPreview) {
-      toast(`Preview Mode: Sound like ${isLiked ? "removed" : "added"}`);
-      setIsLiked((liked) => !liked)
+    if (!session) {
+      ErrorToast.login();
       return;
     }
-    mutate({ soundId, liked: !liked });
+
+    setIsLiked((liked) => !liked);
+    setLikeCount((likes) => likes + (!isLiked ? 1 : -1));
+
+    if (isPreview) {
+      toast(`Preview Mode: Sound like ${isLiked ? "removed" : "added"}`);
+      return;
+    }
+
+    if (!isPending) mutate({ soundId, liked: !liked });
   };
-
-  useEffect(() => {
-    if (!data?.success) return;
-
-    toast(data.value ? "Sound liked" : "Liked removed");
-    setIsLiked(data.value);
-  }, [isSuccess, data]);
 
   return (
     <TooltipProvider delayDuration={0}>
       <Tooltip disableHoverableContent>
         <TooltipTrigger asChild>
-          <Button
-            variant="outline"
-            size="icon"
-            disabled={isPending}
-            onClick={likeClick}
-          >
+          <Button variant="outline" onClick={likeClick}>
             {isLiked ? <HeartOff /> : <Heart />}
+
+            {likes &&
+              Intl.NumberFormat(navigator.language, {
+                notation: "compact",
+              }).format(likeCount)}
           </Button>
         </TooltipTrigger>
         <TooltipContent>{isLiked ? "UnLike" : "Like"}</TooltipContent>

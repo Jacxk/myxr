@@ -1,7 +1,7 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { type Region } from "wavesurfer.js/dist/plugins/regions.esm.js";
 import { SoundWaveForm } from "~/components/sound/sound-waveform";
@@ -14,57 +14,72 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { useSteps } from "~/context/StepsContext";
+import { ErrorToast } from "~/lib/messages/toast.global";
 import { trimAudioAndConvertToMp3 } from "~/utils/audioTrimmer";
 import { type SoundUploadProps } from "./select-file";
-
-type LocalRegion = {
-  start: number;
-  end: number;
-};
 
 export function EditSoundStep() {
   const { data, reset, setData, nextStep } = useSteps<SoundUploadProps>();
 
+  const region = useRef<Region>(data.region);
+  const fileChanged = useRef<boolean>(false);
+
   const [loading, setLoading] = useState<boolean>(false);
   const [totalTime, setTotalTime] = useState<number>(0);
-  const [fileChanged, setFileChanged] = useState<boolean>(false);
-  const [region, setRegion] = useState<LocalRegion>({
-    start: data.region?.start ?? 0,
-    end: data.region?.end ?? 5,
-  });
+  const [selectedTime, setSelectedTime] = useState<number>(0);
 
   const onDecode = (time: number) => {
-    if (!data.newFile) setFileChanged(true);
+    if (!data.editedFile) fileChanged.current = true;
     setTotalTime(time);
   };
 
   const onRegionCreate = (thisRegion: Region) => {
-    setRegion(thisRegion);
+    region.current = thisRegion;
+    setSelectedTime(Math.abs(thisRegion.start - thisRegion.end));
   };
 
   const onRegionUpdate = (thisRegion: Region) => {
-    setFileChanged(true);
-    setRegion(thisRegion);
+    fileChanged.current = true;
+    region.current = thisRegion;
+    setSelectedTime(Math.abs(thisRegion.start - thisRegion.end));
+  };
+
+  const onError = () => {
+    toast.dismiss("fileSelected");
+    toast.error("Something went wrong, check the file and try again!");
   };
 
   function goToNextStep() {
-    if (!data.file) return;
-    if (!fileChanged) {
+    const currentRegion = region.current;
+    if (!data.file || !currentRegion) return;
+    if (!fileChanged.current) {
       nextStep();
       return;
     }
+
+    toast.dismiss("fileSelected");
     toast.loading("Editing audio file...", { id: "editingAudio" });
+
     setLoading(true);
 
-    trimAudioAndConvertToMp3(data.file, region.start, region.end + 0.01)
+    trimAudioAndConvertToMp3(data.file, currentRegion.start, currentRegion.end)
       .then((newFile) => {
-        setData({ newFile, region, file: data.file });
+        setData({
+          ...data,
+          editedFile: newFile,
+          region: region.current,
+          file: data.file,
+          fileProps: {
+            ...data.fileProps,
+            url: URL.createObjectURL(newFile as Blob),
+          },
+        });
         toast("Audio edited successfully!");
         nextStep();
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Something went wrong.");
+        ErrorToast.internal();
       })
       .finally(() => {
         toast.dismiss("editingAudio");
@@ -91,16 +106,18 @@ export function EditSoundStep() {
             <div className="flex flex-col">
               <span>Name: {data.file?.name}</span>
               <span>Audio Length: {totalTime.toFixed(2)}s</span>
+              <span>Selected Length: {selectedTime.toFixed(2)}s</span>
             </div>
           </CardContent>
         </Card>
       </div>
       <SoundWaveForm
         url={URL.createObjectURL(data.file as Blob)}
-        regionData={data.region}
+        regionData={region.current}
         onDecode={onDecode}
         onRegionCreate={onRegionCreate}
         onRegionUpdate={onRegionUpdate}
+        onError={onError}
         editable
       />
       <div className="flex w-full justify-end gap-4">

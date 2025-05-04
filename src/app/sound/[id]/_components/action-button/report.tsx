@@ -1,9 +1,10 @@
 "use client";
 
 import { DialogTitle } from "@radix-ui/react-dialog";
+import { useMutation } from "@tanstack/react-query";
 import { Flag, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import {
@@ -19,7 +20,28 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
-import { api } from "~/trpc/react";
+import { useSession } from "~/lib/auth-client";
+import { ErrorToast } from "~/lib/messages/toast.global";
+import { isTRPCError } from "~/lib/utils";
+import { useTRPC } from "~/trpc/react";
+
+function handleNotSuccess(error?: string) {
+  if (error === "REPORT_EXISTS") {
+    ErrorToast.soundAlreadyReported();
+  } else toast.error("Failed to report sound");
+}
+
+function handleError(error: unknown) {
+  if (!isTRPCError(error)) {
+    ErrorToast.internal();
+    console.error("Unexpected error:", error);
+    return;
+  }
+
+  if (error.shape?.data.code === "BAD_REQUEST") {
+    ErrorToast.invalidReport();
+  }
+}
 
 function ReportModal({
   reason,
@@ -53,58 +75,78 @@ function PendingButton({
   );
 }
 
-export function ReportButton({ id }: Readonly<{ id: string }>) {
+export function ReportButton({
+  id,
+  isPreview,
+}: {
+  id: string;
+  isPreview?: boolean;
+}) {
+  const api = useTRPC();
+  const { data: session } = useSession();
+
   const [open, setOpen] = useState<boolean>(false);
   const [reason, setReason] = useState("");
 
-  const { mutate, data, isPending, error, isError } =
-    api.sound.reportSound.useMutation();
+  const { mutate, isPending } = useMutation(
+    api.sound.reportSound.mutationOptions({
+      onSuccess({ success, value, error }) {
+        if (!success) {
+          handleNotSuccess(error);
+          return;
+        }
+
+        if (!value?.caseId) {
+          ErrorToast.internal();
+          return;
+        }
+
+        toast("Thank you for your feedback.", {
+          action: (
+            <Button variant="outline">
+              <Link
+                href={`/user/me/reports?id=${encodeURIComponent(value.caseId)}`}
+              >
+                View
+              </Link>
+            </Button>
+          ),
+        });
+        setOpen(false);
+      },
+      onError(error) {
+        handleError(error);
+      },
+    }),
+  );
+
+  const onOpenChange = (open: boolean) => {
+    if (open && !session) {
+      ErrorToast.login();
+      return;
+    }
+
+    setOpen(open);
+    setReason("");
+  };
 
   const handleSubmit = () => {
+    if (!session) {
+      ErrorToast.login();
+      return;
+    }
+
+    if (isPreview) {
+      toast("Preview Mode: Sound Reported");
+      return;
+    }
+
     mutate({ id, reason });
   };
 
-  useEffect(() => {
-    if (!data) return;
-    if (!data.success) {
-      if (data.error === "REPORT_EXISTS") {
-        toast.error("You have already reported this sound.");
-      } else toast.error("Failed to report sound");
-      return;
-    }
-
-    if (!data.value?.caseId) {
-      toast.error("Something went wrong");
-      return;
-    }
-
-    toast("Thank you for your feedback.", {
-      action: (
-        <Button variant="outline">
-          <Link
-            href={`/user/me/reports?id=${encodeURIComponent(data.value.caseId)}`}
-          >
-            View
-          </Link>
-        </Button>
-      ),
-    });
-    setReason("");
-    setOpen(false);
-  }, [data?.success]);
-
-  useEffect(() => {
-    if (!isError) return;
-    if (error?.data?.code === "BAD_REQUEST") {
-      toast.error("Please provide a valid reason.");
-    } else {
-      toast.error("Failed to report sound.");
-    }
-  }, [isError, error]);
-
   return (
     <>
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Report Sound</DialogTitle>
@@ -132,7 +174,7 @@ export function ReportButton({ id }: Readonly<{ id: string }>) {
           <Button
             size="icon"
             variant="destructive"
-            onClick={() => setOpen(true)}
+            onClick={() => onOpenChange(true)}
           >
             <Flag />
           </Button>

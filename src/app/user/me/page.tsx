@@ -1,5 +1,5 @@
 import SoundsRoute from "./sounds/page";
 
-export default function () {
+export default function MeMainPage() {
   return <SoundsRoute />;
 }

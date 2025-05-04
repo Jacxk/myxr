@@ -1,7 +1,9 @@
 "use client";
 
 import type { Guild } from "@prisma/client";
-import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import type { Snowflake } from "discord-api-types/globals";
+import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import {
@@ -20,12 +22,13 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { StepsProvider, useSteps } from "~/context/StepsContext";
-import { api } from "~/trpc/react";
+import { useSession } from "~/lib/auth-client";
+import { ErrorToast } from "~/lib/messages/toast.global";
+import { useTRPC } from "~/trpc/react";
 
 type InviteButtonProps = {
   guildId: string;
   onClick?: () => void;
-  tries: number;
 };
 
 type StepComponentProps = {
@@ -34,12 +37,33 @@ type StepComponentProps = {
   description: string;
   children?: ReactNode;
   footer?: ReactNode;
+  setCurrentStep?: (step: number) => void;
 };
 
 type GuildState = {
-  id?: string;
+  id?: Snowflake;
   name?: string;
 };
+
+type ExtendableSuccess = {
+  onSuccess?: (guild: GuildState, newBot: boolean) => void;
+};
+
+type GuildSelectProps = {
+  guilds: Guild[];
+  selectedGuild: GuildState;
+  dialogOpen: boolean;
+  isSuccess?: boolean;
+  setSelectedGuild: (guild: GuildState) => void;
+  onDialogOpenChange: (open: boolean) => void;
+} & ExtendableSuccess;
+
+type BotCheckInProps = {
+  check?: boolean;
+  tries: number;
+  guild: GuildState;
+  setTries: (tries: number) => void;
+} & ExtendableSuccess;
 
 function generateBotInvite(guildId: string) {
   return `https://discord.com/oauth2/authorize?client_id=1293222273473318952&guild_id=${guildId}&disable_guild_select=true`;
@@ -50,14 +74,8 @@ function openInviteLink(guildId: string) {
   window.open(inviteLink, "_blank", "noopener,noreferrer");
 }
 
-function InviteButton({
-  onClick,
-  tries,
-  guildId,
-}: Readonly<InviteButtonProps>) {
+function InviteButton({ onClick, guildId }: Readonly<InviteButtonProps>) {
   const { currentStep, setCurrentStep } = useSteps();
-  const [inviteClicked, setInviteClicked] = useState(false);
-  const [maxTries, setMaxTries] = useState(4);
 
   const handleClick = useCallback(() => {
     openInviteLink(guildId);
@@ -65,27 +83,14 @@ function InviteButton({
 
     if (currentStep === 1) {
       setCurrentStep(2);
-      setInviteClicked(true);
     }
-  }, [currentStep, guildId]);
+  }, [currentStep, guildId, onClick, setCurrentStep]);
 
-  useEffect(() => {
-    if (!inviteClicked) {
-      setMaxTries((prev) => prev + 1);
-      return;
-    }
-
-    if (tries >= maxTries) {
-      setCurrentStep(4);
-      return;
-    }
-
-    if (tries > 0 && inviteClicked) {
-      setCurrentStep(3);
-    }
-  }, [tries, inviteClicked]);
-
-  return <Button onClick={() => handleClick()}>Invite</Button>;
+  return (
+    <Button onClick={() => handleClick()}>
+      {currentStep > 2 ? "Try Again" : "Invite"}
+    </Button>
+  );
 }
 
 function StepComponent({
@@ -108,90 +113,150 @@ function StepComponent({
   );
 }
 
-export function SelectGuild({
-  guilds,
-}: Readonly<{ guilds: Guild[] | undefined }>) {
-  const [guild, setGuild] = useState<GuildState>(
-    JSON.parse(localStorage.getItem("selectedGuild") ?? "{}"),
+function BotCheckIn({
+  check,
+  tries,
+  setTries,
+  guild,
+  onSuccess,
+}: BotCheckInProps) {
+  const api = useTRPC();
+  const { mutate } = useMutation(
+    api.guild.isBotIn.mutationOptions({
+      onSuccess({ success, value }) {
+        if (success && value) return onSuccess?.(guild, true);
+
+        if (tries >= maxTries) {
+          setCurrentStep(4);
+        } else if (tries === 0) {
+          setCurrentStep(3);
+        }
+
+        setTries(tries + 1);
+      },
+    }),
   );
-  const [prevGuild, setPrevGuild] = useState<GuildState>({});
-  const [botJoined, setBotJoined] = useState<boolean>(false);
-  const [tries, setTries] = useState<number>(0);
-  const [open, setOpen] = useState<boolean>(false);
+  const { currentStep, setCurrentStep } = useSteps();
 
-  const computedValue = useMemo(
-    () => guild.id && `${guild.id}-${guild.name}`,
-    [guild],
-  );
-
-  const { mutateAsync, isPending, data } = api.guild.isBotIn.useMutation();
-
-  const fallbackGuild = useCallback(() => {
-    setGuild(prevGuild);
-  }, [prevGuild]);
-
-  const selectGuild = useCallback(
-    async (guildString: string) => {
-      const [id, name] = guildString.split("-");
-
-      setBotJoined(false);
-      setGuild({ id, name });
-      setPrevGuild(guild);
-
-      const { success, value } = await mutateAsync(id!);
-
-      if (!isPending && success && !value) {
-        setOpen(true);
-        return;
-      } else if (!success) {
-        toast.error("Something went wrong...");
-        fallbackGuild();
-        return;
-      }
-
-      localStorage.setItem("selectedGuild", JSON.stringify({ id, name }));
-    },
-    [isPending, guild],
-  );
+  const maxTries = 3;
 
   const checkBotJoined = useCallback(() => {
-    mutateAsync(guild.id!).then(({ success, value }) => {
-      setBotJoined(success && value);
-      setTries((tries) => tries + 1);
-    });
-  }, [guild.id]);
+    if (currentStep === 1) return;
 
-  const onOpenChange = useCallback(
-    (open: boolean) => {
-      if (!open && !botJoined) fallbackGuild();
-      setOpen(open);
-    },
-    [botJoined, fallbackGuild],
-  );
+    mutate(guild.id!);
+  }, [currentStep, guild, mutate]);
 
   useEffect(() => {
-    if (isPending || !data) return;
+    if (check) window.addEventListener("focus", checkBotJoined);
 
-    if (botJoined && data.success && data.value) {
-      setOpen(false);
-      toast("Bot has been successfully detected!");
-    }
-  }, [data, isPending, botJoined]);
-
-  useEffect(() => {
-    const removeListener = () => {
+    return () => {
       window.removeEventListener("focus", checkBotJoined);
     };
+  }, [check, checkBotJoined]);
 
-    if (open) window.addEventListener("focus", checkBotJoined);
-    else removeListener();
+  return null;
+}
 
-    return removeListener;
-  }, [open, guild.id, data]);
+function GuildSelect({
+  guilds,
+  selectedGuild,
+  dialogOpen,
+  isSuccess,
+  setSelectedGuild,
+  onDialogOpenChange,
+  onSuccess,
+}: GuildSelectProps) {
+  const api = useTRPC();
+  const { mutate } = useMutation(
+    api.guild.isBotIn.mutationOptions({
+      onSuccess({ success, value }) {
+        setBotAlreadyIn(success && value);
+        if (success && !value) {
+          onDialogOpenChange(true);
+        } else if (!success) {
+          ErrorToast.internal();
+          setSelectedGuild(prevGuild);
+        } else onSuccess?.(selectedGuild, false);
+      },
+    }),
+  );
+
+  const [prevGuild, setPrevGuild] = useState<GuildState>(selectedGuild);
+  const [botAlreadyIn, setBotAlreadyIn] = useState(false);
+
+  const value = selectedGuild.id && `${selectedGuild.id}-${selectedGuild.name}`;
+
+  const onGuildSelect = async (guildString: string) => {
+    const [id, name] = guildString.split("-");
+    const prevGuild = selectedGuild;
+
+    if (!id || !name) return;
+
+    setSelectedGuild({ id, name });
+    setPrevGuild(prevGuild);
+
+    mutate(id);
+  };
+
+  useEffect(() => {
+    if (!botAlreadyIn && !dialogOpen && !isSuccess) {
+      setSelectedGuild(prevGuild);
+    }
+  }, [botAlreadyIn, dialogOpen, prevGuild, isSuccess, setSelectedGuild]);
+
+  return (
+    <Select onValueChange={onGuildSelect} value={value}>
+      <SelectTrigger className="sm:min-w-[180px]" asChild>
+        <div className="hidden sm:flex">
+          <SelectValue placeholder="Select a Guild" />
+        </div>
+      </SelectTrigger>
+      <SelectContent>
+        {guilds?.map((guild) => (
+          <SelectItem key={guild.id} value={`${guild.id}-${guild.name}`}>
+            {guild.name}
+          </SelectItem>
+        )) ?? (
+          <SelectItem value="none" disabled>
+            No guilds found
+          </SelectItem>
+        )}
+      </SelectContent>
+    </Select>
+  );
+}
+
+export function SelectGuild() {
+  const { data: session } = useSession();
+
+  const guilds = session ? session.user.guilds : [];
+  const storedGuild = localStorage.getItem("selectedGuild");
+
+  const [tries, setTries] = useState(0);
+  const [success, setSuccess] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [guild, setGuild] = useState<GuildState>(
+    JSON.parse(storedGuild ?? "{}") as GuildState,
+  );
+
+  const onDialogOpenChange = (open: boolean) => {
+    if (!open) setTries(0);
+    setDialogOpen(open);
+    setSuccess(false);
+  };
+
+  const onSuccess = (guild: GuildState, newBot: boolean) => {
+    setDialogOpen(false);
+    setSuccess(true);
+
+    if (newBot) toast("Bot has been successfully detected!");
+
+    localStorage.setItem("selectedGuild", JSON.stringify(guild));
+  };
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog open={dialogOpen} onOpenChange={onDialogOpenChange}>
         <DialogContent>
           <StepsProvider>
             <StepComponent
@@ -214,33 +279,30 @@ export function SelectGuild({
               title="This is awkward."
               description={`We've tried ${tries} times to verify if the bot joined. Maybe try again later.`}
             />
+
             <DialogFooter>
-              <Button onClick={checkBotJoined} variant="outline">
-                Re-Check
-              </Button>
-              <InviteButton guildId={guild.id!} tries={tries} />
+              <InviteButton guildId={guild.id!} />
             </DialogFooter>
+
+            <BotCheckIn
+              guild={guild}
+              check={dialogOpen}
+              tries={tries}
+              setTries={setTries}
+              onSuccess={onSuccess}
+            />
           </StepsProvider>
         </DialogContent>
       </Dialog>
-      <Select onValueChange={selectGuild} value={computedValue}>
-        <SelectTrigger className="sm:min-w-[180px]" asChild>
-          <div className="hidden sm:flex">
-            <SelectValue placeholder="Select a Guild" />
-          </div>
-        </SelectTrigger>
-        <SelectContent>
-          {guilds?.map((guild) => (
-            <SelectItem key={guild.id} value={`${guild.id}-${guild.name}`}>
-              {guild.name}
-            </SelectItem>
-          )) ?? (
-            <SelectItem value="none" disabled>
-              No guilds found
-            </SelectItem>
-          )}
-        </SelectContent>
-      </Select>
+      <GuildSelect
+        guilds={guilds ?? []}
+        selectedGuild={guild}
+        dialogOpen={dialogOpen}
+        onDialogOpenChange={setDialogOpen}
+        setSelectedGuild={setGuild}
+        isSuccess={success}
+        onSuccess={onSuccess}
+      />
     </>
   );
 }

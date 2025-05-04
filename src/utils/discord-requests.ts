@@ -12,6 +12,7 @@ interface DiscordError {
 }
 
 function hasPermission(userPermission: string, permission: DiscordPermission) {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
   return (Number(userPermission) & permission) === permission;
 }
 
@@ -31,22 +32,22 @@ async function createDiscordRequest<T>(
 
   if (opts?.no_content_type) delete headers["Content-Type"];
 
-  const url = `https://discord.com/api/v10/${path}`
+  const url = `https://discord.com/api/v10/${path}`;
 
-  console.log(`[Discord Request] ${url}`)
+  console.log(`[Discord Request] ${url}`);
   const res = await fetch(url, {
     ...opts,
     headers,
   });
 
-  const data = await res.json();
+  const data = (await res.json()) as T;
 
   if (!res.ok) {
     const { message } = data as DiscordError;
     throw new Error(message || "Failed to fetch data from Discord");
   }
 
-  return data as T;
+  return data;
 }
 
 export async function getDiscordGuilds(id: string) {
@@ -58,6 +59,7 @@ export async function getDiscordGuilds(id: string) {
 
   return data.filter(
     (guild: APIGuild) =>
+      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
       guild.owner ||
       hasPermission(
         guild.permissions!,
@@ -94,32 +96,6 @@ export async function createSound({
   return data;
 }
 
-export async function refreshAccessToken(refreshToken: string) {
-  const body = new URLSearchParams({
-    client_id: env.AUTH_DISCORD_ID,
-    client_secret: env.AUTH_DISCORD_SECRET,
-    grant_type: "refresh_token",
-    refresh_token: refreshToken,
-  });
-  const response = await fetch("https://discord.com/api/oauth2/token", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body,
-  });
-
-  if (!response.ok) throw new Error("Failed to refresh token");
-
-  const refreshedTokens = await response.json();
-
-  return {
-    access_token: refreshedTokens.access_token,
-    refresh_token: refreshedTokens.refresh_token ?? refreshToken,
-    expires_at: Math.floor(Date.now() / 1000) + refreshedTokens.expires_in,
-  };
-}
-
 export async function getSoundBoard(guildId: string) {
   try {
     const data = await createDiscordRequest<{ items: APISoundboardSound[] }>(
@@ -128,7 +104,7 @@ export async function getSoundBoard(guildId: string) {
     );
 
     return data.items;
-  } catch (e) {
+  } catch {
     return [];
   }
 }

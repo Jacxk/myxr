@@ -1,6 +1,5 @@
 "use client";
-
-import { Sound, SoundReport } from "@prisma/client";
+import type { Sound, SoundReport } from "@prisma/client";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -21,16 +20,21 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { Textarea } from "~/components/ui/textarea";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
+
+import { useQuery } from "@tanstack/react-query";
 
 type Report = SoundReport & { sound: Sound };
 
-export default function () {
+export default function MeReportsPage() {
+  const api = useTRPC();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
 
-  const { data: reports, isLoading } = api.user.reports.useQuery();
+  const { data: reports, isPending } = useQuery(
+    api.user.reports.queryOptions(),
+  );
   const [selectedReport, setSelectedReport] = useState<Report | undefined>();
 
   const clearSelected = (open: boolean) => {
@@ -46,8 +50,8 @@ export default function () {
 
   useEffect(() => {
     const id = searchParams.get("id");
-    const report = reports?.filter((r) => r.id === id) || [];
-    
+    const report = reports?.filter((r) => r.id === id) ?? [];
+
     if (id && report?.length > 0) setSelectedReport(report[0]);
   }, [searchParams, reports]);
 
@@ -89,7 +93,7 @@ export default function () {
       </Dialog>
       <Table>
         <TableCaption>
-          {isLoading && "Loding reports..."}
+          {isPending && "Loading reports..."}
           {reports?.length === 0 ? "No reports have been made" : ""}
         </TableCaption>
         <TableHeader>

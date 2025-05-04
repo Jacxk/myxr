@@ -1,0 +1,34 @@
+{
+  "editor.tabSize": 2,
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "javascript.updateImportsOnPaste.enabled": true,
+  "typescript.updateImportsOnPaste.enabled": true,
+  "eslint.lintTask.enable": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "file",
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "always",
+    "source.fixAll.eslint": "always"
+  },
+  "files.autoSave": "off",
+  "workbench.editor.customLabels.patterns": {
+    "**/app/**/page.tsx": "${dirname} [page.tsx]",
+    "**/app/**/layout.tsx": "${dirname} [layout.tsx]",
+    "**/app/**/error.tsx": "${dirname} [error.tsx]",
+    "**/app/**/not-found.tsx": "${dirname} [not-found.tsx]",
+    "**/app/**/loading.tsx": "${dirname} [loading.tsx]"
+  },
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  },
+  "eslint.validate": ["typescript"],
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}

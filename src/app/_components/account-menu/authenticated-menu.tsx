@@ -1,0 +1,37 @@
+"use client";
+
+import Link from "next/link";
+import {
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "~/components/ui/dropdown-menu";
+import { signOut, useSession } from "~/lib/auth-client";
+import { AuthenticatedClient } from "../authentication-client";
+import { ThemeSwitch } from "./theme-switch";
+
+export function AuthenticatedMenu() {
+  const { data: session } = useSession();
+
+  const user = session?.user;
+
+  return (
+    <AuthenticatedClient>
+      <DropdownMenuLabel className="flex justify-between">
+        <span className="text-muted-foreground">Hello</span>
+        <span>{user?.name}</span>
+      </DropdownMenuLabel>
+      <DropdownMenuSeparator />
+      <Link href={"/user/me"}>
+        <DropdownMenuItem>Profile</DropdownMenuItem>
+      </Link>
+      <DropdownMenuSeparator />
+      <ThemeSwitch />
+      <Link href="/settings">
+        <DropdownMenuItem>Settings</DropdownMenuItem>
+      </Link>
+      <DropdownMenuSeparator />
+      <DropdownMenuItem onClick={() => signOut()}>Sign out</DropdownMenuItem>
+    </AuthenticatedClient>
+  );
+}

@@ -1,14 +1,14 @@
+"use client";
+
 import { Dialog, DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
+import { useMutation } from "@tanstack/react-query";
 import { Trash } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { type MouseEvent, useState } from "react";
 import { toast } from "sonner";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 import { Button } from "../ui/button";
-import {
-  DialogContent,
-  DialogFooter,
-  DialogHeader
-} from "../ui/dialog";
+import { DialogContent, DialogFooter, DialogHeader } from "../ui/dialog";
 import {
   Tooltip,
   TooltipContent,
@@ -25,32 +25,31 @@ export function DeleteSoundButton({
   guildId: string;
   onDeleted?: () => void;
 }>) {
-  const { mutate, isSuccess } = api.guild.deleteSound.useMutation();
+  const api = useTRPC();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
-
-  const onConfirmDeleteClick = () => {
-    mutate(
-      { soundId: discordSoundId, guildId: guildId },
-      {
-        onSuccess: () => {
-          toast("Sound deleted successfully!");
-        },
-        onError: (error) => {
-          toast.error("Failed to delete sound.", {
-            description: error.message,
-          });
-        },
+  const { mutate, isPending } = useMutation(
+    api.guild.deleteSound.mutationOptions({
+      onSuccess: () => {
+        toast("Sound deleted successfully!");
+        router.refresh();
+        onDeleted?.();
       },
-    );
-    setOpen(false);
+      onSettled: () => {
+        setOpen(false);
+      },
+    }),
+  );
+
+  const onConfirmDeleteClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    mutate({ soundId: discordSoundId, guildId: guildId });
   };
 
-  useEffect(() => {
-    if (isSuccess) {
-      toast("Sound deleted");
-      onDeleted?.();
-    }
-  }, [isSuccess]);
+  const onDeleteClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    setOpen(true);
+  };
 
   return (
     <>
@@ -63,7 +62,11 @@ export function DeleteSoundButton({
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="destructive" onClick={onConfirmDeleteClick}>
+            <Button
+              variant="destructive"
+              disabled={isPending}
+              onClick={onConfirmDeleteClick}
+            >
               Delete
             </Button>
           </DialogFooter>
@@ -73,11 +76,7 @@ export function DeleteSoundButton({
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
-              variant="destructive"
-              onClick={() => setOpen(true)}
-              size="icon"
-            >
+            <Button variant="destructive" onClick={onDeleteClick} size="icon">
               <Trash />
             </Button>
           </TooltipTrigger>

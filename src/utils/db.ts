@@ -1,9 +1,11 @@
+import type { GuildSound, LikedSound } from "@prisma/client";
 import type { APIGuild } from "discord-api-types/v10";
+import { z } from "zod";
 import { db } from "~/server/db";
 import { getDiscordGuilds } from "./discord-requests";
-import { GuildSound } from "@prisma/client";
 
 const soundInclude = {
+  tags: true,
   createdBy: {
     select: {
       image: true,
@@ -13,6 +15,24 @@ const soundInclude = {
       id: true,
     },
   },
+  guildSounds: {
+    select: {
+      guild: {
+        select: {
+          name: true,
+          id: true,
+          image: true,
+        },
+      },
+    },
+  },
+};
+
+const populateLike = (likedBy: LikedSound[], userId?: string) => {
+  return {
+    likes: likedBy.length,
+    likedByUser: likedBy.filter((user) => user.userId === userId).length > 0,
+  };
 };
 
 export const discordAuthorization = async (id: string) => {
@@ -46,49 +66,66 @@ export const getSounds = async ({
   return (
     sounds.map((sound) => ({
       ...sound,
-      liked: sound.likedBy.length > 0,
+      ...populateLike(sound.likedBy, userId),
     })) ?? []
   );
 };
 
-export const getSoundsFromUser = async (id: string) => {
+export const getSoundsFromUser = async (userId: string) => {
   const getData = (createdById: string) =>
     db.sound.findMany({
       orderBy: { createdAt: "desc" },
       where: { createdById },
-      include: { ...soundInclude, likedBy: { where: { userId: id } } },
+      include: { ...soundInclude, likedBy: { where: { userId: userId } } },
     });
-  const sounds = await getData(id);
+  const sounds = await getData(userId);
 
   if (sounds.length > 0)
     return sounds.map((sound) => ({
       ...sound,
-      liked: sound.likedBy.length > 0,
+      ...populateLike(sound.likedBy, userId),
     }));
 
   const user = await db.account.findFirst({
-    where: { accountId: id },
+    where: { accountId: userId },
   });
 
   if (user)
     return (await getData(user.userId)).map((sound) => ({
       ...sound,
-      liked: sound.likedBy.length > 0,
+      ...populateLike(sound.likedBy, userId),
     }));
 
   return [];
 };
 
-export const getSound = (id: string, userId?: string) => {
-  return db.sound.findFirst({
+export const getSound = async (id: string, userId?: string) => {
+  const sound = await db.sound.findFirst({
     where: { id },
     include: {
-      createdBy: true,
-      guildSounds: { select: { guild: { select: { name: true, id: true } } } },
-      tags: true,
+      ...soundInclude,
       likedBy: true,
     },
   });
+
+  if (!sound) return null;
+
+  return {
+    ...sound,
+    ...populateLike(sound.likedBy, userId),
+  };
+};
+
+export const getUserLikedSounds = async (userId: string) => {
+  const sounds = await db.sound.findMany({
+    where: { likedBy: { some: { userId } } },
+    include: { ...soundInclude, likedBy: { where: { userId } } },
+  });
+
+  return sounds.map((sound) => ({
+    ...sound,
+    ...populateLike(sound.likedBy, userId),
+  }));
 };
 
 export const updateGuildMemberShip = async (
@@ -138,10 +175,12 @@ export const getUserGuilds = async (userId: string) => {
 };
 
 export const upsertGuild = async (guild: APIGuild) => {
+  const image = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`;
+
   await db.guild.upsert({
     where: { id: guild.id },
-    create: { id: guild.id, name: guild.name },
-    update: { name: guild.name },
+    create: { id: guild.id, name: guild.name, image },
+    update: { name: guild.name, image },
   });
 };
 
@@ -167,5 +206,97 @@ export const handleSoundGuildCreate = async ({
   await db.sound.update({
     where: { id: soundId },
     data: { usegeCount: { increment: 1 } },
+  });
+};
+
+export const getSoundsFromTag = async (
+  tag: string,
+  limit: number,
+  cursor?: string | null,
+  userId?: string,
+) => {
+  const data = await db.tag.findFirst({
+    take: limit + 1,
+    skip: cursor ? 1 : 0,
+    cursor: cursor ? { name: cursor } : undefined,
+    where: { name: tag },
+    include: { sounds: { include: { likedBy: { where: { userId } } } } },
+  });
+
+  return (
+    data?.sounds.map((sound) => ({
+      ...sound,
+      ...populateLike(sound.likedBy, userId),
+    })) ?? []
+  );
+};
+
+export const SearchType = z.enum(["normal", "tag"]);
+
+export const searchForSoundsInfinite = async (
+  query: string,
+  type: z.infer<typeof SearchType>,
+  limit: number,
+  cursor?: string | null,
+  userId?: string,
+) => {
+  let sounds = null;
+  const formattedQuery = query
+    .trim()
+    .split(/\s+/)
+    .map((word) => word + ":*");
+
+  const soundSearch = formattedQuery.join(" & ");
+  const tagSearch = formattedQuery.join(" | ");
+
+  if (type === "normal") {
+    sounds = await db.sound.findMany({
+      take: limit + 1,
+      skip: cursor ? 1 : 0,
+      cursor: cursor ? { id: cursor } : undefined,
+      include: { likedBy: { where: { userId } } },
+      where: {
+        OR: [
+          { name: { search: soundSearch } },
+          { tags: { some: { name: { search: tagSearch } } } },
+        ],
+      },
+    });
+  } else {
+    sounds = await getSoundsFromTag(query, limit, cursor, userId);
+  }
+
+  return sounds.map((sound) => ({
+    ...sound,
+    ...populateLike(sound.likedBy, userId),
+  }));
+};
+
+export const getAllSounds = async (
+  limit: number,
+  cursor?: string | null,
+  userId?: string,
+) => {
+  const sounds = await db.sound.findMany({
+    take: limit + 1,
+    skip: cursor ? 1 : 0,
+    cursor: cursor ? { id: cursor } : undefined,
+    orderBy: { usegeCount: "desc" },
+    include: {
+      createdBy: true,
+      likedBy: { where: { userId } },
+    },
+  });
+
+  return sounds.map((sound) => ({
+    ...sound,
+    ...populateLike(sound.likedBy, userId),
+  }));
+};
+
+export const getGuildSounds = async (guildId: string) => {
+  return await db.guildSound.findMany({
+    where: { guildId },
+    include: { sound: { include: { createdBy: true } }, guild: true },
   });
 };

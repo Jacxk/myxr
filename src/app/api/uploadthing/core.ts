@@ -22,6 +22,7 @@ export const ourFileRouter = {
     .middleware(async ({ input }) => {
       const session = await getServerSession();
 
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
       if (!session?.user) throw new UploadThingError("Unauthorized");
 
       return {

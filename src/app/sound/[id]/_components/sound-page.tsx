@@ -1,11 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import { AddToGuildButton } from "~/components/sound/add-button";
 import { LikeButton } from "~/components/sound/like-button";
-import { SoundProperties } from "~/components/sound/sound";
 import { SoundWaveForm } from "~/components/sound/sound-waveform";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { TooltipProvider } from "~/components/ui/tooltip";
+import type { RouterOutputs } from "~/trpc/react";
 import { DownloadButton } from "./action-button/download";
 import { ReportButton } from "./action-button/report";
 import { CreatedDate } from "./created-date";
@@ -13,59 +15,46 @@ import { SoundEmoji } from "./emoji";
 import { Guild } from "./guild";
 import { SoundData } from "./sound-data";
 
-interface User {
+type SoundPageProps = {
   id: string;
-  name?: string | null;
-  image?: string | null;
-}
-
-interface Sound extends SoundProperties {
-  guildSounds: Array<{ guild: { id: string; name: string; image?: string } }>;
-  likedBy: Array<{ userId: string }>;
-  createdAt: Date;
-  usegeCount: number;
-}
-interface SoundPageProps {
-  id: string;
-  sound: Sound;
-  user?: User;
+  sound: NonNullable<RouterOutputs["sound"]["getSound"]>;
   isPreview?: boolean;
-}
+};
 
-function ActionButtons({
-  id,
-  sound,
-  user,
-  isPreview,
-}: Readonly<SoundPageProps>) {
+function ActionButtons({ id, sound, isPreview }: SoundPageProps) {
   return (
     <div className="flex gap-2">
       <TooltipProvider delayDuration={0}>
-        <AddToGuildButton soundId={id} isPreview={isPreview} />
+        <AddToGuildButton
+          soundId={id}
+          isPreview={isPreview}
+          usage={sound.usegeCount}
+        />
 
         <LikeButton
           soundId={id}
-          liked={sound.likedBy.some((data) => data.userId === user?.id)}
+          liked={sound.likedByUser}
           isPreview={isPreview}
+          likes={sound.likes}
         />
 
-        <DownloadButton soundUrl={sound.url} soundName={sound.name} />
+        <DownloadButton
+          soundUrl={sound.url}
+          soundId={sound.id}
+          soundName={sound.name}
+          downloads={sound.downloadCount}
+        />
 
-        <ReportButton id={id} />
+        <ReportButton id={id} isPreview={isPreview} />
       </TooltipProvider>
     </div>
   );
 }
 
-export function SoundPage({
-  id,
-  sound,
-  user,
-  isPreview,
-}: Readonly<SoundPageProps>) {
+export function SoundPage({ id, sound, isPreview }: Readonly<SoundPageProps>) {
   return (
-    <div className="flex w-full flex-col gap-4">
-      <div className="flex w-full flex-row gap-4">
+    <div className="flex w-full flex-col gap-6">
+      <div className="flex w-full flex-row gap-10">
         <div className="flex shrink-0">
           <SoundEmoji emoji={sound.emoji} />
         </div>
@@ -91,12 +80,7 @@ export function SoundPage({
               </Link>
             </Button>
           </div>
-          <ActionButtons
-            id={id}
-            sound={sound}
-            user={user}
-            isPreview={isPreview}
-          />
+          <ActionButtons id={id} sound={sound} isPreview={isPreview} />
         </div>
       </div>
       <SoundWaveForm url={sound.url} />
@@ -113,7 +97,7 @@ export function SoundPage({
               <Guild
                 key={guildSound.guild.id}
                 name={guildSound.guild.name}
-                image=""
+                image={guildSound.guild.image}
               />
             ))}
           </div>
@@ -121,18 +105,6 @@ export function SoundPage({
         <div className="flex flex-col gap-4 sm:w-1/5">
           <SoundData title="Created">
             <CreatedDate date={sound.createdAt} />
-          </SoundData>
-
-          <SoundData title="Usage">
-            {Intl.NumberFormat(navigator.language, {
-              notation: "compact",
-            }).format(sound.usegeCount)}
-          </SoundData>
-
-          <SoundData title="Likes">
-            {Intl.NumberFormat(navigator.language, {
-              notation: "compact",
-            }).format(sound.likedBy.length)}
           </SoundData>
 
           {(sound.tags?.length ?? 0) > 0 && (

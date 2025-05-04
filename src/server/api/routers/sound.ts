@@ -1,4 +1,3 @@
-import { Sound } from "@prisma/client";
 import { z } from "zod";
 
 import {
@@ -6,7 +5,13 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { getSound, getSounds } from "~/utils/db";
+import {
+  getAllSounds,
+  getSound,
+  getSounds,
+  searchForSoundsInfinite,
+  SearchType,
+} from "~/utils/db";
 
 export const soundRouter = createTRPCRouter({
   me: protectedProcedure
@@ -39,16 +44,11 @@ export const soundRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const sounds = await ctx.db.sound.findMany({
-        take: input.limit + 1, // Fetch one extra to check if there's a next page
-        skip: input.cursor ? 1 : 0, // Skip the cursor if provided
-        cursor: input.cursor ? { id: input.cursor } : undefined,
-        orderBy: { usegeCount: "desc" },
-        include: {
-          createdBy: true,
-          likedBy: { where: { userId: ctx.session?.user.id } },
-        },
-      });
+      const sounds = await getAllSounds(
+        input.limit,
+        input.cursor,
+        ctx.session?.user.id,
+      );
 
       let nextCursor: typeof input.cursor | undefined = undefined;
       if (sounds.length > input.limit) {
@@ -57,10 +57,7 @@ export const soundRouter = createTRPCRouter({
       }
 
       return {
-        sounds: sounds.map((sound) => ({
-          ...sound,
-          liked: sound.likedBy.length > 0,
-        })),
+        sounds,
         nextCursor,
       };
     }),
@@ -70,45 +67,28 @@ export const soundRouter = createTRPCRouter({
         id: z.string(),
       }),
     )
-    .query(({ input }) => {
-      return getSound(input.id);
+    .query(({ input, ctx }) => {
+      return getSound(input.id, ctx.session?.user.id);
     }),
   search: publicProcedure
     .input(
       z.object({
         query: z.string(),
-        type: z
-          .enum(["normal", "tag"])
-          .nullish()
-          .transform((value) => value ?? "normal"),
+        type: SearchType.nullish().transform((value) => value ?? "normal"),
         limit: z.number().min(1).max(100).default(50),
         cursor: z.string().nullish(),
         direction: z.enum(["forward", "backward"]).default("forward"),
       }),
     )
-    .query(async ({ ctx, input }) => {
-      let sounds: Sound[] = [];
-
-      if (input.type === "normal") {
-        sounds = await ctx.db.sound.findMany({
-          take: input.limit + 1,
-          skip: input.cursor ? 1 : 0,
-          cursor: input.cursor ? { id: input.cursor } : undefined,
-          where: {
-            OR: [
-              { name: { search: input.query } },
-              { tags: { some: { name: { search: input.query } } } },
-            ],
-          },
-        });
-      } else if (input.type === "tag") {
-        const tags = await ctx.db.tag.findFirst({
-          where: { name: input.query },
-          include: { sounds: true },
-        });
-
-        sounds = tags?.sounds ?? [];
-      }
+    .query(async ({ input, ctx }) => {
+      const userId = ctx.session?.user.id;
+      const sounds = await searchForSoundsInfinite(
+        input.query,
+        input.type,
+        input.limit,
+        input.cursor,
+        userId,
+      );
 
       let nextCursor: typeof input.cursor | undefined = undefined;
       if (sounds.length > input.limit) {
@@ -168,5 +148,22 @@ export const soundRouter = createTRPCRouter({
 
       const report = await ctx.db.soundReport.create({ data });
       return { success: true, value: { caseId: report.id } };
+    }),
+  download: publicProcedure
+    .input(
+      z.object({
+        soundId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { downloadCount } = await ctx.db.sound.update({
+        where: { id: input.soundId },
+        data: { downloadCount: { increment: 1 } },
+      });
+
+      return {
+        success: true,
+        value: { downloadCount: downloadCount },
+      };
     }),
 });

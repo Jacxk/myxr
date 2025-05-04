@@ -89,20 +89,21 @@ enum Role {
 }
 
 model Sound {
-    id          String        @id @default(cuid())
-    name        String
-    emoji       String
-    url         String        @unique
-    usegeCount  Int           @default(0)
-    createdAt   DateTime      @default(now())
-    updatedAt   DateTime      @updatedAt
-    createdById String
-    deletedAt   DateTime?
-    guildSounds GuildSound[]
-    createdBy   User          @relation(fields: [createdById], references: [id])
-    tags        Tag[]
-    likedBy     LikedSound[]
-    reports     SoundReport[]
+    id            String        @id @default(cuid())
+    name          String
+    emoji         String
+    url           String        @unique
+    usegeCount    Int           @default(0)
+    downloadCount Int           @default(0)
+    createdAt     DateTime      @default(now())
+    updatedAt     DateTime      @updatedAt
+    createdById   String
+    deletedAt     DateTime?
+    guildSounds   GuildSound[]
+    createdBy     User          @relation(fields: [createdById], references: [id])
+    tags          Tag[]
+    likedBy       LikedSound[]
+    reports       SoundReport[]
 
     @@index([name])
 }
@@ -115,6 +116,7 @@ model Tag {
 model Guild {
     id               String            @id
     name             String
+    image            String?
     sounds           GuildSound[]
     soundMasterRoles String[]
     users            GuildMembership[]

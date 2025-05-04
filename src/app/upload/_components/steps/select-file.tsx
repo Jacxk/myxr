@@ -3,25 +3,77 @@
 import { UploadCloud } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import type { Region } from "wavesurfer.js/dist/plugins/regions.js";
 import { useSteps } from "~/context/StepsContext";
+import { useSession } from "~/lib/auth-client";
+import { ErrorToast } from "~/lib/messages/toast.global";
 import { cn } from "~/lib/utils";
 
-export interface SoundUploadProps {
-  file?: File;
-  newFile?: File | null;
-  region?: {
-    start: number;
-    end: number;
-  };
-}
+type FileProps = {
+  name: string;
+  emoji: string;
+  url: string;
+  tags?: { name: string }[];
+};
+
+type UploadUser = {
+  id: string;
+  name: string;
+  image: string;
+  role: string;
+};
+
+export type SoundUploadProps = {
+  user: UploadUser;
+  file: File;
+  fileProps: FileProps;
+  editedFile?: File;
+  region?: Region;
+};
 
 export function SelectFileStep() {
+  const { data: session } = useSession();
   const { data, setData, nextStep } = useSteps<SoundUploadProps>();
+
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [validFileType, setValidFileType] = useState<boolean>(false);
 
+  function initializeData(file: File) {
+    const fileName = file.name.split(".")[0] ?? "Unknown";
+    if (!session) return;
+    setData({
+      ...data,
+      file,
+      user: session.user as UploadUser,
+      fileProps: {
+        name: fileName,
+        emoji: "🎵",
+        url: URL.createObjectURL(file as Blob),
+      },
+    });
+  }
+
+  function validateFile(file: File | DataTransferItem | null | undefined) {
+    const valid = !!file && file.type.includes("audio/");
+
+    setValidFileType(valid);
+
+    return valid;
+  }
+
   function onFileSelect(files: File[]) {
-    toast("File selected " + files[0]?.name);
+    const file = files[0];
+
+    if (!file) return;
+
+    if (!validateFile(file)) {
+      return ErrorToast.invalidAudioFile();
+    }
+
+    const fileName = file.name.split(".")[0] ?? "Unknown";
+
+    toast("File selected " + fileName, { id: "fileSelected" });
+    initializeData(file);
     nextStep();
   }
 
@@ -33,9 +85,7 @@ export function SelectFileStep() {
 
     const file = event.dataTransfer.items[0];
 
-    setValidFileType(
-      !!file && file.kind === "file" && file.type.includes("audio/"),
-    );
+    validateFile(file);
   };
 
   const handleDragLeave = (event: React.DragEvent<HTMLLabelElement>) => {
@@ -51,13 +101,8 @@ export function SelectFileStep() {
     setIsDragging(false);
     setValidFileType(false);
 
-    if (!validFileType) {
-      return toast.error("Invalid file type. Please upload an audio file.");
-    }
-
     if (event.dataTransfer.files.length > 0) {
       const uploadedFiles = Array.from(event.dataTransfer.files);
-      setData({ file: uploadedFiles[0] });
       onFileSelect(uploadedFiles);
     }
   };
@@ -65,7 +110,9 @@ export function SelectFileStep() {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const selectedFiles = Array.from(event.target.files);
-      setData({ file: selectedFiles[0] });
+
+      if (!selectedFiles[0]) return;
+      setData({ ...data, file: selectedFiles[0] });
       onFileSelect(selectedFiles);
     }
   };

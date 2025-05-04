@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, ReactNode, useContext, useMemo, useState } from "react";
+import {
+  createContext,
+  type ReactNode,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
 
@@ -11,7 +17,7 @@ type SideTab = {
 
 const SideTabContext = createContext<SideTab>({
   activeTab: null,
-  setActiveTab: () => {},
+  setActiveTab: () => null,
 });
 
 export function SideTab({
