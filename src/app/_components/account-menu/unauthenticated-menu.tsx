@@ -17,7 +17,14 @@ export function UnAuthenticatedMenu() {
         <span>Guest</span>
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
-      <DropdownMenuItem onClick={() => signIn.social({ provider: "discord" })}>
+      <DropdownMenuItem
+        onClick={() =>
+          signIn.social({
+            provider: "discord",
+            callbackURL: window.location.href,
+          })
+        }
+      >
         Sign In
       </DropdownMenuItem>
       <DropdownMenuSeparator />

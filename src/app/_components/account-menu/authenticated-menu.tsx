@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   DropdownMenuItem,
   DropdownMenuLabel,
@@ -12,6 +13,7 @@ import { ThemeSwitch } from "./theme-switch";
 
 export function AuthenticatedMenu() {
   const { data: session } = useSession();
+  const router = useRouter();
 
   const user = session?.user;
 
@@ -31,7 +33,19 @@ export function AuthenticatedMenu() {
         <DropdownMenuItem>Settings</DropdownMenuItem>
       </Link>
       <DropdownMenuSeparator />
-      <DropdownMenuItem onClick={() => signOut()}>Sign out</DropdownMenuItem>
+      <DropdownMenuItem
+        onClick={() =>
+          signOut({
+            fetchOptions: {
+              onSuccess() {
+                router.push("/");
+              },
+            },
+          })
+        }
+      >
+        Sign out
+      </DropdownMenuItem>
     </AuthenticatedClient>
   );
 }
