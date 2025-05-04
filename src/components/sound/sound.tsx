@@ -1,8 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { memo } from "react";
-import Twemoji from "react-twemoji";
 import { cn } from "~/lib/utils";
 import type { RouterOutputs } from "~/trpc/react";
 import { useAudio } from "../../context/AudioContext";
@@ -24,6 +24,13 @@ export type SoundProperties = {
   isPreview?: boolean;
 };
 
+export function getEmojiUrl(emoji: string, svg = false) {
+  const emojiCode = emoji.codePointAt(0)?.toString(16);
+  if (svg)
+    return `https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/${emojiCode}.svg`;
+  return `https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/72x72/${emojiCode}.png`;
+}
+
 const EmojiButton = memo(function EmojiButtonMemoized({
   id,
   url,
@@ -35,6 +42,7 @@ const EmojiButton = memo(function EmojiButtonMemoized({
 }) {
   const { isPlaying, currentId, play, preload } = useAudio();
   const currentlyPlay = isPlaying && currentId === id;
+  const size = 72;
 
   return (
     <button
@@ -44,7 +52,7 @@ const EmojiButton = memo(function EmojiButtonMemoized({
       onMouseOver={() => preload(url)}
       onClick={() => play(id, url)}
     >
-      <Twemoji options={{ className: "twemoji w-20 h-20" }}>{emoji}</Twemoji>
+      <Image width={size} height={size} src={getEmojiUrl(emoji)} alt={emoji} />
     </button>
   );
 });

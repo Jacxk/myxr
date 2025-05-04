@@ -11,6 +11,12 @@ const config = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  images: {
+    remotePatterns: [
+      new URL("https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/**"),
+      new URL("https://cdn.discordapp.com/emojis/**"),
+    ],
+  },
 };
 
 export default config;
