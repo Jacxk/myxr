@@ -1,8 +1,8 @@
 import "~/styles/globals.css";
 
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
-
 import { ThemeProvider } from "next-themes";
 import NextTopLoader from "nextjs-toploader";
 import { Toaster } from "~/components/ui/sonner";
@@ -43,6 +43,7 @@ export default function RootLayout({
             </HydrateClient>
           </ThemeProvider>
         </TRPCReactProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
