@@ -1,41 +1,27 @@
+import { SiGithub } from "@icons-pack/react-simple-icons";
 import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="flex grow-0 flex-col border-t py-4 text-center text-sm text-muted-foreground">
-      <p>
-        Created by{" "}
-        <a
-          href="https://github.com/jacxk"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-500 hover:underline"
-        >
-          Jacxk
-        </a>
-        . View the project on{" "}
+    <footer className="mx-auto flex w-full max-w-7xl grow-0 flex-row justify-between border-t p-6 text-sm text-muted-foreground">
+      <div className="grow-1"></div>
+      <div className="flex items-center gap-6">
+        <Link href="/legal/privacy-policy" className="hover:underline">
+          Privacy Policy
+        </Link>
+        <Link href="/legal/terms" className="hover:underline">
+          Terms of Service
+        </Link>
+      </div>
+      <div className="flex">
         <a
           href="https://github.com/jacxk/myxr"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-500 hover:underline"
         >
-          GitHub
+          <SiGithub />
         </a>
-        .
-      </p>
-      <p>
-        <Link
-          href="/legal/privacy-policy"
-          className="text-blue-500 hover:underline"
-        >
-          Privacy Policy
-        </Link>{" "}
-        &middot;{" "}
-        <Link href="/legal/terms" className="text-blue-500 hover:underline">
-          Terms of Service
-        </Link>
-      </p>
+      </div>
     </footer>
   );
 }

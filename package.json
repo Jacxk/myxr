@@ -23,6 +23,7 @@
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.0",
     "@breezystack/lamejs": "^1.2.7",
+    "@icons-pack/react-simple-icons": "^12.7.0",
     "@prisma/client": "^6.7.0",
     "@radix-ui/react-avatar": "^1.1.7",
     "@radix-ui/react-dialog": "^1.1.11",
