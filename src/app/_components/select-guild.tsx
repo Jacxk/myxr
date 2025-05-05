@@ -41,8 +41,8 @@ type StepComponentProps = {
 };
 
 type GuildState = {
-  id?: Snowflake;
-  name?: string;
+  id: Snowflake;
+  name: string;
 };
 
 type ExtendableSuccess = {
@@ -78,6 +78,8 @@ function InviteButton({ onClick, guildId }: Readonly<InviteButtonProps>) {
   const { currentStep, setCurrentStep } = useSteps();
 
   const handleClick = useCallback(() => {
+    if (!guildId) return;
+
     openInviteLink(guildId);
     onClick?.();
 
@@ -143,7 +145,7 @@ function BotCheckIn({
   const checkBotJoined = useCallback(() => {
     if (currentStep === 1) return;
 
-    mutate(guild.id!);
+    mutate(guild.id);
   }, [currentStep, guild, mutate]);
 
   useEffect(() => {
@@ -230,14 +232,11 @@ export function SelectGuild() {
   const { data: session } = useSession();
 
   const guilds = session ? session.user.guilds : [];
-  const storedGuild = localStorage.getItem("selectedGuild");
 
   const [tries, setTries] = useState(0);
   const [success, setSuccess] = useState(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
-  const [guild, setGuild] = useState<GuildState>(
-    JSON.parse(storedGuild ?? "{}") as GuildState,
-  );
+  const [guild, setGuild] = useState<GuildState>();
 
   const onDialogOpenChange = (open: boolean) => {
     if (!open) setTries(0);
@@ -253,6 +252,25 @@ export function SelectGuild() {
 
     localStorage.setItem("selectedGuild", JSON.stringify(guild));
   };
+
+  useEffect(() => {
+    const savedGuild = localStorage.getItem("selectedGuild");
+    if (savedGuild) {
+      const parsedGuild = JSON.parse(savedGuild) as GuildState;
+      setGuild(parsedGuild);
+    }
+  }, []);
+
+  if (!guild)
+    return (
+      <Select>
+        <SelectTrigger className="sm:min-w-[180px]" asChild>
+          <div className="hidden sm:flex">
+            <SelectValue placeholder="Loading..." />
+          </div>
+        </SelectTrigger>
+      </Select>
+    );
 
   return (
     <>
@@ -281,7 +299,7 @@ export function SelectGuild() {
             />
 
             <DialogFooter>
-              <InviteButton guildId={guild.id!} />
+              <InviteButton guildId={guild.id} />
             </DialogFooter>
 
             <BotCheckIn

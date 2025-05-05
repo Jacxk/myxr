@@ -51,17 +51,6 @@ const handleInternalServerError = (message: string): void => {
   }
 };
 
-const getGuildFromLocalStorage = ():
-  | z.infer<typeof GuildSchema>
-  | undefined => {
-  const savedGuild = localStorage.getItem("selectedGuild");
-  if (!savedGuild) return undefined;
-
-  const parsedGuild = JSON.parse(savedGuild) as typeof GuildSchema;
-  const result = GuildSchema.safeParse(parsedGuild);
-  return result.success ? result.data : undefined;
-};
-
 export function AddToGuildButton({
   soundId,
   usage,
@@ -72,6 +61,7 @@ export function AddToGuildButton({
 
   const [open, setOpen] = useState<boolean>(false);
   const [usageCount, setUsageCount] = useState(usage ?? 0);
+  const [guild, setGuild] = useState<z.infer<typeof GuildSchema> | undefined>();
 
   const { mutate, isPending } = useMutation(
     api.guild.createSound.mutationOptions({
@@ -97,7 +87,6 @@ export function AddToGuildButton({
       return;
     }
 
-    const guild = getGuildFromLocalStorage();
     if (!guild) {
       ErrorToast.selectGuild();
       return;
@@ -105,7 +94,7 @@ export function AddToGuildButton({
 
     setUsageCount((usage) => usage + 1);
     mutate({ soundId, guildId: guild.id, guildName: guild.name });
-  }, [mutate, soundId, session]);
+  }, [mutate, soundId, session, guild]);
 
   const addSoundToGuild = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>): void => {
@@ -120,13 +109,17 @@ export function AddToGuildButton({
         return;
       }
 
-      const guild = getGuildFromLocalStorage();
-      if (!guild) {
-        ErrorToast.selectGuild();
-        return;
+      const savedGuild = localStorage.getItem("selectedGuild");
+      if (savedGuild) {
+        const parsedGuild = JSON.parse(savedGuild) as typeof GuildSchema;
+        const result = GuildSchema.safeParse(parsedGuild);
+        if (result.success) {
+          setGuild(result.data);
+          setOpen(true);
+          return;
+        }
       }
-
-      setOpen(true);
+      ErrorToast.selectGuild();
     },
     [isPreview, session],
   );
@@ -137,7 +130,7 @@ export function AddToGuildButton({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{`Add sound to ${getGuildFromLocalStorage()?.name}`}</DialogTitle>
+            <DialogTitle>{`Add sound to ${guild?.name}`}</DialogTitle>
           </DialogHeader>
           <p>Are you sure you want to add this sound?</p>
           <DialogFooter>
