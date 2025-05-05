@@ -10,6 +10,11 @@ import { getUserGuilds, updateGuildMemberShip } from "~/utils/db";
 
 export const auth = betterAuth({
   database: prismaAdapter(db, { provider: "postgresql" }),
+  user: {
+    deleteUser: {
+      enabled: true,
+    },
+  },
   plugins: [
     nextCookies(),
     customSession(async ({ user, session }) => {

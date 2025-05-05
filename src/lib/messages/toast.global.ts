@@ -28,4 +28,6 @@ export const ErrorToast = {
   validation: () => toast.error("Validation failed. Please correct the input."),
   serverDown: () =>
     toast.error("The server is currently unavailable. Please try later."),
+  failedToDeleteAccount: () =>
+    toast.error("Failed to delete account. Please try again."),
 };

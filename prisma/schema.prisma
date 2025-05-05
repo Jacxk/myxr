@@ -100,7 +100,7 @@ model Sound {
     createdById   String
     deletedAt     DateTime?
     guildSounds   GuildSound[]
-    createdBy     User          @relation(fields: [createdById], references: [id])
+    createdBy     User          @relation(fields: [createdById], references: [id], onDelete: Cascade)
     tags          Tag[]
     likedBy       LikedSound[]
     reports       SoundReport[]
@@ -134,7 +134,7 @@ model GuildSound {
 
 model GuildMembership {
     userId  String
-    user    User   @relation(fields: [userId], references: [id])
+    user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
     guildId String
     guild   Guild  @relation(fields: [guildId], references: [id])
 
@@ -145,7 +145,7 @@ model GuildMembership {
 model LikedSound {
     userId  String
     soundId String
-    user    User   @relation(fields: [userId], references: [id])
+    user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
     sound   Sound  @relation(fields: [soundId], references: [id])
 
     @@id([userId, soundId])
@@ -167,7 +167,7 @@ model SoundReport {
     createdAt   DateTime     @default(now())
     actionTaken ActionStatus @default(IN_PROGRESS)
     actionText  String?
-    user        User         @relation(fields: [userId], references: [id])
+    user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
     sound       Sound        @relation(fields: [soundId], references: [id])
 
     @@index([userId])

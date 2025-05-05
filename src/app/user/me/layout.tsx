@@ -1,7 +1,8 @@
-import { Castle, Flag, Heart, Volume2 } from "lucide-react";
+import { Castle, Flag, Heart, Trash, Volume2 } from "lucide-react";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { getServerSession } from "~/lib/auth";
+import { cn } from "~/lib/utils";
 import { api } from "~/trpc/server";
 import { TabLink } from "./_components/tab-link";
 
@@ -10,9 +11,11 @@ function Tab({
   exact,
   label,
   icon,
+  className,
 }: {
   path: string;
   exact?: boolean;
+  className?: string;
   label: string;
   icon: ReactNode;
 }) {
@@ -20,7 +23,7 @@ function Tab({
     <TabLink
       href={`/user/me/${path}`}
       matchExact={exact ? "/user/me" : undefined}
-      className="flex flex-row gap-2"
+      className={cn("flex flex-row gap-2", className)}
     >
       {icon}
       <span className="hidden sm:block">{label}</span>
@@ -72,6 +75,12 @@ export default async function Layout({
           path="reports"
           label="Reports"
           icon={<Flag className="shrink-0" />}
+        />
+        <Tab
+          path="delete-account"
+          label="Delete Account"
+          icon={<Trash />}
+          className="text-red-500 hover:bg-red-500/20"
         />
       </div>
       {children}
