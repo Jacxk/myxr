@@ -11,7 +11,7 @@ import {
 } from "react";
 
 interface AudioContextType {
-  audio: HTMLAudioElement;
+  audio: HTMLAudioElement | null;
   isPlaying: boolean;
   currentId: string;
   play: (id: string, src: string, fromStart?: boolean) => void;
@@ -22,13 +22,14 @@ interface AudioContextType {
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
 
 export const AudioProvider = ({ children }: { children: ReactNode }) => {
-  const audioRef = useRef<HTMLAudioElement>(new Audio());
-  const preloadAudioRef = useRef<HTMLAudioElement>(new Audio());
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const preloadAudioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentId, setCurrentId] = useState<string>("");
 
   const play = (id: string, src: string) => {
     const audio = audioRef.current;
+    if (!audio) return;
 
     audio.pause();
     audio.currentTime = 0;
@@ -44,14 +45,14 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 
   const preload = (src: string) => {
     const preloadAudio = preloadAudioRef.current;
-    if (preloadAudio.src !== src) {
+    if (preloadAudio && preloadAudio.src !== src) {
       preloadAudio.src = src;
       preloadAudio.load();
     }
   };
 
   const pause = () => {
-    audioRef.current.pause();
+    audioRef.current?.pause();
   };
 
   const value = useMemo(
@@ -67,7 +68,10 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
   );
 
   useEffect(() => {
-    const audio = audioRef.current;
+    const audio = new Audio();
+
+    audioRef.current = audio;
+    preloadAudioRef.current = new Audio();
 
     const handlePlay = () => setIsPlaying(true);
     const handleStop = () => setIsPlaying(false);
