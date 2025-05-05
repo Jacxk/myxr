@@ -243,6 +243,7 @@ export const searchForSoundsInfinite = async (
   let sounds = null;
   const formattedQuery = query
     .trim()
+    .replace(/[()|&:*!]/g, "")
     .split(/\s+/)
     .map((word) => word + ":*");
 
