@@ -29,9 +29,6 @@ export function AuthenticatedMenu() {
       </Link>
       <DropdownMenuSeparator />
       <ThemeSwitch />
-      <Link href="/settings">
-        <DropdownMenuItem>Settings</DropdownMenuItem>
-      </Link>
       <DropdownMenuSeparator />
       <DropdownMenuItem
         onClick={() =>
