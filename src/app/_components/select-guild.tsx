@@ -50,12 +50,12 @@ type ExtendableSuccess = {
 };
 
 type GuildSelectProps = {
-  guilds: Guild[];
-  selectedGuild: GuildState;
+  guilds?: Guild[];
+  selectedGuild: GuildState | null;
   dialogOpen: boolean;
   isSuccess?: boolean;
-  setSelectedGuild: (guild: GuildState) => void;
-  onDialogOpenChange: (open: boolean) => void;
+  setSelectedGuild: (guild: GuildState | null) => void;
+  setDialogOpen: (open: boolean) => void;
 } & ExtendableSuccess;
 
 type BotCheckInProps = {
@@ -159,52 +159,74 @@ function BotCheckIn({
   return null;
 }
 
+function SelectPlaceholder({ text }: { text: string }) {
+  return (
+    <Select>
+      <SelectTrigger className="sm:min-w-[180px]" asChild>
+        <div className="hidden sm:flex">
+          <SelectValue placeholder={text} />
+        </div>
+      </SelectTrigger>
+    </Select>
+  );
+}
+
 function GuildSelect({
   guilds,
   selectedGuild,
   dialogOpen,
   isSuccess,
   setSelectedGuild,
-  onDialogOpenChange,
+  setDialogOpen,
   onSuccess,
 }: GuildSelectProps) {
   const api = useTRPC();
-  const { mutate } = useMutation(
+  const { mutate, isPending } = useMutation(
     api.guild.isBotIn.mutationOptions({
       onSuccess({ success, value }) {
         setBotAlreadyIn(success && value);
         if (success && !value) {
-          onDialogOpenChange(true);
+          setDialogOpen(true);
         } else if (!success) {
           ErrorToast.internal();
           setSelectedGuild(prevGuild);
-        } else onSuccess?.(selectedGuild, false);
+        } else if (selectedGuild) onSuccess?.(selectedGuild, false);
       },
     }),
   );
 
-  const [prevGuild, setPrevGuild] = useState<GuildState>(selectedGuild);
+  const [prevGuild, setPrevGuild] = useState<GuildState | null>(selectedGuild);
   const [botAlreadyIn, setBotAlreadyIn] = useState(false);
 
-  const value = selectedGuild.id && `${selectedGuild.id}-${selectedGuild.name}`;
+  const value = selectedGuild?.id
+    ? `${selectedGuild.id}-${selectedGuild.name}`
+    : "none";
 
   const onGuildSelect = async (guildString: string) => {
     const [id, name] = guildString.split("-");
-    const prevGuild = selectedGuild;
-
     if (!id || !name) return;
 
     setSelectedGuild({ id, name });
-    setPrevGuild(prevGuild);
+    setPrevGuild(selectedGuild);
 
     mutate(id);
   };
 
   useEffect(() => {
-    if (!botAlreadyIn && !dialogOpen && !isSuccess) {
+    if (!botAlreadyIn && !dialogOpen && !isSuccess && !isPending) {
       setSelectedGuild(prevGuild);
     }
-  }, [botAlreadyIn, dialogOpen, prevGuild, isSuccess, setSelectedGuild]);
+  }, [
+    botAlreadyIn,
+    dialogOpen,
+    prevGuild,
+    isSuccess,
+    isPending,
+    setSelectedGuild,
+  ]);
+
+  if (!guilds) return <SelectPlaceholder text="Loading guilds..." />;
+  if (guilds.length === 0) return <SelectPlaceholder text="No guilds found" />;
 
   return (
     <Select onValueChange={onGuildSelect} value={value}>
@@ -214,15 +236,15 @@ function GuildSelect({
         </div>
       </SelectTrigger>
       <SelectContent>
-        {guilds?.map((guild) => (
+        <SelectItem value="none" disabled>
+          Select a Guild
+        </SelectItem>
+
+        {guilds.map((guild) => (
           <SelectItem key={guild.id} value={`${guild.id}-${guild.name}`}>
             {guild.name}
           </SelectItem>
-        )) ?? (
-          <SelectItem value="none" disabled>
-            No guilds found
-          </SelectItem>
-        )}
+        ))}
       </SelectContent>
     </Select>
   );
@@ -231,12 +253,12 @@ function GuildSelect({
 export function SelectGuild() {
   const { data: session } = useSession();
 
-  const guilds = session ? session.user.guilds : [];
+  const guilds = session?.user.guilds;
 
   const [tries, setTries] = useState(0);
   const [success, setSuccess] = useState(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
-  const [guild, setGuild] = useState<GuildState>();
+  const [guild, setGuild] = useState<GuildState | null>(null);
 
   const onDialogOpenChange = (open: boolean) => {
     if (!open) setTries(0);
@@ -261,17 +283,6 @@ export function SelectGuild() {
     }
   }, []);
 
-  if (!guild)
-    return (
-      <Select>
-        <SelectTrigger className="sm:min-w-[180px]" asChild>
-          <div className="hidden sm:flex">
-            <SelectValue placeholder="Loading..." />
-          </div>
-        </SelectTrigger>
-      </Select>
-    );
-
   return (
     <>
       <Dialog open={dialogOpen} onOpenChange={onDialogOpenChange}>
@@ -280,7 +291,7 @@ export function SelectGuild() {
             <StepComponent
               step={1}
               title="We found a problem"
-              description={`Looks like the bot is not in ${guild.name}. You need to invite it to the guild to continue.`}
+              description={`Looks like the bot is not in ${guild?.name}. You need to invite it to the guild to continue.`}
             />
             <StepComponent
               step={2}
@@ -299,26 +310,28 @@ export function SelectGuild() {
             />
 
             <DialogFooter>
-              <InviteButton guildId={guild.id} />
+              {guild && <InviteButton guildId={guild.id} />}
             </DialogFooter>
 
-            <BotCheckIn
-              guild={guild}
-              check={dialogOpen}
-              tries={tries}
-              setTries={setTries}
-              onSuccess={onSuccess}
-            />
+            {guild && (
+              <BotCheckIn
+                guild={guild}
+                check={dialogOpen}
+                tries={tries}
+                setTries={setTries}
+                onSuccess={onSuccess}
+              />
+            )}
           </StepsProvider>
         </DialogContent>
       </Dialog>
       <GuildSelect
-        guilds={guilds ?? []}
+        guilds={guilds}
         selectedGuild={guild}
         dialogOpen={dialogOpen}
-        onDialogOpenChange={setDialogOpen}
-        setSelectedGuild={setGuild}
         isSuccess={success}
+        setDialogOpen={setDialogOpen}
+        setSelectedGuild={setGuild}
         onSuccess={onSuccess}
       />
     </>
