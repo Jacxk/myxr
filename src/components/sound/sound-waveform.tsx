@@ -38,8 +38,6 @@ export function SoundWaveForm({
   const [isReady, setIsReady] = useState<boolean>(false);
 
   const initializeWaveSurfer = useCallback(() => {
-    regionsPlugin.current = RegionsPlugin.create();
-    zoomPlugin.current = ZoomPlugin.create();
     waveSurfer.current = WaveSurfer.create({
       container: "#waveForm",
       barGap: 4,
@@ -49,11 +47,16 @@ export function SoundWaveForm({
       dragToSeek: true,
       normalize: true,
       autoCenter: false,
-      plugins: [regionsPlugin.current, zoomPlugin.current],
       url,
     });
 
     if (editable) {
+      regionsPlugin.current = RegionsPlugin.create();
+      zoomPlugin.current = ZoomPlugin.create();
+
+      waveSurfer.current.registerPlugin(zoomPlugin.current);
+      waveSurfer.current.registerPlugin(regionsPlugin.current);
+
       waveSurfer.current.on("decode", (time) => {
         onDecode?.(time);
 
