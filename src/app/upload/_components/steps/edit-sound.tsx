@@ -107,7 +107,8 @@ export function EditSoundStep() {
           <CardContent className="flex flex-col gap-6 text-muted-foreground">
             <p>
               Drag the ends of the region to adjust the size. You can also
-              adjust the position of the region by draging it.
+              adjust the position of the region by draging it. Additionally, you
+              can zoom in and out by scrolling on the waveform.
             </p>
             <div className="flex flex-col">
               <span>Name: {data.file?.name}</span>

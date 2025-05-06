@@ -1,20 +1,20 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { memo } from "react";
-import Twemoji from "react-twemoji";
 import { cn } from "~/lib/utils";
-import type { getSound, searchForSoundsInfinite } from "~/utils/db";
+import type { RouterOutputs } from "~/trpc/react";
 import { useAudio } from "../../context/AudioContext";
 import { Button } from "../ui/button";
 import { AddToGuildButton } from "./add-button";
 import { DeleteSoundButton } from "./delete-button";
 import { LikeButton } from "./like-button";
 
-type Sound = Awaited<ReturnType<typeof getSound>>;
-type SearchSound = Awaited<ReturnType<typeof searchForSoundsInfinite>>[number];
+type Sound = RouterOutputs["sound"]["getSound"];
+type SearchSound = RouterOutputs["sound"]["search"]["sounds"][number];
 
-export type SoundProperties<> = {
+export type SoundProperties = {
   sound: NonNullable<Sound | SearchSound>;
   className?: string;
   displayAddButton?: boolean;
@@ -23,6 +23,17 @@ export type SoundProperties<> = {
   guildId?: string;
   isPreview?: boolean;
 };
+
+export function getEmojiUrl(emoji: string, svg = false) {
+  const codePoints = Array.from(emoji)
+    .map((char) => char.codePointAt(0)?.toString(16))
+    .filter(Boolean)
+    .join("-");
+
+  if (svg)
+    return `https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/${codePoints}.svg`;
+  return `https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/72x72/${codePoints}.png`;
+}
 
 const EmojiButton = memo(function EmojiButtonMemoized({
   id,
@@ -33,17 +44,19 @@ const EmojiButton = memo(function EmojiButtonMemoized({
   url: string;
   emoji: string;
 }) {
-  const { isPlaying, currentId, play } = useAudio();
+  const { isPlaying, currentId, play, preload } = useAudio();
   const currentlyPlay = isPlaying && currentId === id;
+  const size = 72;
 
   return (
     <button
       className={cn("flex transform cursor-pointer transition-transform", {
         "scale-90": currentlyPlay,
       })}
+      onMouseOver={() => preload(url)}
       onClick={() => play(id, url)}
     >
-      <Twemoji options={{ className: "twemoji w-20 h-20" }}>{emoji}</Twemoji>
+      <Image width={size} height={size} src={getEmojiUrl(emoji)} alt={emoji} />
     </button>
   );
 });

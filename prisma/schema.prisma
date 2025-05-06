@@ -89,20 +89,21 @@ enum Role {
 }
 
 model Sound {
-    id          String        @id @default(cuid())
-    name        String
-    emoji       String
-    url         String        @unique
-    usegeCount  Int           @default(0)
-    createdAt   DateTime      @default(now())
-    updatedAt   DateTime      @updatedAt
-    createdById String
-    deletedAt   DateTime?
-    guildSounds GuildSound[]
-    createdBy   User          @relation(fields: [createdById], references: [id])
-    tags        Tag[]
-    likedBy     LikedSound[]
-    reports     SoundReport[]
+    id            String        @id @default(cuid())
+    name          String
+    emoji         String
+    url           String        @unique
+    usegeCount    Int           @default(0)
+    downloadCount Int           @default(0)
+    createdAt     DateTime      @default(now())
+    updatedAt     DateTime      @updatedAt
+    createdById   String
+    deletedAt     DateTime?
+    guildSounds   GuildSound[]
+    createdBy     User          @relation(fields: [createdById], references: [id], onDelete: Cascade)
+    tags          Tag[]
+    likedBy       LikedSound[]
+    reports       SoundReport[]
 
     @@index([name])
 }
@@ -133,7 +134,7 @@ model GuildSound {
 
 model GuildMembership {
     userId  String
-    user    User   @relation(fields: [userId], references: [id])
+    user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
     guildId String
     guild   Guild  @relation(fields: [guildId], references: [id])
 
@@ -144,7 +145,7 @@ model GuildMembership {
 model LikedSound {
     userId  String
     soundId String
-    user    User   @relation(fields: [userId], references: [id])
+    user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
     sound   Sound  @relation(fields: [soundId], references: [id])
 
     @@id([userId, soundId])
@@ -166,7 +167,7 @@ model SoundReport {
     createdAt   DateTime     @default(now())
     actionTaken ActionStatus @default(IN_PROGRESS)
     actionText  String?
-    user        User         @relation(fields: [userId], references: [id])
+    user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
     sound       Sound        @relation(fields: [soundId], references: [id])
 
     @@index([userId])

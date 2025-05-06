@@ -6,6 +6,7 @@ import WaveSurfer from "wavesurfer.js";
 import RegionsPlugin, {
   type Region,
 } from "wavesurfer.js/dist/plugins/regions.js";
+import ZoomPlugin from "wavesurfer.js/dist/plugins/zoom.esm.js";
 import { cn } from "~/lib/utils";
 import { Button } from "../ui/button";
 
@@ -31,12 +32,12 @@ export function SoundWaveForm({
   const waveSurfer = useRef<WaveSurfer>(undefined);
   const regionsPlugin =
     useRef<ReturnType<typeof RegionsPlugin.create>>(undefined);
+  const zoomPlugin = useRef<ReturnType<typeof ZoomPlugin.create>>(undefined);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [isReady, setIsReady] = useState<boolean>(false);
 
   const initializeWaveSurfer = useCallback(() => {
-    regionsPlugin.current = RegionsPlugin.create();
     waveSurfer.current = WaveSurfer.create({
       container: "#waveForm",
       barGap: 4,
@@ -45,11 +46,17 @@ export function SoundWaveForm({
       minPxPerSec: 1,
       dragToSeek: true,
       normalize: true,
-      plugins: [regionsPlugin.current],
+      autoCenter: false,
       url,
     });
 
     if (editable) {
+      regionsPlugin.current = RegionsPlugin.create();
+      zoomPlugin.current = ZoomPlugin.create();
+
+      waveSurfer.current.registerPlugin(zoomPlugin.current);
+      waveSurfer.current.registerPlugin(regionsPlugin.current);
+
       waveSurfer.current.on("decode", (time) => {
         onDecode?.(time);
 
@@ -96,6 +103,10 @@ export function SoundWaveForm({
     waveSurfer.current.on("ready", () => {
       setIsReady(true);
     });
+
+    waveSurfer.current.on("finish", () => {
+      waveSurfer.current?.seekTo(0);
+    });
   }, [
     editable,
     url,
@@ -109,6 +120,7 @@ export function SoundWaveForm({
   const destroyWaveSurfer = () => {
     waveSurfer.current?.destroy();
     regionsPlugin.current?.destroy();
+    zoomPlugin.current?.destroy();
   };
 
   useEffect(() => {

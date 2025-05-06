@@ -1,12 +1,13 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
 import { Heart, HeartOff } from "lucide-react";
 import { usePostHog } from "posthog-js/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useSession } from "~/lib/auth-client";
 import { ErrorToast } from "~/lib/messages/toast.global";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 import { Button } from "../ui/button";
 import {
   Tooltip,
@@ -17,36 +18,40 @@ import {
 
 export function LikeButton({
   soundId,
+  likes,
   liked,
   isPreview,
 }: Readonly<{
   soundId: string;
+  likes?: number;
   liked?: boolean;
   isPreview?: boolean;
 }>) {
+  const api = useTRPC();
   const { data: session } = useSession();
   const posthog = usePostHog();
 
   const [isLiked, setIsLiked] = useState<boolean>(liked ?? false);
-  const { mutate, isPending } = api.sound.likeSound.useMutation({
-    onSuccess(data, variables) {
-      posthog.capture("User like sound", {
-        soundId: variables.soundId,
-        liked: variables.liked,
-      });
+  const [likeCount, setLikeCount] = useState(likes ?? 0);
 
-      if (!data.success) return;
+  const { mutate, isPending } = useMutation(
+    api.sound.likeSound.mutationOptions({
+      onSuccess(data, variables) {
+        posthog.capture("User like sound", {
+          soundId: variables.soundId,
+          liked: variables.liked,
+        });
 
-      toast(data.value ? "Sound liked" : "Liked removed");
-      setIsLiked(data.value);
-    },
-    onError(error) {
-      if (error.data?.code === "UNAUTHORIZED") {
-        ErrorToast.login();
-      }
-      setIsLiked(false);
-    },
-  });
+        if (!data.success) return;
+
+        toast(data.value ? "Sound liked" : "Liked removed");
+        setIsLiked(data.value);
+      },
+      onError() {
+        setIsLiked(false);
+      },
+    }),
+  );
 
   const likeClick = () => {
     if (!session) {
@@ -55,6 +60,7 @@ export function LikeButton({
     }
 
     setIsLiked((liked) => !liked);
+    setLikeCount((likes) => likes + (!isLiked ? 1 : -1));
 
     if (isPreview) {
       toast(`Preview Mode: Sound like ${isLiked ? "removed" : "added"}`);
@@ -68,8 +74,13 @@ export function LikeButton({
     <TooltipProvider delayDuration={0}>
       <Tooltip disableHoverableContent>
         <TooltipTrigger asChild>
-          <Button variant="outline" size="icon" onClick={likeClick}>
+          <Button variant="outline" onClick={likeClick}>
             {isLiked ? <HeartOff /> : <Heart />}
+
+            {likes &&
+              Intl.NumberFormat(navigator.language, {
+                notation: "compact",
+              }).format(likeCount)}
           </Button>
         </TooltipTrigger>
         <TooltipContent>{isLiked ? "UnLike" : "Like"}</TooltipContent>

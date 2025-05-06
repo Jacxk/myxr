@@ -1,33 +1,45 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
 import { Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { Button } from "~/components/ui/button";
+import { useSession } from "~/lib/auth-client";
 import { ErrorToast } from "~/lib/messages/toast.global";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 
 export function FollowButton({
   id,
   isFollowing,
 }: Readonly<{ id: string; isFollowing: boolean }>) {
-  const [following, setFollowing] = useState(isFollowing);
-  const { mutateAsync, isPending } = api.user.followUser.useMutation();
+  const api = useTRPC();
   const router = useRouter();
+  const { data: session } = useSession();
+
+  const [following, setFollowing] = useState(isFollowing);
+
+  const { mutate, isPending } = useMutation(
+    api.user.followUser.mutationOptions({
+      onSuccess({ value }) {
+        setFollowing(value.following);
+        router.refresh();
+      },
+      onError() {
+        setFollowing(false);
+      },
+    }),
+  );
 
   const onFollowButtonClick = useCallback(() => {
     if (isPending) return;
+    if (!session) {
+      ErrorToast.login();
+      return;
+    }
     setFollowing((following) => !following);
-    mutateAsync({ id })
-      .then((data) => {
-        setFollowing(data.value.following);
-        router.refresh();
-      })
-      .catch((error) => {
-        console.error(error);
-        ErrorToast.internal();
-      });
-  }, [isPending, id, router, mutateAsync]);
+    mutate({ id });
+  }, [id, isPending, session, mutate]);
 
   return (
     <Button

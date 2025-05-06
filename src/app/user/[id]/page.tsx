@@ -43,7 +43,7 @@ export default async function UserPage({
               {user.name?.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <div className="flex w-full justify-between">
+          <div className="flex w-full flex-col justify-between gap-4 sm:flex-row">
             <div className="flex w-full flex-col gap-2">
               <h1 className="text-4xl font-bold">{user.name}</h1>
               <div className="flex gap-6">
@@ -61,7 +61,7 @@ export default async function UserPage({
                 </div>
               </div>
             </div>
-            <div className="flex flex-col items-end gap-2">
+            <div className="flex flex-col gap-2 sm:items-end">
               {session?.user.id !== id && (
                 <FollowButton id={id} isFollowing={isFollowing} />
               )}

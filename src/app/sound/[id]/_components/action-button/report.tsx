@@ -1,6 +1,7 @@
 "use client";
 
 import { DialogTitle } from "@radix-ui/react-dialog";
+import { useMutation } from "@tanstack/react-query";
 import { Flag, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { usePostHog } from "posthog-js/react";
@@ -23,7 +24,25 @@ import {
 import { useSession } from "~/lib/auth-client";
 import { ErrorToast } from "~/lib/messages/toast.global";
 import { isTRPCError } from "~/lib/utils";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
+
+function handleNotSuccess(error?: string) {
+  if (error === "REPORT_EXISTS") {
+    ErrorToast.soundAlreadyReported();
+  } else toast.error("Failed to report sound");
+}
+
+function handleError(error: unknown) {
+  if (!isTRPCError(error)) {
+    ErrorToast.internal();
+    console.error("Unexpected error:", error);
+    return;
+  }
+
+  if (error.shape?.data.code === "BAD_REQUEST") {
+    ErrorToast.invalidReport();
+  }
+}
 
 function ReportModal({
   reason,
@@ -64,13 +83,51 @@ export function ReportButton({
   id: string;
   isPreview?: boolean;
 }) {
+  const api = useTRPC();
   const { data: session } = useSession();
   const posthog = usePostHog();
 
   const [open, setOpen] = useState<boolean>(false);
   const [reason, setReason] = useState("");
 
-  const { mutateAsync, isPending } = api.sound.reportSound.useMutation();
+  const { mutate, isPending } = useMutation(
+    api.sound.reportSound.mutationOptions({
+      onSuccess({ success, value, error }) {
+        posthog.capture("Sound reported", {
+          soundId: id,
+          success,
+          error,
+          ...value,
+        });
+
+        if (!success) {
+          handleNotSuccess(error);
+          return;
+        }
+
+        if (!value?.caseId) {
+          ErrorToast.internal();
+          return;
+        }
+
+        toast("Thank you for your feedback.", {
+          action: (
+            <Button variant="outline">
+              <Link
+                href={`/user/me/reports?id=${encodeURIComponent(value.caseId)}`}
+              >
+                View
+              </Link>
+            </Button>
+          ),
+        });
+        setOpen(false);
+      },
+      onError(error) {
+        handleError(error);
+      },
+    }),
+  );
 
   const onOpenChange = (open: boolean) => {
     if (open && !session) {
@@ -93,56 +150,7 @@ export function ReportButton({
       return;
     }
 
-    // TODO: Move this to useMutation
-    mutateAsync({ id, reason })
-      .then(({ success, value, error }) => {
-        posthog.capture("Sound reported", {
-          soundId: id,
-          success,
-          error,
-          ...value,
-        });
-
-        if (!success) {
-          if (error === "REPORT_EXISTS") {
-            ErrorToast.soundAlreadyReported();
-          } else toast.error("Failed to report sound");
-          return;
-        }
-
-        if (!value?.caseId) {
-          ErrorToast.internal();
-          return;
-        }
-
-        toast("Thank you for your feedback.", {
-          action: (
-            <Button variant="outline">
-              <Link
-                href={`/user/me/reports?id=${encodeURIComponent(value.caseId)}`}
-              >
-                View
-              </Link>
-            </Button>
-          ),
-        });
-        setOpen(false);
-      })
-      .catch((error: Error) => {
-        if (!isTRPCError(error)) {
-          ErrorToast.internal();
-          console.error("Unexpected error:", error);
-          return;
-        }
-
-        if (error.shape?.data.code === "BAD_REQUEST") {
-          ErrorToast.invalidReport();
-        } else if (error.data?.code === "UNAUTHORIZED") {
-          ErrorToast.login();
-        } else {
-          toast.error(error.message);
-        }
-      });
+    mutate({ id, reason });
   };
 
   return (

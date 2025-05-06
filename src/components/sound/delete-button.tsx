@@ -1,10 +1,13 @@
+"use client";
+
 import { Dialog, DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
+import { useMutation } from "@tanstack/react-query";
 import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { usePostHog } from "posthog-js/react";
 import { type MouseEvent, useState } from "react";
 import { toast } from "sonner";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 import { Button } from "../ui/button";
 import { DialogContent, DialogFooter, DialogHeader } from "../ui/dialog";
 import {
@@ -24,30 +27,28 @@ export function DeleteSoundButton({
   onDeleted?: () => void;
 }>) {
   const posthog = usePostHog();
+  const api = useTRPC();
   const router = useRouter();
 
   const [open, setOpen] = useState(false);
 
-  const { mutate, isPending } = api.guild.deleteSound.useMutation({
-    onSuccess: (data, variables) => {
-      posthog.capture("Sound removed from guild", {
-        soundId: variables.soundId,
-        guildId: variables.guildId,
-      });
+  const { mutate, isPending } = useMutation(
+    api.guild.deleteSound.mutationOptions({
+      onSuccess: (_, variables) => {
+        posthog.capture("Sound removed from guild", {
+          soundId: variables.soundId,
+          guildId: variables.guildId,
+        });
 
-      toast("Sound deleted successfully!");
-      onDeleted?.();
-      router.refresh();
-    },
-    onError: (error) => {
-      toast.error("Failed to delete sound.", {
-        description: error.message,
-      });
-    },
-    onSettled: () => {
-      setOpen(false);
-    },
-  });
+        toast("Sound deleted successfully!");
+        onDeleted?.();
+        router.refresh();
+      },
+      onSettled: () => {
+        setOpen(false);
+      },
+    }),
+  );
 
   const onConfirmDeleteClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();

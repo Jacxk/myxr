@@ -1,7 +1,9 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
 import { Download } from "lucide-react";
 import { usePostHog } from "posthog-js/react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import {
@@ -9,6 +11,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
+import { useTRPC } from "~/trpc/react";
 
 async function downloadFile(url: string, filename: string) {
   toast("Downloading sound!");
@@ -29,29 +32,50 @@ async function downloadFile(url: string, filename: string) {
 
 export function DownloadButton({
   soundUrl,
-  soundName,
   soundId,
+  soundName,
+  downloads,
 }: Readonly<{
   soundUrl: string;
-  soundName: string;
   soundId: string;
+  soundName: string;
+  downloads: number;
 }>) {
   const posthog = usePostHog();
+
+  const api = useTRPC();
+  const [currentDownloads, setCurrentDownloads] = useState(downloads);
+  const { mutate } = useMutation(
+    api.sound.download.mutationOptions({
+      onSuccess({ success, value }) {
+        if (success) setCurrentDownloads(value.downloadCount);
+      },
+    }),
+  );
+
+  const onDownloadClick = async () => {
+    mutate({ soundId });
+    setCurrentDownloads((currentDownloads) => currentDownloads + 1);
+
+    posthog.capture("Sound downloaded", {
+      soundId,
+    });
+
+    await downloadFile(soundUrl, soundName).catch(() => {
+      setCurrentDownloads((currentDownloads) => currentDownloads - 1);
+    });
+  };
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button
-          size="icon"
-          variant="outline"
-          onClick={async () => {
-            await downloadFile(soundUrl, soundName);
-            posthog.capture("Sound downloaded", {
-              soundId,
-            });
-          }}
-        >
+        <Button variant="outline" onClick={() => onDownloadClick()}>
           <Download />
+
+          {downloads &&
+            Intl.NumberFormat(navigator.language, {
+              notation: "compact",
+            }).format(currentDownloads)}
         </Button>
       </TooltipTrigger>
       <TooltipContent>Download</TooltipContent>

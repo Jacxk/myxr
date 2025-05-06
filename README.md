@@ -1,29 +1,27 @@
-# Create T3 App
+# Myxr Project
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+Welcome to **Myxr**, a project designed to enhance your audio and soundboard management experience. This project leverages modern web technologies to provide seamless audio trimming, waveform visualization, and integration with Discord guild soundboards.
 
-## What's next? How do I make an app with this?
+## Features
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+- **Audio Trimming and Conversion**: Trim audio files and convert them to MP3.
+- **Waveform Visualization**: Interactive and animated sound waveforms for an enhanced user experience.
+- **Discord Soundboard Management**: Easily manage and interact with soundboards from your Discord guilds.
+- **Dowload Sounds**: With a click of a button, sounds can be downloaded to device.
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## Technologies Used
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+This project is built using the following technologies:
 
-## Learn More
+- [Next.js](https://nextjs.org) — A React framework for building fast and scalable web applications.
+- [Better-Auth](https://better-auth.com) — Authentication for Next.js applications.
+- [Prisma](https://prisma.io) — A modern database toolkit for TypeScript and Node.js.
+- [Tailwind CSS](https://tailwindcss.com) — A utility-first CSS framework for styling.
+- [tRPC](https://trpc.io) — End-to-end typesafe APIs for TypeScript.
+- [WaveSurfer.js](https://wavesurfer-js.org) — Audio waveform visualization library.
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+## License
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+This project is licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
-
-## How do I deploy this?
-
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+---

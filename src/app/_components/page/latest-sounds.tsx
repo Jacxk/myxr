@@ -1,6 +1,4 @@
-import Link from "next/link";
 import Sound from "~/components/sound/sound";
-import { Button } from "~/components/ui/button";
 import { AudioProvider } from "~/context/AudioContext";
 import { api } from "~/trpc/server";
 
@@ -15,11 +13,6 @@ export async function LatestSounds() {
           <Sound key={sound.id} sound={sound} />
         ))}
       </AudioProvider>
-      <div className="col-span-full flex justify-center">
-        <Button variant="link" asChild>
-          <Link href="/latest">View more...</Link>
-        </Button>
-      </div>
     </div>
   );
 }

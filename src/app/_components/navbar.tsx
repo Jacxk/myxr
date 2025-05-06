@@ -8,16 +8,15 @@ import {
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 import { AccountMenu } from "./account-menu";
-import { Authenticated, NotAuthenticated } from "./authentication";
+import { Authenticated } from "./authentication";
 import { SearchBar } from "./search-bar";
 import { SelectGuild } from "./select-guild";
-import { SignInButton } from "./signin";
 
 export default async function Navbar() {
   return (
     <nav className="relative mx-auto flex w-full max-w-7xl grow-0 items-center justify-between gap-2 border-b p-6">
       <Link href="/" className="text-4xl font-bold">
-        Myxr
+        myxr
       </Link>
       <SearchBar />
       <Authenticated>
@@ -36,12 +35,8 @@ export default async function Navbar() {
             </Tooltip>
           </TooltipProvider>
         </Link>
-        <AccountMenu />
       </Authenticated>
-
-      <NotAuthenticated>
-        <SignInButton />
-      </NotAuthenticated>
+      <AccountMenu />
     </nav>
   );
 }

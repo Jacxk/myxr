@@ -1,15 +1,16 @@
 "use client";
 
 import type { Snowflake } from "discord-api-types/globals";
+import Image from "next/image";
 import Link from "next/link";
-import Twemoji from "react-twemoji";
 import { AudioProvider, useAudio } from "~/context/AudioContext";
 import { cn } from "~/lib/utils";
-import type { getSoundsFromUser } from "~/utils/db";
+import type { RouterOutputs } from "~/trpc/react";
 import { Button } from "../ui/button";
 import { DeleteSoundButton } from "./delete-button";
+import { getEmojiUrl } from "./sound";
 
-type Sound = NonNullable<Awaited<ReturnType<typeof getSoundsFromUser>>>[number];
+type Sound = NonNullable<RouterOutputs["user"]["getSounds"]>[number];
 
 export type SoundListData = {
   sound: Sound;
@@ -31,6 +32,10 @@ function SoundRow({
   className,
 }: SoundListData & { className: string }) {
   const { play } = useAudio();
+  const size = 34;
+  const emoji = sound.emoji.startsWith("http")
+    ? sound.emoji
+    : getEmojiUrl(sound.emoji);
 
   return (
     <Button
@@ -41,13 +46,7 @@ function SoundRow({
     >
       <div className="grid h-fit w-full cursor-pointer grid-cols-4 items-center">
         <div>
-          {sound.emoji.startsWith("http") ? (
-            <img src={sound.emoji} alt="emoji" className="twemoji-list" />
-          ) : (
-            <Twemoji options={{ className: "twemoji-list" }}>
-              {sound.emoji}
-            </Twemoji>
-          )}
+          <Image src={emoji} alt={sound.emoji} width={size} height={size} />
         </div>
         <div className="col-span-2">
           {external ? (

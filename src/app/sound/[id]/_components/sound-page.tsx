@@ -7,7 +7,7 @@ import { SoundWaveForm } from "~/components/sound/sound-waveform";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { TooltipProvider } from "~/components/ui/tooltip";
-import type { getSound } from "~/utils/db";
+import type { RouterOutputs } from "~/trpc/react";
 import { DownloadButton } from "./action-button/download";
 import { ReportButton } from "./action-button/report";
 import { CreatedDate } from "./created-date";
@@ -17,7 +17,7 @@ import { SoundData } from "./sound-data";
 
 type SoundPageProps = {
   id: string;
-  sound: NonNullable<Awaited<ReturnType<typeof getSound>>>;
+  sound: NonNullable<RouterOutputs["sound"]["getSound"]>;
   isPreview?: boolean;
 };
 
@@ -25,18 +25,24 @@ function ActionButtons({ id, sound, isPreview }: SoundPageProps) {
   return (
     <div className="flex gap-2">
       <TooltipProvider delayDuration={0}>
-        <AddToGuildButton soundId={id} isPreview={isPreview} />
+        <AddToGuildButton
+          soundId={id}
+          isPreview={isPreview}
+          usage={sound.usegeCount}
+        />
 
         <LikeButton
           soundId={id}
           liked={sound.likedByUser}
           isPreview={isPreview}
+          likes={sound.likes}
         />
 
         <DownloadButton
           soundUrl={sound.url}
-          soundName={sound.name}
           soundId={sound.id}
+          soundName={sound.name}
+          downloads={sound.downloadCount}
         />
 
         <ReportButton id={id} isPreview={isPreview} />
@@ -47,8 +53,8 @@ function ActionButtons({ id, sound, isPreview }: SoundPageProps) {
 
 export function SoundPage({ id, sound, isPreview }: Readonly<SoundPageProps>) {
   return (
-    <div className="flex w-full flex-col gap-4">
-      <div className="flex w-full flex-row gap-4">
+    <div className="flex w-full flex-col gap-6">
+      <div className="flex w-full flex-row gap-10">
         <div className="flex shrink-0">
           <SoundEmoji emoji={sound.emoji} />
         </div>
@@ -99,18 +105,6 @@ export function SoundPage({ id, sound, isPreview }: Readonly<SoundPageProps>) {
         <div className="flex flex-col gap-4 sm:w-1/5">
           <SoundData title="Created">
             <CreatedDate date={sound.createdAt} />
-          </SoundData>
-
-          <SoundData title="Usage">
-            {Intl.NumberFormat(navigator.language, {
-              notation: "compact",
-            }).format(sound.usegeCount)}
-          </SoundData>
-
-          <SoundData title="Likes">
-            {Intl.NumberFormat(navigator.language, {
-              notation: "compact",
-            }).format(sound.likes)}
           </SoundData>
 
           {(sound.tags?.length ?? 0) > 0 && (

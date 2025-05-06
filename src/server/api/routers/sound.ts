@@ -149,4 +149,21 @@ export const soundRouter = createTRPCRouter({
       const report = await ctx.db.soundReport.create({ data });
       return { success: true, value: { caseId: report.id } };
     }),
+  download: publicProcedure
+    .input(
+      z.object({
+        soundId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { downloadCount } = await ctx.db.sound.update({
+        where: { id: input.soundId },
+        data: { downloadCount: { increment: 1 } },
+      });
+
+      return {
+        success: true,
+        value: { downloadCount: downloadCount },
+      };
+    }),
 });
