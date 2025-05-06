@@ -3,6 +3,7 @@
 import type { Guild } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 import type { Snowflake } from "discord-api-types/globals";
+import { usePostHog } from "posthog-js/react";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
@@ -118,14 +119,21 @@ function StepComponent({
 function BotCheckIn({
   check,
   tries,
-  setTries,
   guild,
+  setTries,
   onSuccess,
 }: BotCheckInProps) {
+  const posthog = usePostHog();
   const api = useTRPC();
   const { mutate } = useMutation(
     api.guild.isBotIn.mutationOptions({
       onSuccess({ success, value }) {
+        posthog.capture("Check bot in guild", {
+          guildId: guild.id,
+          tries,
+          value,
+        });
+
         if (success && value) return onSuccess?.(guild, true);
 
         if (tries >= maxTries) {

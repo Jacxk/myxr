@@ -2,6 +2,7 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { Download } from "lucide-react";
+import { usePostHog } from "posthog-js/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
@@ -40,6 +41,8 @@ export function DownloadButton({
   soundName: string;
   downloads: number;
 }>) {
+  const posthog = usePostHog();
+
   const api = useTRPC();
   const [currentDownloads, setCurrentDownloads] = useState(downloads);
   const { mutate } = useMutation(
@@ -53,6 +56,10 @@ export function DownloadButton({
   const onDownloadClick = async () => {
     mutate({ soundId });
     setCurrentDownloads((currentDownloads) => currentDownloads + 1);
+
+    posthog.capture("Sound downloaded", {
+      soundId,
+    });
 
     await downloadFile(soundUrl, soundName).catch(() => {
       setCurrentDownloads((currentDownloads) => currentDownloads - 1);

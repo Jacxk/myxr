@@ -4,6 +4,7 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import { useMutation } from "@tanstack/react-query";
 import { Flag, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { usePostHog } from "posthog-js/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
@@ -84,6 +85,7 @@ export function ReportButton({
 }) {
   const api = useTRPC();
   const { data: session } = useSession();
+  const posthog = usePostHog();
 
   const [open, setOpen] = useState<boolean>(false);
   const [reason, setReason] = useState("");
@@ -91,6 +93,13 @@ export function ReportButton({
   const { mutate, isPending } = useMutation(
     api.sound.reportSound.mutationOptions({
       onSuccess({ success, value, error }) {
+        posthog.capture("Sound reported", {
+          soundId: id,
+          success,
+          error,
+          ...value,
+        });
+
         if (!success) {
           handleNotSuccess(error);
           return;

@@ -1,6 +1,7 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
+import { usePostHog } from "posthog-js/react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { type Region } from "wavesurfer.js/dist/plugins/regions.esm.js";
@@ -19,6 +20,7 @@ import { trimAudioAndConvertToMp3 } from "~/utils/audioTrimmer";
 import { type SoundUploadProps } from "./select-file";
 
 export function EditSoundStep() {
+  const posthog = usePostHog();
   const { data, reset, setData, nextStep } = useSteps<SoundUploadProps>();
 
   const region = useRef<Region>(data.region);
@@ -73,6 +75,10 @@ export function EditSoundStep() {
             ...data.fileProps,
             url: URL.createObjectURL(newFile as Blob),
           },
+        });
+
+        posthog.capture("Sound create - edited", {
+          fileName: data.file.name,
         });
         toast("Audio edited successfully!");
         nextStep();

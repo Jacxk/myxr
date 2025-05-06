@@ -5,6 +5,7 @@ import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import NextTopLoader from "nextjs-toploader";
+import { PostHogProvider } from "~/components/PostHogProvider";
 import { Toaster } from "~/components/ui/sonner";
 import { TRPCReactProvider } from "~/trpc/react";
 import { HydrateClient } from "~/trpc/server";
@@ -23,26 +24,28 @@ export default function RootLayout({
   return (
     <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
       <body>
-        <TRPCReactProvider>
-          <ThemeProvider attribute="class">
-            <HydrateClient>
-              <div className="flex h-screen flex-col">
-                <Navbar />
-                <NextTopLoader
-                  showSpinner={false}
-                  speed={600}
-                  initialPosition={0.2}
-                  crawlSpeed={100}
-                />
-                <div className="mx-auto w-full max-w-7xl flex-1 grow p-4 sm:py-10">
-                  {children}
+        <PostHogProvider>
+          <TRPCReactProvider>
+            <ThemeProvider attribute="class">
+              <HydrateClient>
+                <div className="flex h-screen flex-col">
+                  <Navbar />
+                  <NextTopLoader
+                    showSpinner={false}
+                    speed={600}
+                    initialPosition={0.2}
+                    crawlSpeed={100}
+                  />
+                  <div className="mx-auto w-full max-w-7xl flex-1 grow p-4 sm:py-10">
+                    {children}
+                  </div>
+                  <Footer />
                 </div>
-                <Footer />
-              </div>
-              <Toaster />
-            </HydrateClient>
-          </ThemeProvider>
-        </TRPCReactProvider>
+                <Toaster />
+              </HydrateClient>
+            </ThemeProvider>
+          </TRPCReactProvider>
+        </PostHogProvider>
         <SpeedInsights />
       </body>
     </html>
