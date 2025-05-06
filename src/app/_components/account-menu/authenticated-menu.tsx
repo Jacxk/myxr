@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Button } from "~/components/ui/button";
 import {
   DropdownMenuItem,
   DropdownMenuLabel,
@@ -17,11 +18,15 @@ export function AuthenticatedMenu() {
 
   const user = session?.user;
 
+  if (!user) return null;
+
   return (
     <AuthenticatedClient>
       <DropdownMenuLabel className="flex justify-between">
         <span className="text-muted-foreground">Hello</span>
-        <span>{user?.name}</span>
+        <Button variant="link" className="h-fit p-0" asChild>
+          <Link href={`/user/${user.id}`}>{user.name}</Link>
+        </Button>
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
       <Link href={"/user/me"}>
