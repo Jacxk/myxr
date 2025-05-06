@@ -46,7 +46,6 @@ function PostHogPageView() {
   useEffect(() => {
     if (data?.user) {
       posthog.identify(data.user.id, {
-        email: data.user.email,
         name: data.user.name,
         role: data.user.role,
       });
