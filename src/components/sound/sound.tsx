@@ -25,10 +25,14 @@ export type SoundProperties = {
 };
 
 export function getEmojiUrl(emoji: string, svg = false) {
-  const emojiCode = emoji.codePointAt(0)?.toString(16);
+  const codePoints = Array.from(emoji)
+    .map((char) => char.codePointAt(0)?.toString(16))
+    .filter(Boolean)
+    .join("-");
+
   if (svg)
-    return `https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/${emojiCode}.svg`;
-  return `https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/72x72/${emojiCode}.png`;
+    return `https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/${codePoints}.svg`;
+  return `https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/72x72/${codePoints}.png`;
 }
 
 const EmojiButton = memo(function EmojiButtonMemoized({
