@@ -7,10 +7,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
-import { AccountMenu } from "./account-menu";
 import { Authenticated } from "./authentication";
-import { SearchBar } from "./search-bar";
-import { SelectGuild } from "./select-guild";
+import { AccountMenu } from "./navbar/account-menu";
+import { Notifications } from "./navbar/notifications";
+import { SearchBar } from "./navbar/search-bar";
+import { SelectGuild } from "./navbar/select-guild";
 
 export default async function Navbar() {
   return (
@@ -36,6 +37,7 @@ export default async function Navbar() {
           </TooltipProvider>
         </Link>
       </Authenticated>
+      <Notifications />
       <AccountMenu />
     </nav>
   );
