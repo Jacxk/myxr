@@ -3,7 +3,7 @@
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useMutation } from "@tanstack/react-query";
 import { Flag, Loader2 } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePostHog } from "posthog-js/react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -86,6 +86,7 @@ export function ReportButton({
   const api = useTRPC();
   const { data: session } = useSession();
   const posthog = usePostHog();
+  const router = useRouter();
 
   const [open, setOpen] = useState<boolean>(false);
   const [reason, setReason] = useState("");
@@ -111,15 +112,14 @@ export function ReportButton({
         }
 
         toast("Thank you for your feedback.", {
-          action: (
-            <Button variant="outline">
-              <Link
-                href={`/user/me/reports?id=${encodeURIComponent(value.caseId)}`}
-              >
-                View
-              </Link>
-            </Button>
-          ),
+          action: {
+            label: "View",
+            onClick: () => {
+              router.push(
+                `/user/me/reports?id=${encodeURIComponent(value.caseId)}`,
+              );
+            },
+          },
         });
         setOpen(false);
       },
