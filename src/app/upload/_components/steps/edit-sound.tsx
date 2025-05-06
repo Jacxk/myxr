@@ -95,7 +95,7 @@ export function EditSoundStep() {
 
   return (
     <div className="flex h-full flex-col items-center gap-6">
-      <div className="flex w-full justify-center">
+      <div className="flex w-full justify-between gap-4">
         <Card>
           <CardHeader>
             <CardTitle>Edit Sound</CardTitle>
@@ -105,16 +105,23 @@ export function EditSoundStep() {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-6 text-muted-foreground">
-            <p>
-              Drag the ends of the region to adjust the size. You can also
-              adjust the position of the region by draging it. Additionally, you
-              can zoom in and out by scrolling on the waveform.
-            </p>
             <div className="flex flex-col">
               <span>Name: {data.file?.name}</span>
               <span>Audio Length: {totalTime.toFixed(2)}s</span>
               <span>Selected Length: {selectedTime.toFixed(2)}s</span>
             </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>How it works:</CardTitle>
+          </CardHeader>
+          <CardContent className="text-muted-foreground">
+            <ul className="list-disc">
+              <li>Drag the ends of the region to adjust the size.</li>
+              <li>Adjust the position of the region by draging it.</li>
+              <li>You zoom in and out by scrolling on the waveform.</li>
+            </ul>
           </CardContent>
         </Card>
       </div>

@@ -32,7 +32,6 @@ export function SoundWaveForm({
   const waveSurfer = useRef<WaveSurfer>(undefined);
   const regionsPlugin =
     useRef<ReturnType<typeof RegionsPlugin.create>>(undefined);
-  const zoomPlugin = useRef<ReturnType<typeof ZoomPlugin.create>>(undefined);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [isReady, setIsReady] = useState<boolean>(false);
@@ -49,13 +48,16 @@ export function SoundWaveForm({
       autoCenter: false,
       url,
     });
-
     if (editable) {
       regionsPlugin.current = RegionsPlugin.create();
-      zoomPlugin.current = ZoomPlugin.create();
+      const zoomPlugin = ZoomPlugin.create();
 
-      waveSurfer.current.registerPlugin(zoomPlugin.current);
       waveSurfer.current.registerPlugin(regionsPlugin.current);
+      waveSurfer.current.registerPlugin(zoomPlugin);
+
+      waveSurfer.current.on("destroy", () => {
+        zoomPlugin.destroy();
+      });
 
       waveSurfer.current.on("decode", (time) => {
         onDecode?.(time);
@@ -120,7 +122,6 @@ export function SoundWaveForm({
   const destroyWaveSurfer = () => {
     waveSurfer.current?.destroy();
     regionsPlugin.current?.destroy();
-    zoomPlugin.current?.destroy();
   };
 
   useEffect(() => {
