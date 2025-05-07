@@ -116,12 +116,12 @@ export const soundRouter = createTRPCRouter({
       };
 
       const existingLike = await ctx.db.likedSound.findFirst({ where: data });
-      let liked;
+      let liked = input.liked;
 
-      if (existingLike) {
+      if (!input.liked && existingLike) {
         await ctx.db.likedSound.delete({ where: { userId_soundId: data } });
         liked = false;
-      } else {
+      } else if (input.liked && !existingLike) {
         await ctx.db.likedSound.create({ data });
         liked = true;
       }

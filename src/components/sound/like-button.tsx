@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { Heart, HeartOff } from "lucide-react";
+import { Heart } from "lucide-react";
 import { usePostHog } from "posthog-js/react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -44,11 +44,11 @@ export function LikeButton({
 
         if (!data.success) return;
 
-        toast(data.value ? "Sound liked" : "Liked removed");
         setIsLiked(data.value);
       },
       onError() {
         setIsLiked(false);
+        ErrorToast.internal();
       },
     }),
   );
@@ -59,15 +59,16 @@ export function LikeButton({
       return;
     }
 
-    setIsLiked((liked) => !liked);
-    setLikeCount((likes) => likes + (!isLiked ? 1 : -1));
+    const liked = !isLiked;
+    setIsLiked(liked);
+    setLikeCount((likes) => likes + (!liked ? 1 : -1));
 
     if (isPreview) {
       toast(`Preview Mode: Sound like ${isLiked ? "removed" : "added"}`);
       return;
     }
 
-    if (!isPending) mutate({ soundId, liked: !liked });
+    if (!isPending) mutate({ soundId, liked });
   };
 
   return (
@@ -75,7 +76,7 @@ export function LikeButton({
       <Tooltip disableHoverableContent>
         <TooltipTrigger asChild>
           <Button variant="outline" onClick={likeClick}>
-            {isLiked ? <HeartOff /> : <Heart />}
+            <Heart fill={isLiked ? "currentColor" : "none"} />
 
             {likes &&
               Intl.NumberFormat(navigator.language, {
@@ -83,7 +84,7 @@ export function LikeButton({
               }).format(likeCount)}
           </Button>
         </TooltipTrigger>
-        <TooltipContent>{isLiked ? "UnLike" : "Like"}</TooltipContent>
+        <TooltipContent>{isLiked ? "Remove like" : "Like"}</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );

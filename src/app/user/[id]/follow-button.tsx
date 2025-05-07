@@ -47,7 +47,7 @@ export function FollowButton({
       className="flex w-32 rounded-full"
       onClick={onFollowButtonClick}
     >
-      <Heart fill={following ? "black" : undefined} />
+      <Heart fill={following ? "currentColor" : "none"} />
       {following ? "Following" : "Follow"}
     </Button>
   );
