@@ -23,10 +23,14 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
+      <meta
+        name="format-detection"
+        content="telephone=no, date=no, address=no, email=no"
+      />
       <body>
-        <PostHogProvider>
-          <TRPCReactProvider>
-            <ThemeProvider attribute="class">
+        <ThemeProvider attribute="class">
+          <PostHogProvider>
+            <TRPCReactProvider>
               <HydrateClient>
                 <div className="flex h-screen flex-col">
                   <Navbar />
@@ -43,9 +47,9 @@ export default function RootLayout({
                 </div>
                 <Toaster />
               </HydrateClient>
-            </ThemeProvider>
-          </TRPCReactProvider>
-        </PostHogProvider>
+            </TRPCReactProvider>
+          </PostHogProvider>
+        </ThemeProvider>
         <SpeedInsights />
       </body>
     </html>
