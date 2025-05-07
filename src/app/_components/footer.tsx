@@ -12,6 +12,9 @@ export function Footer() {
         <Link href="/legal/terms" className="hover:underline">
           Terms of Service
         </Link>
+        <Link href="/legal/dmca" className="hover:underline">
+          DMCA Policy
+        </Link>
       </div>
       <div className="flex">
         <a
