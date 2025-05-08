@@ -87,10 +87,11 @@ export default function DeleteAccount() {
             <Button
               disabled={!valid || isPending}
               variant="destructive"
-              type="submit"
               onClick={onDeleteConfirm}
+              loading={isPending}
+              loadingText="Deleting..."
             >
-              {isPending ? "Deleting..." : "Delete"}
+              Delete
             </Button>
           </DialogFooter>
         </DialogContent>
