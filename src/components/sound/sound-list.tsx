@@ -38,11 +38,9 @@ function SoundRow({
     : getEmojiUrl(sound.emoji);
 
   return (
-    <Button
-      variant="ghost"
+    <div
       onClick={() => play(discordSoundId, sound.url)}
-      className={cn("gap-0 rounded-none", className)}
-      asChild
+      className={cn("hover:bg-accent p-2 text-sm", className)}
     >
       <div className="grid h-fit w-full cursor-pointer grid-cols-4 items-center">
         <div>
@@ -81,7 +79,7 @@ function SoundRow({
           />
         </div>
       </div>
-    </Button>
+    </div>
   );
 }
 
