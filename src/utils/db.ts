@@ -301,3 +301,9 @@ export const getGuildSounds = async (guildId: string) => {
     include: { sound: { include: { createdBy: true } }, guild: true },
   });
 };
+
+export const getGuild = async (guildId: string) => {
+  return db.guild.findFirst({
+    where: { id: guildId },
+  });
+};

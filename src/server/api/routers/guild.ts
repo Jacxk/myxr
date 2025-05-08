@@ -4,11 +4,10 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { handleSoundGuildCreate } from "~/utils/db";
+import { getGuild, handleSoundGuildCreate } from "~/utils/db";
 import {
   createSound,
   deleteSound,
-  getGuild,
   getSoundBoard,
   isBotInGuild,
 } from "~/utils/discord-requests";
