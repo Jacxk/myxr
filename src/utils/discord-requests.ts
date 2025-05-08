@@ -2,17 +2,22 @@ import type { APIGuild, APISoundboardSound } from "discord-api-types/v10";
 import { env } from "~/env";
 import { discordAuthorization } from "./db";
 
-enum DiscordPermission {
-  MANAGE_GUILD_EXPRESSIONS = 1 << 30,
-}
+const DiscordPermission = {
+  MANAGE_GUILD_EXPRESSIONS: 1 << 30,
+};
 
 interface DiscordError {
   message: string;
   code: number;
 }
 
-function hasPermission(userPermission: string, permission: DiscordPermission) {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+type DiscordPermissionValue =
+  (typeof DiscordPermission)[keyof typeof DiscordPermission];
+
+function hasPermission(
+  userPermission: string,
+  permission: DiscordPermissionValue,
+) {
   return (Number(userPermission) & permission) === permission;
 }
 
