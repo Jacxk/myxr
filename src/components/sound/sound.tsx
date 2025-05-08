@@ -26,13 +26,14 @@ export type SoundProperties = {
 
 export function getEmojiUrl(emoji: string, svg = false) {
   const codePoints = Array.from(emoji)
-    .map((char) => char.codePointAt(0)?.toString(16))
-    .filter(Boolean)
+    .map((char) => char.codePointAt(0)!)
+    .filter((cp) => cp !== 0xfe0f)
+    .map((cp) => cp.toString(16))
     .join("-");
 
-  if (svg)
-    return `https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/${codePoints}.svg`;
-  return `https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/72x72/${codePoints}.png`;
+  const ext = svg ? "svg" : "png";
+  const folder = svg ? "svg" : "72x72";
+  return `https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/${folder}/${codePoints}.${ext}`;
 }
 
 const EmojiButton = memo(function EmojiButtonMemoized({
@@ -79,7 +80,7 @@ export default memo(function Sound({
     >
       <EmojiButton id={sound.id} url={sound.url} emoji={sound.emoji} />
       <Button
-        className="whitespace-normal break-words p-0 text-center"
+        className="p-0 text-center break-words whitespace-normal"
         variant="link"
         asChild
       >
