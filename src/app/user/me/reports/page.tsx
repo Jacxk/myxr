@@ -85,7 +85,7 @@ export default function MeReportsPage() {
               disabled
             />
           </div>
-          <div className="flex justify-between text-muted-foreground">
+          <div className="text-muted-foreground flex justify-between">
             <div>{selectedReport?.id}</div>
             <div>{selectedReport?.createdAt.toDateString()}</div>
           </div>
@@ -105,7 +105,11 @@ export default function MeReportsPage() {
         </TableHeader>
         <TableBody>
           {reports?.map((report) => (
-            <TableRow key={report.id} onClick={() => selectReport(report)}>
+            <TableRow
+              className="cursor-pointer"
+              key={report.id}
+              onClick={() => selectReport(report)}
+            >
               <TableCell>{report.sound.name}</TableCell>
               <TableCell>{report.actionTaken}</TableCell>
               <TableCell className="text-right">

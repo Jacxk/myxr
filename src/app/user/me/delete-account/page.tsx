@@ -32,6 +32,12 @@ export default function DeleteAccount() {
 
   const onDeleteConfirm = async () => {
     setIsPending(true);
+    if (!valid) {
+      ErrorToast.invalidEmail();
+      setIsPending(false);
+      return;
+    }
+
     const deleted = await deleteUser();
     if (deleted.data?.success) {
       router.push("/");

@@ -30,4 +30,5 @@ export const ErrorToast = {
     toast.error("The server is currently unavailable. Please try later."),
   failedToDeleteAccount: () =>
     toast.error("Failed to delete account. Please try again."),
+  invalidEmail: () => toast.error("Invalid email. Please try again."),
 };
