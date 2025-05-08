@@ -64,6 +64,7 @@ export default async function MeGuildIdPage({
           discordSoundId: sound.sound_id,
           guildId: sound.guild_id,
           external: true,
+          available: sound.available,
           sound: {
             id: sound.sound_id,
             name: sound.name,

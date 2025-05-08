@@ -17,6 +17,7 @@ export type SoundListData = {
   guildId: Snowflake;
   discordSoundId: Snowflake;
   external?: boolean;
+  available?: boolean;
 };
 
 type SoundTableListProps = {
@@ -106,7 +107,12 @@ export function SoundTableList({ data }: SoundTableListProps) {
               discordSoundId={guildSound.discordSoundId}
               guildId={guildSound.guildId}
               external={guildSound.external}
-              className={cn({ "bg-yellow-100/5": guildSound.external })}
+              className={cn({
+                "bg-yellow-100/5": guildSound.external,
+                "bg-red-500/5":
+                  typeof guildSound.available === "boolean" &&
+                  !guildSound.available,
+              })}
             />
           ))}
         </div>
