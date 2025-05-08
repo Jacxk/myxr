@@ -51,21 +51,25 @@ async function createDiscordRequest<T>(
 }
 
 export async function getDiscordGuilds(id: string) {
-  const authorization = await discordAuthorization(id);
-  const data = await createDiscordRequest<APIGuild[]>(
-    "users/@me/guilds",
-    authorization,
-  );
+  try {
+    const authorization = await discordAuthorization(id);
+    const data = await createDiscordRequest<APIGuild[]>(
+      "users/@me/guilds",
+      authorization,
+    );
 
-  return data.filter(
-    (guild: APIGuild) =>
-      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-      guild.owner ||
-      hasPermission(
-        guild.permissions!,
-        DiscordPermission.MANAGE_GUILD_EXPRESSIONS,
-      ),
-  );
+    return data.filter(
+      (guild: APIGuild) =>
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+        guild.owner ||
+        hasPermission(
+          guild.permissions!,
+          DiscordPermission.MANAGE_GUILD_EXPRESSIONS,
+        ),
+    );
+  } catch {
+    return [];
+  }
 }
 
 export async function createSound({

@@ -144,6 +144,19 @@ export const updateGuildMemberShip = async (
 
   const guilds = await getDiscordGuilds(userId);
 
+  const existingGuildIds = guilds.map((guild) => guild.id);
+  if (existingGuildIds.length > 0)
+    await db.guildMembership.deleteMany({
+      where: {
+        userId,
+        NOT: {
+          guildId: {
+            in: existingGuildIds,
+          },
+        },
+      },
+    });
+
   for (const guild of guilds) {
     await upsertGuild(guild);
 
