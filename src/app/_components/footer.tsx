@@ -23,6 +23,7 @@ export function Footer() {
           href="https://github.com/jacxk/myxr"
           target="_blank"
           rel="noopener noreferrer"
+          className="hover:text-primary"
         >
           <SiGithub />
         </a>

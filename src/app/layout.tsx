@@ -40,7 +40,7 @@ export default function RootLayout({
                     initialPosition={0.2}
                     crawlSpeed={100}
                   />
-                  <div className="mx-auto w-full max-w-7xl flex-1 grow p-4 sm:py-10">
+                  <div className="mx-auto w-full max-w-7xl flex-1 grow p-6 sm:py-10">
                     {children}
                   </div>
                   <Footer />
