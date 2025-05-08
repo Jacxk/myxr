@@ -58,7 +58,7 @@ export function SoundPage({ id, sound, isPreview }: Readonly<SoundPageProps>) {
         <div className="flex shrink-0">
           <SoundEmoji emoji={sound.emoji} />
         </div>
-        <div className="flex flex-grow flex-col justify-between gap-6 sm:flex-row">
+        <div className="flex grow flex-col justify-between gap-6 sm:flex-row">
           <div className="flex flex-col">
             <h1 className="text-3xl font-extrabold">{sound.name}</h1>
             <Button

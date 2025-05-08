@@ -3,9 +3,11 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="mx-auto flex w-full max-w-7xl grow-0 flex-row justify-between border-t p-6 text-sm text-muted-foreground">
-      <div className="grow-1"></div>
-      <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-6">
+    <footer className="text-muted-foreground mx-auto flex w-full max-w-7xl grow-0 flex-row items-center justify-between border-t p-6 text-sm">
+      <div className="text-foreground text-xl font-semibold">
+        <Link href="/">myxr</Link>
+      </div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
         <Link href="/legal/privacy-policy" className="hover:underline">
           Privacy Policy
         </Link>
