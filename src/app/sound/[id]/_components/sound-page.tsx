@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { EmojiImage } from "~/components/emoji-image";
 import { AddToGuildButton } from "~/components/sound/add-button";
 import { LikeButton } from "~/components/sound/like-button";
 import { SoundWaveForm } from "~/components/sound/sound-waveform";
@@ -11,7 +12,6 @@ import type { RouterOutputs } from "~/trpc/react";
 import { DownloadButton } from "./action-button/download";
 import { ReportButton } from "./action-button/report";
 import { CreatedDate } from "./created-date";
-import { SoundEmoji } from "./emoji";
 import { Guild } from "./guild";
 import { SoundData } from "./sound-data";
 
@@ -56,7 +56,7 @@ export function SoundPage({ id, sound, isPreview }: Readonly<SoundPageProps>) {
     <div className="flex w-full flex-col gap-6">
       <div className="flex w-full flex-row gap-10">
         <div className="flex shrink-0">
-          <SoundEmoji emoji={sound.emoji} />
+          <EmojiImage emoji={sound.emoji} />
         </div>
         <div className="flex grow flex-col justify-between gap-6 sm:flex-row">
           <div className="flex flex-col">

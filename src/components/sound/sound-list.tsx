@@ -6,9 +6,9 @@ import Link from "next/link";
 import { AudioProvider, useAudio } from "~/context/AudioContext";
 import { cn } from "~/lib/utils";
 import type { RouterOutputs } from "~/trpc/react";
+import { getEmojiUrl } from "../emoji-image";
 import { Button } from "../ui/button";
 import { DeleteSoundButton } from "./delete-button";
-import { getEmojiUrl } from "./sound";
 
 type Sound = NonNullable<RouterOutputs["user"]["getSounds"]>[number];
 
