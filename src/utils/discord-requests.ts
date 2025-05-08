@@ -1,4 +1,9 @@
-import type { APIGuild, APISoundboardSound } from "discord-api-types/v10";
+import {
+  type APIGuild,
+  type APIGuildMember,
+  type APIRole,
+  type APISoundboardSound,
+} from "discord-api-types/v10";
 import { env } from "~/env";
 import { discordAuthorization } from "./db";
 
@@ -15,9 +20,10 @@ type DiscordPermissionValue =
   (typeof DiscordPermission)[keyof typeof DiscordPermission];
 
 function hasPermission(
-  userPermission: string,
+  userPermission: string | undefined | null,
   permission: DiscordPermissionValue,
 ) {
+  if (!userPermission) return false;
   return (Number(userPermission) & permission) === permission;
 }
 
@@ -68,7 +74,7 @@ export async function getDiscordGuilds(id: string) {
         // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
         guild.owner ||
         hasPermission(
-          guild.permissions!,
+          guild.permissions,
           DiscordPermission.MANAGE_GUILD_EXPRESSIONS,
         ),
     );
@@ -139,4 +145,24 @@ export async function isBotInGuild(guildId: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+export async function getGuildRoles(guildId: string) {
+  const data = await createDiscordRequest<APIRole[]>(
+    `/guilds/${guildId}/roles`,
+    BOT_AUTORIZATION,
+  );
+
+  return data;
+}
+
+export async function getUserRoles(guildId: string, userId: string) {
+  const data = await createDiscordRequest<APIGuildMember>(
+    `/guilds/${guildId}/members/${userId}`,
+    BOT_AUTORIZATION,
+  );
+
+  return {
+    roles: data.roles,
+  };
 }

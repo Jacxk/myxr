@@ -2,7 +2,7 @@ import type { GuildSound, LikedSound } from "@prisma/client";
 import type { APIGuild } from "discord-api-types/v10";
 import { z } from "zod";
 import { db } from "~/server/db";
-import { getDiscordGuilds } from "./discord-requests";
+import { getDiscordGuilds, getUserRoles } from "./discord-requests";
 
 const soundInclude = {
   tags: true,
@@ -42,6 +42,15 @@ export const discordAuthorization = async (id: string) => {
   });
 
   return `Bearer ${user?.accessToken}`;
+};
+
+export const getDiscordId = async (userId: string) => {
+  const account = await db.account.findFirst({
+    where: { userId },
+    select: { accountId: true },
+  });
+
+  return account?.accountId;
 };
 
 export const getSounds = async ({
@@ -162,6 +171,7 @@ export const updateGuildMemberShip = async (
 
     const data = {
       guildId: guild.id,
+      manageExpressions: true,
       userId,
     };
 
@@ -319,4 +329,37 @@ export const getGuild = async (guildId: string) => {
   return db.guild.findFirst({
     where: { id: guildId },
   });
+};
+
+export const getSoundMasterRoles = async (guildId: string) => {
+  return db.guild.findFirst({
+    where: { id: guildId },
+    select: {
+      soundMasterRoles: true,
+    },
+  });
+};
+
+export const setSoundMasterRoles = async (guildId: string, roles: string[]) => {
+  await db.guild.update({
+    where: { id: guildId },
+    data: { soundMasterRoles: roles },
+  });
+};
+
+export const hasSoundBoardCreatePermission = async (
+  guildId: string,
+  userId: string,
+) => {
+  const guildRoles = await getSoundMasterRoles(guildId);
+  const discordId = await getDiscordId(userId);
+
+  if (!discordId) return false;
+
+  const userRoles = await getUserRoles(guildId, discordId);
+  const hasPermission = userRoles.roles.some((role) =>
+    guildRoles?.soundMasterRoles.some((guildRole) => guildRole === role),
+  );
+
+  return hasPermission;
 };
