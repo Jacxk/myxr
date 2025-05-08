@@ -1,3 +1,9 @@
+import { type Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "DMCA Policy",
+};
+
 export default function DMCAPage() {
   return (
     <main className="mx-auto max-w-3xl p-6">

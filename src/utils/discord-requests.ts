@@ -131,3 +131,12 @@ export async function isBotInGuild(guildId: string): Promise<boolean> {
     return false;
   }
 }
+
+export async function getGuild(guildId: string) {
+  const data = await createDiscordRequest<APIGuild>(
+    `/guilds/${guildId}`,
+    BOT_AUTORIZATION,
+  );
+
+  return data;
+}

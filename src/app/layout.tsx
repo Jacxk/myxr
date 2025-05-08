@@ -13,9 +13,30 @@ import { Footer } from "./_components/footer";
 import Navbar from "./_components/navbar";
 
 export const metadata: Metadata = {
-  title: "Myxr",
+  metadataBase: new URL("https://myxr.cc"),
+  title: {
+    default: "myxr",
+    template: "%s | myxr",
+  },
   description: "Upload sounds to Discord with ease",
   icons: { icon: "/favicon.ico" },
+  openGraph: {
+    title: "Myxr",
+    description: "Upload sounds to Discord with ease",
+    url: "https://myxr.cc",
+    siteName: "Myxr",
+    type: "website",
+    locale: "en_US",
+    // TODO: Add images
+    // images: "/og.png",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Myxr",
+    description: "Upload sounds to Discord with ease",
+    // TODO: Add images
+    // images: "/og.png",
+  },
 };
 
 export default function RootLayout({

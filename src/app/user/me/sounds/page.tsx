@@ -6,7 +6,7 @@ import { getServerSession } from "~/lib/auth";
 import { api } from "~/trpc/server";
 
 export const metadata: Metadata = {
-  title: "My Sounds - Myxr",
+  title: "My Sounds",
 };
 
 export default async function MeSoundsPage() {

@@ -6,6 +6,20 @@ import {
 import { api } from "~/trpc/server";
 import { getSoundBoard } from "~/utils/discord-requests";
 
+export async function generateMetadata({
+  params,
+}: Readonly<{
+  params: Promise<{ id: string }>;
+}>) {
+  const { id } = await params;
+
+  const guild = await api.guild.getGuild(id);
+
+  return {
+    title: `${guild?.name} - Guild`,
+  };
+}
+
 const getEmoji = (sound: APISoundboardSound) => {
   if (sound.emoji_id) {
     return `https://cdn.discordapp.com/emojis/${sound.emoji_id}.png`;
@@ -67,7 +81,7 @@ export default async function MeGuildIdPage({
     <>
       <title>{`${guild?.name} - Guild Sounds`}</title>
       <div className="flex w-full flex-col items-center">
-        <h2 className="text-xl text-muted-foreground">{guild?.name}</h2>
+        <h2 className="text-muted-foreground text-xl">{guild?.name}</h2>
         <SoundTableList
           data={[
             guildSounds as unknown as SoundListData,

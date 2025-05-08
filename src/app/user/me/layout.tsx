@@ -1,6 +1,6 @@
 import { Castle, Flag, Heart, Trash, Volume2 } from "lucide-react";
 import { redirect } from "next/navigation";
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { getServerSession } from "~/lib/auth";
 import { cn } from "~/lib/utils";
 import { api } from "~/trpc/server";

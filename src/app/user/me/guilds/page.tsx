@@ -1,5 +1,10 @@
+import { type Metadata } from "next";
 import { getServerSession } from "~/lib/auth";
 import GuildsRoute from "./[id]/page";
+
+export const metadata: Metadata = {
+  title: "My Guilds",
+};
 
 export default async function MeGuildsPage() {
   const session = await getServerSession();

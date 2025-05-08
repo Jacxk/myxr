@@ -8,11 +8,15 @@ import { handleSoundGuildCreate } from "~/utils/db";
 import {
   createSound,
   deleteSound,
+  getGuild,
   getSoundBoard,
   isBotInGuild,
 } from "~/utils/discord-requests";
 
 export const guildRouter = createTRPCRouter({
+  getGuild: publicProcedure.input(z.string()).query(async ({ input }) => {
+    return getGuild(input);
+  }),
   isBotIn: publicProcedure.input(z.string()).mutation(async ({ input }) => {
     return {
       success: true,
