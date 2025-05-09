@@ -43,10 +43,10 @@ export default async function Layout({
       user: { id: userId, guilds },
     } = session;
 
-    void api.user.getGuildSounds.prefetch(userId);
+    void api.guild.getGuildSounds.prefetch(userId);
 
     if (guilds.length > 0 && guilds[0]?.id) {
-      void api.user.getGuildSounds.prefetch(guilds[0].id);
+      void api.guild.getGuildSounds.prefetch(guilds[0].id);
     }
   } else {
     return redirect("/");
