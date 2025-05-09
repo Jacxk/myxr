@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  allowedToManageGuildProtectedProcedure,
   createTRPCRouter,
   protectedProcedure,
   publicProcedure,
@@ -9,7 +10,6 @@ import {
   getGuildSounds,
   getSoundMasterRoles,
   handleSoundGuildCreate,
-  hasSoundBoardCreatePermission,
   setSoundMasterRoles,
 } from "~/utils/db";
 import {
@@ -30,25 +30,14 @@ export const guildRouter = createTRPCRouter({
       value: await isBotInGuild(input),
     };
   }),
-  createSound: protectedProcedure
+  createSound: allowedToManageGuildProtectedProcedure
     .input(
       z.object({
         soundId: z.string(),
-        guildId: z.string(),
         guildName: z.string(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const hasPermission = await hasSoundBoardCreatePermission(
-        input.guildId,
-        ctx.session.session.userId,
-      );
-      const isAdmin =
-        ctx.session.user.guilds.filter((guild) => guild.id === input.guildId)
-          .length > 0;
-
-      if (!(hasPermission || isAdmin)) throw Error("NO_PERMISSION");
-
       const data = await ctx.db.sound.findFirst({
         where: { id: input.soundId },
       });
@@ -79,10 +68,9 @@ export const guildRouter = createTRPCRouter({
     .query(async ({ input }) => {
       return await getSoundBoard(input);
     }),
-  deleteSound: protectedProcedure
+  deleteSound: allowedToManageGuildProtectedProcedure
     .input(
       z.object({
-        guildId: z.string(),
         soundId: z.string(),
       }),
     )
@@ -121,10 +109,9 @@ export const guildRouter = createTRPCRouter({
           isMasterRole: !!roles?.soundMasterRoles.includes(role.id),
         }));
     }),
-  setSoundMasterRoles: protectedProcedure
+  setSoundMasterRoles: allowedToManageGuildProtectedProcedure
     .input(
       z.object({
-        guildId: z.string(),
         roles: z.array(z.string()),
       }),
     )
@@ -132,6 +119,7 @@ export const guildRouter = createTRPCRouter({
       return setSoundMasterRoles(input.guildId, input.roles);
     }),
 });
+
 async function downloadSoundToBase64(url: string) {
   const file = await fetch(url);
   const arrayBuffer = await file.arrayBuffer();
