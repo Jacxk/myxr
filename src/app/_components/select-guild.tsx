@@ -243,7 +243,7 @@ function GuildSelect({
           <SelectValue placeholder="Select a Guild" />
         </div>
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="max-h-[300px] overflow-y-auto">
         <SelectItem value="none" disabled>
           Select a Guild
         </SelectItem>

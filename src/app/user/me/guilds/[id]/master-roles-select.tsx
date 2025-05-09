@@ -69,14 +69,17 @@ export default function MasterRolesSelect({ guildId }: { guildId: string }) {
           <Settings2 />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="max-w-56" align="end">
+      <DropdownMenuContent
+        className="max-h-[300px] max-w-56 overflow-y-auto"
+        align="end"
+      >
         <DropdownMenuLabel>Edit Server Settings</DropdownMenuLabel>
         <DropdownMenuSeparator />
 
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>Sound Master Role</DropdownMenuSubTrigger>
           <DropdownMenuPortal>
-            <DropdownMenuSubContent className="w-56">
+            <DropdownMenuSubContent className="max-h-[300px] w-56 overflow-y-auto">
               <DropdownMenuLabel>Select Sound Master Roles</DropdownMenuLabel>
               <DropdownMenuLabel className="text-muted-foreground text-xs">
                 Select the roles that can manage the sound of the guild.
