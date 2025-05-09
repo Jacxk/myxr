@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Users } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EmojiImage } from "~/components/emoji-image";
 import { Button } from "~/components/ui/button";
 import {
@@ -18,8 +18,14 @@ import { useTRPC } from "~/trpc/react";
 
 export default function MasterRolesSelect({ guildId }: { guildId: string }) {
   const api = useTRPC();
-  const { data: roles, isLoading } = useQuery(
-    api.guild.getGuildRoles.queryOptions(guildId),
+  const {
+    data: roles,
+    isRefetching,
+    refetch,
+  } = useQuery(
+    api.guild.getGuildRoles.queryOptions(guildId, {
+      enabled: false,
+    }),
   );
   const { mutate } = useMutation(
     api.guild.setSoundMasterRoles.mutationOptions({
@@ -32,9 +38,15 @@ export default function MasterRolesSelect({ guildId }: { guildId: string }) {
     }),
   );
 
-  const [selectedRoles, setSelectedRoles] = useState<string[]>(
-    roles?.filter((role) => role.isMasterRole).map((role) => role.id) ?? [],
-  );
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (roles) {
+      setSelectedRoles(
+        roles.filter((role) => role.isMasterRole).map((role) => role.id),
+      );
+    }
+  }, [roles]);
 
   const onCheckedChange = (checked: boolean, roleId: string) => {
     const roles = checked
@@ -47,7 +59,11 @@ export default function MasterRolesSelect({ guildId }: { guildId: string }) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="self-end" asChild>
+      <DropdownMenuTrigger
+        className="self-end"
+        onMouseEnter={() => !isRefetching && refetch()}
+        asChild
+      >
         <Button variant="outline" size="icon">
           <Users />
         </Button>
@@ -58,11 +74,6 @@ export default function MasterRolesSelect({ guildId }: { guildId: string }) {
           Select the roles that can manage the sound of the guild.
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {isLoading && (
-          <DropdownMenuCheckboxItem disabled>
-            Loading...
-          </DropdownMenuCheckboxItem>
-        )}
         {roles?.length === 0 && (
           <DropdownMenuCheckboxItem disabled>
             No roles found
