@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Users } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { EmojiImage } from "~/components/emoji-image";
 import { Button } from "~/components/ui/button";
 import {
@@ -35,17 +35,13 @@ export default function MasterRolesSelect({ guildId }: { guildId: string }) {
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
 
   const onCheckedChange = (checked: boolean, roleId: string) => {
-    setSelectedRoles((prev) => {
-      const roles = checked
-        ? [...prev, roleId]
-        : prev.filter((id) => id !== roleId);
-      return roles;
-    });
-  };
+    const roles = checked
+      ? [...selectedRoles, roleId]
+      : selectedRoles.filter((id) => id !== roleId);
 
-  useEffect(() => {
-    mutate({ guildId, roles: selectedRoles });
-  }, [guildId, selectedRoles, mutate]);
+    mutate({ guildId, roles });
+    setSelectedRoles(roles);
+  };
 
   return (
     <DropdownMenu>

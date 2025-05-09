@@ -197,7 +197,9 @@ export const getUserGuilds = async (userId: string) => {
 };
 
 export const upsertGuild = async (guild: APIGuild) => {
-  const image = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`;
+  const image = guild.icon
+    ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`
+    : null;
 
   await db.guild.upsert({
     where: { id: guild.id },
