@@ -13,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { ErrorToast } from "~/lib/messages/toast.global";
 import { useTRPC } from "~/trpc/react";
 
 export default function MasterRolesSelect({ guildId }: { guildId: string }) {
@@ -21,7 +22,14 @@ export default function MasterRolesSelect({ guildId }: { guildId: string }) {
     api.guild.getGuildRoles.queryOptions(guildId),
   );
   const { mutate } = useMutation(
-    api.guild.setSoundMasterRoles.mutationOptions(),
+    api.guild.setSoundMasterRoles.mutationOptions({
+      onSuccess: (data) => {
+        setSelectedRoles(data);
+      },
+      onError: () => {
+        ErrorToast.unauthorized();
+      },
+    }),
   );
 
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);

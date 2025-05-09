@@ -341,10 +341,12 @@ export const getSoundMasterRoles = async (guildId: string) => {
 };
 
 export const setSoundMasterRoles = async (guildId: string, roles: string[]) => {
-  await db.guild.update({
+  const { soundMasterRoles } = await db.guild.update({
     where: { id: guildId },
     data: { soundMasterRoles: roles },
   });
+
+  return soundMasterRoles;
 };
 
 export const hasSoundBoardCreatePermission = async (
