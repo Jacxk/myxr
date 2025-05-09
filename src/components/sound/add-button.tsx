@@ -141,7 +141,11 @@ export function AddToGuildButton({
           </DialogHeader>
           <p>Are you sure you want to add this sound?</p>
           <DialogFooter>
-            <Button onClick={onAddClick} disabled={isPending}>
+            <Button
+              onClick={onAddClick}
+              disabled={isPending}
+              loading={isPending}
+            >
               Add
             </Button>
           </DialogFooter>
