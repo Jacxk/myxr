@@ -171,7 +171,6 @@ export const updateGuildMemberShip = async (
 
     const data = {
       guildId: guild.id,
-      manageExpressions: true,
       userId,
     };
 
