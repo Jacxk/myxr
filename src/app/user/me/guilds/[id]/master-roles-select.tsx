@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Users } from "lucide-react";
+import { Settings2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { EmojiImage } from "~/components/emoji-image";
 import { Button } from "~/components/ui/button";
@@ -10,7 +10,11 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuLabel,
+  DropdownMenuPortal,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { ErrorToast } from "~/lib/messages/toast.global";
@@ -21,6 +25,7 @@ export default function MasterRolesSelect({ guildId }: { guildId: string }) {
   const {
     data: roles,
     isRefetching,
+    isLoading,
     refetch,
   } = useQuery(
     api.guild.getGuildRoles.queryOptions(guildId, {
@@ -58,46 +63,58 @@ export default function MasterRolesSelect({ guildId }: { guildId: string }) {
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        className="self-end"
-        onMouseEnter={() => !isRefetching && refetch()}
-        asChild
-      >
-        <Button variant="outline" size="icon">
-          <Users />
+    <DropdownMenu onOpenChange={(open) => open && !isRefetching && refetch()}>
+      <DropdownMenuTrigger className="self-end" asChild>
+        <Button variant="outline" size="icon" className="mx-2">
+          <Settings2 />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end">
-        <DropdownMenuLabel>Select Sound Master Roles</DropdownMenuLabel>
-        <DropdownMenuLabel className="text-muted-foreground text-xs">
-          Select the roles that can manage the sound of the guild.
-        </DropdownMenuLabel>
+      <DropdownMenuContent className="max-w-56" align="end">
+        <DropdownMenuLabel>Edit Server Settings</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {roles?.length === 0 && (
-          <DropdownMenuCheckboxItem disabled>
-            No roles found
-          </DropdownMenuCheckboxItem>
-        )}
-        {roles?.map((role) => (
-          <DropdownMenuCheckboxItem
-            key={role.id}
-            checked={selectedRoles.includes(role.id)}
-            onSelect={(event) => event.preventDefault()}
-            onCheckedChange={(checked) => onCheckedChange(checked, role.id)}
-            style={{
-              borderLeft: `6px solid #${role.color.toString(16).padStart(6, "0")}`,
-            }}
-          >
-            {role.unicode_emoji && (
-              <EmojiImage
-                emoji={role.unicode_emoji}
-                size={{ width: 16, height: 16 }}
-              />
-            )}
-            {role.name}
-          </DropdownMenuCheckboxItem>
-        ))}
+
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>Sound Master Role</DropdownMenuSubTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuSubContent className="w-56">
+              <DropdownMenuLabel>Select Sound Master Roles</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-muted-foreground text-xs">
+                Select the roles that can manage the sound of the guild.
+              </DropdownMenuLabel>
+              {isLoading && (
+                <DropdownMenuCheckboxItem disabled>
+                  Loading...
+                </DropdownMenuCheckboxItem>
+              )}
+              {roles?.length === 0 && (
+                <DropdownMenuCheckboxItem disabled>
+                  No roles found
+                </DropdownMenuCheckboxItem>
+              )}
+              {roles?.map((role) => (
+                <DropdownMenuCheckboxItem
+                  key={role.id}
+                  checked={selectedRoles.includes(role.id)}
+                  onSelect={(event) => event.preventDefault()}
+                  onCheckedChange={(checked) =>
+                    onCheckedChange(checked, role.id)
+                  }
+                  style={{
+                    borderLeft: `6px solid #${role.color.toString(16).padStart(6, "0")}`,
+                  }}
+                >
+                  {role.unicode_emoji && (
+                    <EmojiImage
+                      emoji={role.unicode_emoji}
+                      size={{ width: 16, height: 16 }}
+                    />
+                  )}
+                  {role.name}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuSubContent>
+          </DropdownMenuPortal>
+        </DropdownMenuSub>
       </DropdownMenuContent>
     </DropdownMenu>
   );
