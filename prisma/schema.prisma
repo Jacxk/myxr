@@ -118,7 +118,7 @@ model Guild {
     name             String
     image            String?
     sounds           GuildSound[]
-    soundMasterRoles String[]
+    soundMasterRoles String[]          @default([])
     users            GuildMembership[]
 }
 
