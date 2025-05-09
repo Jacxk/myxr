@@ -18,7 +18,7 @@ import { useTRPC } from "~/trpc/react";
 
 export default function MasterRolesSelect({ guildId }: { guildId: string }) {
   const api = useTRPC();
-  const { data: roles } = useQuery(
+  const { data: roles, isLoading } = useQuery(
     api.guild.getGuildRoles.queryOptions(guildId),
   );
   const { mutate } = useMutation(
@@ -57,7 +57,12 @@ export default function MasterRolesSelect({ guildId }: { guildId: string }) {
             Select the roles that can manage the sound of the guild.
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {(!roles || roles.length === 0) && (
+          {isLoading && (
+            <DropdownMenuCheckboxItem disabled>
+              Loading...
+            </DropdownMenuCheckboxItem>
+          )}
+          {roles?.length === 0 && (
             <DropdownMenuCheckboxItem disabled>
               No roles found
             </DropdownMenuCheckboxItem>
