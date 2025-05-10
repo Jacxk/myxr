@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { cache } from "react";
+import AdDisplay from "~/components/ad/ad-display";
 import Sound from "~/components/sound/sound";
 import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -89,6 +90,12 @@ export default async function UserPage({
       </div>
       <div className="flex flex-col gap-4">
         <h2 className="text-2xl font-bold">Sounds</h2>
+        <AdDisplay
+          adSlot="1970362642"
+          format="fluid"
+          layoutKey="-f9+4w+7x-eg+3a"
+          showProbability={1}
+        />
         <SoundsGrid>
           {sounds.map((sound) => (
             <Sound key={sound.id} sound={sound} />

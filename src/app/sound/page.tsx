@@ -8,7 +8,8 @@ import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { useTRPC } from "~/trpc/react";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Suspense } from "react";
+import { Fragment, Suspense } from "react";
+import AdDisplay from "~/components/ad/ad-display";
 
 export default function SoundsHomePage() {
   return (
@@ -53,8 +54,16 @@ function SoundsHomePageSuspended() {
         endMessage={!hasData ? "No sounds where found." : ""}
       >
         <SoundsGrid>
-          {sounds.map((sound) => (
-            <Sound key={sound.id} sound={sound} />
+          {sounds.map((sound, i) => (
+            <Fragment key={sound.id}>
+              <Sound sound={sound} />
+              <AdDisplay
+                adSlot="1944402367"
+                width="100%"
+                height="100%"
+                showProbability={i === sounds.length - 1 ? 1 : 0.4}
+              />
+            </Fragment>
           ))}
         </SoundsGrid>
       </InfiniteScroll>

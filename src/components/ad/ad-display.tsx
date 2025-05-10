@@ -10,23 +10,27 @@ declare global {
   }
 }
 
-export default function AdDisplay({
-  adSlot,
-  className,
-  width = "160px",
-  height = "160px",
-  format,
-  fullWidthResponsive = true,
-  showProbability = 0.2,
-}: {
+type AdDisplayProps = {
   adSlot: string;
   className?: string;
   width?: string;
   height?: string;
-  format?: "auto" | "rectangle";
+  format?: "auto" | "rectangle" | "fluid";
+  layoutKey?: string;
   fullWidthResponsive?: boolean;
   showProbability?: number;
-}) {
+};
+
+export default function AdDisplay({
+  adSlot,
+  className,
+  width,
+  height,
+  format,
+  fullWidthResponsive = true,
+  showProbability = 0.2,
+  layoutKey,
+}: AdDisplayProps) {
   const [shouldShow, setShouldShow] = useState(false);
 
   useEffect(() => {
@@ -59,6 +63,7 @@ export default function AdDisplay({
       data-ad-client={env.NEXT_PUBLIC_ADSENSE_KEY}
       data-ad-slot={displayAdSlot}
       data-ad-format={format}
+      data-ad-layout-key={layoutKey}
       data-full-width-responsive={fullWidthResponsive}
     ></ins>
   );
