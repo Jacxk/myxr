@@ -8,7 +8,7 @@ import { EditSoundStep } from "./_components/steps/edit-sound";
 import { SelectFileStep } from "./_components/steps/select-file";
 
 export const metadata: Metadata = {
-  title: "Upload a Sound - Myxr",
+  title: "Upload a Sound",
 };
 
 export default async function UploadPage() {

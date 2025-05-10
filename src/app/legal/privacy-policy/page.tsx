@@ -1,9 +1,14 @@
-// app/legal/privacy-policy/page.tsx
+import { type Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+};
+
 export default function PrivacyPolicyPage() {
   return (
     <main className="mx-auto max-w-3xl p-6">
       <h1 className="mb-4 text-3xl font-bold">Privacy Policy</h1>
-      <p className="mb-6 text-sm text-gray-500">Last Updated: May 03, 2025</p>
+      <p className="mb-6 text-sm text-gray-500">Last Updated: May 07, 2025</p>
 
       <section className="space-y-4">
         <h2 className="text-xl font-semibold">1. Data We Collect</h2>
@@ -72,7 +77,12 @@ export default function PrivacyPolicyPage() {
         </p>
 
         <h2 className="text-xl font-semibold">9. Contact</h2>
-        <p>For questions or concerns, contact us at: support@myxr.cc</p>
+        <p>
+          For questions or concerns, contact us at:{" "}
+          <a href="mailto:support@myxr.cc" className="text-blue-500">
+            support@myxr.cc
+          </a>
+        </p>
       </section>
     </main>
   );

@@ -1,6 +1,11 @@
+import { type Metadata } from "next";
 import Sound from "~/components/sound/sound";
 import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { api } from "~/trpc/server";
+
+export const metadata: Metadata = {
+  title: "My Liked Sounds",
+};
 
 export default async function MeLikedSounds() {
   const sounds = await api.user.likedSounds();

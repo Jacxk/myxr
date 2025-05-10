@@ -6,9 +6,9 @@ import Link from "next/link";
 import { AudioProvider, useAudio } from "~/context/AudioContext";
 import { cn } from "~/lib/utils";
 import type { RouterOutputs } from "~/trpc/react";
+import { getEmojiUrl } from "../emoji-image";
 import { Button } from "../ui/button";
 import { DeleteSoundButton } from "./delete-button";
-import { getEmojiUrl } from "./sound";
 
 type Sound = NonNullable<RouterOutputs["user"]["getSounds"]>[number];
 
@@ -17,6 +17,7 @@ export type SoundListData = {
   guildId: Snowflake;
   discordSoundId: Snowflake;
   external?: boolean;
+  available?: boolean;
 };
 
 type SoundTableListProps = {
@@ -38,11 +39,9 @@ function SoundRow({
     : getEmojiUrl(sound.emoji);
 
   return (
-    <Button
-      variant="ghost"
+    <div
       onClick={() => play(discordSoundId, sound.url)}
-      className={cn("gap-0 rounded-none", className)}
-      asChild
+      className={cn("hover:bg-accent p-2 text-sm", className)}
     >
       <div className="grid h-fit w-full cursor-pointer grid-cols-4 items-center">
         <div>
@@ -81,7 +80,7 @@ function SoundRow({
           />
         </div>
       </div>
-    </Button>
+    </div>
   );
 }
 
@@ -108,7 +107,12 @@ export function SoundTableList({ data }: SoundTableListProps) {
               discordSoundId={guildSound.discordSoundId}
               guildId={guildSound.guildId}
               external={guildSound.external}
-              className={cn({ "bg-yellow-100/5": guildSound.external })}
+              className={cn({
+                "bg-yellow-100/5": guildSound.external,
+                "bg-red-500/5":
+                  typeof guildSound.available === "boolean" &&
+                  !guildSound.available,
+              })}
             />
           ))}
         </div>

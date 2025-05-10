@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { memo } from "react";
 import { cn } from "~/lib/utils";
 import type { RouterOutputs } from "~/trpc/react";
 import { useAudio } from "../../context/AudioContext";
+import { EmojiImage } from "../emoji-image";
 import { Button } from "../ui/button";
 import { AddToGuildButton } from "./add-button";
 import { DeleteSoundButton } from "./delete-button";
@@ -23,17 +23,6 @@ export type SoundProperties = {
   guildId?: string;
   isPreview?: boolean;
 };
-
-export function getEmojiUrl(emoji: string, svg = false) {
-  const codePoints = Array.from(emoji)
-    .map((char) => char.codePointAt(0)?.toString(16))
-    .filter(Boolean)
-    .join("-");
-
-  if (svg)
-    return `https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/${codePoints}.svg`;
-  return `https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/72x72/${codePoints}.png`;
-}
 
 const EmojiButton = memo(function EmojiButtonMemoized({
   id,
@@ -56,7 +45,7 @@ const EmojiButton = memo(function EmojiButtonMemoized({
       onMouseOver={() => preload(url)}
       onClick={() => play(id, url)}
     >
-      <Image width={size} height={size} src={getEmojiUrl(emoji)} alt={emoji} />
+      <EmojiImage emoji={emoji} size={{ width: size, height: size }} />
     </button>
   );
 });
@@ -79,7 +68,7 @@ export default memo(function Sound({
     >
       <EmojiButton id={sound.id} url={sound.url} emoji={sound.emoji} />
       <Button
-        className="whitespace-normal break-words p-0 text-center"
+        className="p-0 text-center break-words whitespace-normal"
         variant="link"
         asChild
       >

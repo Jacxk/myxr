@@ -1,10 +1,15 @@
+import { type Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Terms of Service",
+};
 
 export default function TermsOfServicePage() {
   return (
     <main className="mx-auto max-w-3xl p-6">
       <h1 className="mb-4 text-3xl font-bold">Terms of Service</h1>
-      <p className="mb-6 text-sm text-gray-500">Last Updated: May 3, 2025</p>
+      <p className="mb-6 text-sm text-gray-500">Last Updated: May 07, 2025</p>
 
       <section className="space-y-4">
         <h2 className="text-xl font-semibold">1. Eligibility</h2>
@@ -81,7 +86,10 @@ export default function TermsOfServicePage() {
 
         <h2 className="text-xl font-semibold">10. Contact</h2>
         <p>
-          If you have questions or concerns, contact us at: support@myxr.cc.
+          If you have questions or concerns, contact us at:{" "}
+          <a href="mailto:support@myxr.cc" className="text-blue-500">
+            support@myxr.cc
+          </a>
         </p>
       </section>
     </main>

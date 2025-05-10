@@ -158,8 +158,10 @@ export function EditDetailsStep() {
               className="w-full"
               onClick={uploadFile}
               disabled={uploading}
+              loading={uploading}
+              loadingText="Saving..."
             >
-              {uploading ? "Saving..." : "Save Changes"}
+              Save Changes
             </Button>
           </div>
         </div>

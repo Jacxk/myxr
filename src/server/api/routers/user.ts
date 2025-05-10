@@ -4,21 +4,12 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import {
-  getGuildSounds,
-  getSoundsFromUser,
-  getUserLikedSounds,
-} from "~/utils/db";
+import { getSoundsFromUser, getUserLikedSounds } from "~/utils/db";
 
 export const userRouter = createTRPCRouter({
   getSounds: publicProcedure.input(z.string()).query(async ({ input }) => {
     return await getSoundsFromUser(input);
   }),
-  getGuildSounds: protectedProcedure
-    .input(z.string())
-    .query(async ({ input }) => {
-      return getGuildSounds(input);
-    }),
   me: protectedProcedure.query(async ({ ctx }) => {
     const sounds = await getSoundsFromUser(ctx.session.user.id);
     const guildSounds = await ctx.db.guildSound.findMany({

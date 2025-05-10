@@ -2,7 +2,7 @@
 
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useMutation } from "@tanstack/react-query";
-import { Flag, Loader2 } from "lucide-react";
+import { Flag } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { usePostHog } from "posthog-js/react";
 import { useState } from "react";
@@ -69,8 +69,12 @@ function PendingButton({
   onClick?: () => void;
 }>) {
   return (
-    <Button type="button" disabled={isPending} onClick={onClick}>
-      {isPending && <Loader2 className="animate-spin" />}
+    <Button
+      type="button"
+      disabled={isPending}
+      onClick={onClick}
+      loading={isPending}
+    >
       Report
     </Button>
   );

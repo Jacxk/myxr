@@ -75,6 +75,7 @@ export function DeleteSoundButton({
               variant="destructive"
               disabled={isPending}
               onClick={onConfirmDeleteClick}
+              loading={isPending}
             >
               Delete
             </Button>

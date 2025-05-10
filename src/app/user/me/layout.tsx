@@ -1,6 +1,6 @@
 import { Castle, Flag, Heart, Trash, Volume2 } from "lucide-react";
 import { redirect } from "next/navigation";
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { getServerSession } from "~/lib/auth";
 import { cn } from "~/lib/utils";
 import { api } from "~/trpc/server";
@@ -43,10 +43,10 @@ export default async function Layout({
       user: { id: userId, guilds },
     } = session;
 
-    void api.user.getGuildSounds.prefetch(userId);
+    void api.guild.getGuildSounds.prefetch(userId);
 
     if (guilds.length > 0 && guilds[0]?.id) {
-      void api.user.getGuildSounds.prefetch(guilds[0].id);
+      void api.guild.getGuildSounds.prefetch(guilds[0].id);
     }
   } else {
     return redirect("/");

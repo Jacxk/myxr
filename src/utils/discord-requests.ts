@@ -1,18 +1,29 @@
-import type { APIGuild, APISoundboardSound } from "discord-api-types/v10";
+import {
+  type APIGuild,
+  type APIGuildMember,
+  type APIRole,
+  type APISoundboardSound,
+} from "discord-api-types/v10";
 import { env } from "~/env";
 import { discordAuthorization } from "./db";
 
-enum DiscordPermission {
-  MANAGE_GUILD_EXPRESSIONS = 1 << 30,
-}
+const DiscordPermission = {
+  MANAGE_GUILD_EXPRESSIONS: 1 << 30,
+};
 
 interface DiscordError {
   message: string;
   code: number;
 }
 
-function hasPermission(userPermission: string, permission: DiscordPermission) {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+type DiscordPermissionValue =
+  (typeof DiscordPermission)[keyof typeof DiscordPermission];
+
+function hasPermission(
+  userPermission: string | undefined | null,
+  permission: DiscordPermissionValue,
+) {
+  if (!userPermission) return false;
   return (Number(userPermission) & permission) === permission;
 }
 
@@ -51,21 +62,25 @@ async function createDiscordRequest<T>(
 }
 
 export async function getDiscordGuilds(id: string) {
-  const authorization = await discordAuthorization(id);
-  const data = await createDiscordRequest<APIGuild[]>(
-    "users/@me/guilds",
-    authorization,
-  );
+  try {
+    const authorization = await discordAuthorization(id);
+    const data = await createDiscordRequest<APIGuild[]>(
+      "users/@me/guilds",
+      authorization,
+    );
 
-  return data.filter(
-    (guild: APIGuild) =>
-      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-      guild.owner ||
-      hasPermission(
-        guild.permissions!,
-        DiscordPermission.MANAGE_GUILD_EXPRESSIONS,
-      ),
-  );
+    return data.filter(
+      (guild: APIGuild) =>
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+        guild.owner ||
+        hasPermission(
+          guild.permissions,
+          DiscordPermission.MANAGE_GUILD_EXPRESSIONS,
+        ),
+    );
+  } catch {
+    return [];
+  }
 }
 
 export async function createSound({
@@ -130,4 +145,24 @@ export async function isBotInGuild(guildId: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+export async function getGuildRoles(guildId: string) {
+  const data = await createDiscordRequest<APIRole[]>(
+    `/guilds/${guildId}/roles`,
+    BOT_AUTORIZATION,
+  );
+
+  return data;
+}
+
+export async function getUserRoles(guildId: string, userId: string) {
+  const data = await createDiscordRequest<APIGuildMember>(
+    `/guilds/${guildId}/members/${userId}`,
+    BOT_AUTORIZATION,
+  );
+
+  return {
+    roles: data.roles,
+  };
 }

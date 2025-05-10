@@ -1,10 +1,34 @@
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import Sound from "~/components/sound/sound";
 import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { getServerSession } from "~/lib/auth";
 import { api } from "~/trpc/server";
 import { FollowButton } from "./follow-button";
+
+const getUser = cache(async (id: string) => {
+  const user = await api.user.getUser({ id });
+  if (!user) return notFound();
+
+  return user;
+});
+
+export async function generateMetadata({
+  params,
+}: Readonly<{
+  params: Promise<{ id: string }>;
+}>) {
+  const { id } = await params;
+
+  const user = await getUser(id);
+
+  return {
+    title: `${user.name} - User`,
+    description: `View ${user.name}'s profile on Myxr`,
+    authors: [{ name: user.name }],
+  };
+}
 
 export default async function UserPage({
   params,
@@ -13,10 +37,9 @@ export default async function UserPage({
 }>) {
   const { id } = await params;
 
-  const user = await api.user.getUser({ id });
-  if (!user) return notFound();
-
+  const user = await getUser(id);
   const sounds = await api.user.getSounds(id);
+
   if (sounds.length === 0) return notFound();
 
   const session = await getServerSession();
@@ -28,55 +51,50 @@ export default async function UserPage({
     ).length === 1;
 
   return (
-    <>
-      <title>{`${user.name!} - User`}</title>
-      <meta name="author" content={user.name!} />
-
-      <div className="flex w-full flex-col gap-20">
-        <div className="flex flex-row gap-10">
-          <Avatar className="size-24 shrink-0 rounded-full">
-            <AvatarImage
-              src={createdBy?.image + "?size=96"}
-              alt={createdBy?.name ?? ""}
-            />
-            <AvatarFallback delayMs={500}>
-              {user.name?.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex w-full flex-col justify-between gap-4 sm:flex-row">
-            <div className="flex w-full flex-col gap-2">
-              <h1 className="text-4xl font-bold">{user.name}</h1>
-              <div className="flex gap-6">
-                <div className="flex gap-1">
-                  <span className="font-bold">
-                    {followerCount.toLocaleString()}
-                  </span>
-                  <span className="text-muted-foreground">followers</span>
-                </div>
-                <div className="flex gap-1">
-                  <span className="font-bold">
-                    {sounds.length.toLocaleString()}
-                  </span>
-                  <span className="text-muted-foreground">sounds</span>
-                </div>
+    <div className="flex w-full flex-col gap-20">
+      <div className="flex flex-row gap-10">
+        <Avatar className="size-24 shrink-0 rounded-full">
+          <AvatarImage
+            src={createdBy?.image + "?size=96"}
+            alt={createdBy?.name ?? ""}
+          />
+          <AvatarFallback delayMs={500}>
+            {user.name?.charAt(0).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex w-full flex-col justify-between gap-4 sm:flex-row">
+          <div className="flex w-full flex-col gap-2">
+            <h1 className="text-4xl font-bold">{user.name}</h1>
+            <div className="flex gap-6">
+              <div className="flex gap-1">
+                <span className="font-bold">
+                  {followerCount.toLocaleString()}
+                </span>
+                <span className="text-muted-foreground">followers</span>
+              </div>
+              <div className="flex gap-1">
+                <span className="font-bold">
+                  {sounds.length.toLocaleString()}
+                </span>
+                <span className="text-muted-foreground">sounds</span>
               </div>
             </div>
-            <div className="flex flex-col gap-2 sm:items-end">
-              {session?.user.id !== id && (
-                <FollowButton id={id} isFollowing={isFollowing} />
-              )}
-            </div>
+          </div>
+          <div className="flex flex-col gap-2 sm:items-end">
+            {session?.user.id !== id && (
+              <FollowButton id={id} isFollowing={isFollowing} />
+            )}
           </div>
         </div>
-        <div className="flex flex-col gap-4">
-          <h2 className="text-2xl font-bold">Sounds</h2>
-          <SoundsGrid>
-            {sounds.map((sound) => (
-              <Sound key={sound.id} sound={sound} />
-            ))}
-          </SoundsGrid>
-        </div>
       </div>
-    </>
+      <div className="flex flex-col gap-4">
+        <h2 className="text-2xl font-bold">Sounds</h2>
+        <SoundsGrid>
+          {sounds.map((sound) => (
+            <Sound key={sound.id} sound={sound} />
+          ))}
+        </SoundsGrid>
+      </div>
+    </div>
   );
 }

@@ -2,7 +2,7 @@ import type { GuildSound, LikedSound } from "@prisma/client";
 import type { APIGuild } from "discord-api-types/v10";
 import { z } from "zod";
 import { db } from "~/server/db";
-import { getDiscordGuilds } from "./discord-requests";
+import { getDiscordGuilds, getUserRoles } from "./discord-requests";
 
 const soundInclude = {
   tags: true,
@@ -42,6 +42,15 @@ export const discordAuthorization = async (id: string) => {
   });
 
   return `Bearer ${user?.accessToken}`;
+};
+
+export const getDiscordId = async (userId: string) => {
+  const account = await db.account.findFirst({
+    where: { userId },
+    select: { accountId: true },
+  });
+
+  return account?.accountId;
 };
 
 export const getSounds = async ({
@@ -144,6 +153,19 @@ export const updateGuildMemberShip = async (
 
   const guilds = await getDiscordGuilds(userId);
 
+  const existingGuildIds = guilds.map((guild) => guild.id);
+  if (existingGuildIds.length > 0)
+    await db.guildMembership.deleteMany({
+      where: {
+        userId,
+        NOT: {
+          guildId: {
+            in: existingGuildIds,
+          },
+        },
+      },
+    });
+
   for (const guild of guilds) {
     await upsertGuild(guild);
 
@@ -175,7 +197,9 @@ export const getUserGuilds = async (userId: string) => {
 };
 
 export const upsertGuild = async (guild: APIGuild) => {
-  const image = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`;
+  const image = guild.icon
+    ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`
+    : null;
 
   await db.guild.upsert({
     where: { id: guild.id },
@@ -300,4 +324,45 @@ export const getGuildSounds = async (guildId: string) => {
     where: { guildId },
     include: { sound: { include: { createdBy: true } }, guild: true },
   });
+};
+
+export const getGuild = async (guildId: string) => {
+  return db.guild.findFirst({
+    where: { id: guildId },
+  });
+};
+
+export const getSoundMasterRoles = async (guildId: string) => {
+  return db.guild.findFirst({
+    where: { id: guildId },
+    select: {
+      soundMasterRoles: true,
+    },
+  });
+};
+
+export const setSoundMasterRoles = async (guildId: string, roles: string[]) => {
+  const { soundMasterRoles } = await db.guild.update({
+    where: { id: guildId },
+    data: { soundMasterRoles: roles },
+  });
+
+  return soundMasterRoles;
+};
+
+export const hasSoundBoardCreatePermission = async (
+  guildId: string,
+  userId: string,
+) => {
+  const guildRoles = await getSoundMasterRoles(guildId);
+  const discordId = await getDiscordId(userId);
+
+  if (!discordId) return false;
+
+  const userRoles = await getUserRoles(guildId, discordId);
+  const hasPermission = userRoles.roles.some((role) =>
+    guildRoles?.soundMasterRoles.some((guildRole) => guildRole === role),
+  );
+
+  return hasPermission;
 };

@@ -10,10 +10,11 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import { headers } from "next/headers";
 import superjson from "superjson";
-import { ZodError } from "zod";
+import { z, ZodError } from "zod";
 import { auth } from "~/lib/auth";
 
 import { db } from "~/server/db";
+import { hasSoundBoardCreatePermission } from "~/utils/db";
 
 /**
  * 1. CONTEXT
@@ -130,6 +131,47 @@ export const protectedProcedure = t.procedure
     return next({
       ctx: {
         // infers the `session` as non-nullable
+        session: { ...ctx.session, user: ctx.session.user },
+      },
+    });
+  });
+
+/**
+ * Protected procedure with guild management permission check
+ *
+ * This procedure extends the protected procedure by adding a check for guild management permissions.
+ * It verifies that the user either:
+ * 1. Has explicit sound board creation permission for the guild, or
+ * 2. Is an admin of the guild
+ *
+ * The procedure requires a guildId input parameter and will throw an UNAUTHORIZED error if the user
+ * lacks sufficient permissions.
+ *
+ * @see protectedProcedure
+ */
+export const allowedToManageGuildProtectedProcedure = protectedProcedure
+  .input(
+    z.object({
+      guildId: z.string(),
+    }),
+  )
+  .use(async ({ ctx, input, next }) => {
+    const hasPermission = await hasSoundBoardCreatePermission(
+      input.guildId,
+      ctx.session.session.userId,
+    );
+    const isAdmin =
+      ctx.session.user.guilds.filter((guild) => guild.id === input.guildId)
+        .length > 0;
+
+    if (!(hasPermission || isAdmin))
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "You are not allowed to manage this guild",
+      });
+
+    return next({
+      ctx: {
         session: { ...ctx.session, user: ctx.session.user },
       },
     });
