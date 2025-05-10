@@ -25,7 +25,7 @@ export default async function MeSoundsPage() {
   }
 
   return (
-    <SoundsGrid sm={4} md={5} lg={6} xl={8}>
+    <SoundsGrid>
       {sounds.map((sound) => (
         <Sound key={sound.id} sound={sound} />
       ))}
