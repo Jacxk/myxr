@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import AdDisplay from "~/components/ad/ad-display";
 import { EmojiImage } from "~/components/emoji-image";
 import { AddToGuildButton } from "~/components/sound/add-button";
 import { LikeButton } from "~/components/sound/like-button";
@@ -86,7 +87,14 @@ export function SoundPage({ id, sound, isPreview }: Readonly<SoundPageProps>) {
       <SoundWaveForm url={sound.url} />
       <div className="border-b" />
       <div className="flex flex-col-reverse justify-between gap-4 sm:flex-row">
-        <div className="flex flex-col gap-4">
+        <div className="flex w-full flex-col gap-4">
+          <AdDisplay
+            adSlot="1970362642"
+            format="fluid"
+            layoutKey="-f9+4w+7x-eg+3a"
+            showProbability={1}
+          />
+
           {sound.guildSounds.length === 0 ? (
             <span>No guilds are using this sound.</span>
           ) : (
