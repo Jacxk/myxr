@@ -46,16 +46,18 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
-      <meta
-        name="format-detection"
-        content="telephone=no, date=no, address=no, email=no"
-      />
-      <Script
-        async
-        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${env.NEXT_PUBLIC_ADSENSE_KEY}`}
-        crossOrigin="anonymous"
-        strategy="lazyOnload"
-      />
+      <head>
+        <meta
+          name="format-detection"
+          content="telephone=no, date=no, address=no, email=no"
+        />
+        <Script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${env.NEXT_PUBLIC_ADSENSE_KEY}`}
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
+      </head>
       <body>
         <ThemeProvider attribute="class">
           <PostHogProvider>
