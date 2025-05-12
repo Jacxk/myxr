@@ -1,10 +1,17 @@
 import { env } from "~/env";
 import { LEGAL_LAST_UPDATED } from "~/utils/constants";
 
+const lastModified = new Date();
+
 export default async function sitemap() {
-  const routes = [""].map((route) => ({
+  const routes = ["", "/upload"].map((route) => ({
     url: `${env.NEXT_PUBLIC_BASE_URL}${route}`,
-    lastModified: new Date(),
+    lastModified,
+  }));
+
+  const sitemaps = ["/sound/sitemap.xml", "/user/sitemap.xml"].map((route) => ({
+    url: `${env.NEXT_PUBLIC_BASE_URL}${route}`,
+    lastModified,
   }));
 
   const legalPages = ["/legal/dmca", "/legal/privacy", "/legal/terms"].map(
@@ -20,5 +27,5 @@ export default async function sitemap() {
     }),
   );
 
-  return [...routes, ...legalPages];
+  return [...routes, ...legalPages, ...sitemaps];
 }
