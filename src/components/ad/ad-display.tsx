@@ -40,8 +40,9 @@ export default function AdDisplay({
   }, [showProbability]);
 
   const isDev = env.NEXT_PUBLIC_DEV_MODE;
+  const isReady = env.NEXT_PUBLIC_IS_READY;
 
-  if (!shouldShow || isDev) return null;
+  if (!shouldShow || isDev || !isReady) return null;
 
   return (
     <AdUnit

@@ -34,6 +34,7 @@ export const env = createEnv({
     NEXT_PUBLIC_DEV_MODE: z.boolean(),
     NEXT_PUBLIC_ADSENSE_PUBLISHER_ID: z.string(),
     NEXT_PUBLIC_BASE_URL: z.string(),
+    NEXT_PUBLIC_IS_READY: z.boolean().default(false),
   },
 
   /**
@@ -55,6 +56,7 @@ export const env = createEnv({
     NEXT_PUBLIC_ADSENSE_PUBLISHER_ID:
       process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID,
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+    NEXT_PUBLIC_IS_READY: process.env.NEXT_PUBLIC_IS_READY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
