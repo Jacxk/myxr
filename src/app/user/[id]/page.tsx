@@ -4,6 +4,7 @@ import AdDisplay from "~/components/ad/ad-display";
 import Sound from "~/components/sound/sound";
 import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
 import { getServerSession } from "~/lib/auth";
 import { api } from "~/trpc/server";
 import { FollowButton } from "./follow-button";
@@ -65,7 +66,14 @@ export default async function UserPage({
         </Avatar>
         <div className="flex w-full flex-col justify-between gap-4 sm:flex-row">
           <div className="flex w-full flex-col gap-2">
-            <h1 className="text-4xl font-bold">{user.name}</h1>
+            <h1 className="flex gap-4 text-4xl font-bold">
+              <span>{user.name}</span>
+              {user.role !== "USER" && (
+                <div className="flex items-start">
+                  <Badge variant="outline">{user.role}</Badge>
+                </div>
+              )}
+            </h1>
             <div className="flex gap-6">
               <div className="flex gap-1">
                 <span className="font-bold">
