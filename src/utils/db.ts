@@ -366,3 +366,29 @@ export const hasSoundBoardCreatePermission = async (
 
   return hasPermission;
 };
+
+export const getSoundCount = () => {
+  return db.sound.count();
+};
+
+export const getAllSoundsIds = () => {
+  return db.sound.findMany({
+    select: {
+      id: true,
+      updatedAt: true,
+    },
+  });
+};
+
+export const getUserCount = () => {
+  return db.user.count();
+};
+
+export const getAllUsersIds = async () => {
+  return db.user.findMany({
+    select: {
+      id: true,
+      updatedAt: true,
+    },
+  });
+};
