@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { GuildSound, LikedSound } from "@prisma/client";
 import type { APIGuild } from "discord-api-types/v10";
 import { z } from "zod";
