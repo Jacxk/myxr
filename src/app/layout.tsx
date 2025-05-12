@@ -3,12 +3,11 @@ import "~/styles/globals.css";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
+import { GoogleAdSense } from "next-google-adsense";
 import { ThemeProvider } from "next-themes";
-import Script from "next/script";
 import NextTopLoader from "nextjs-toploader";
 import { PostHogProvider } from "~/components/PostHogProvider";
 import { Toaster } from "~/components/ui/sonner";
-import { env } from "~/env";
 import { TRPCReactProvider } from "~/trpc/react";
 import { HydrateClient } from "~/trpc/server";
 import { Footer } from "./_components/footer";
@@ -46,19 +45,8 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
-      <head>
-        <meta
-          name="format-detection"
-          content="telephone=no, date=no, address=no, email=no"
-        />
-        <Script
-          async
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${env.NEXT_PUBLIC_ADSENSE_KEY}`}
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
-      </head>
       <body>
+        <GoogleAdSense />
         <ThemeProvider attribute="class">
           <PostHogProvider>
             <TRPCReactProvider>

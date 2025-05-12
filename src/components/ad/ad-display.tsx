@@ -1,5 +1,6 @@
 "use client";
 
+import { AdUnit } from "next-google-adsense";
 import { useEffect, useState } from "react";
 import { env } from "~/env";
 import { cn } from "~/lib/utils";
@@ -32,39 +33,63 @@ export default function AdDisplay({
   layoutKey,
 }: AdDisplayProps) {
   const [shouldShow, setShouldShow] = useState(false);
+  // const pathname = usePathname();
+  // const searchParams = useSearchParams();
 
   useEffect(() => {
     const random = Math.random();
     setShouldShow(random < showProbability);
   }, [showProbability]);
 
-  useEffect(() => {
-    if (!shouldShow) return;
+  // useEffect(() => {
+  //   if (!shouldShow) return;
 
-    try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (e) {
-      console.error("AdSense error:", e);
-    }
-  }, [shouldShow]);
+  //   try {
+  //     (window.adsbygoogle = window.adsbygoogle || []).push({});
+  //   } catch (e) {
+  //     console.error("AdSense error:", e);
+  //   }
+  // }, [shouldShow, pathname, searchParams]);
 
   if (!shouldShow) return null;
 
-  const displayAdSlot = env.NEXT_PUBLIC_DEV_MODE ? "0000000000" : adSlot;
+  // const displayAdSlot = env.NEXT_PUBLIC_DEV_MODE ? "0000000000" : adSlot;
 
+  // return (
+  //   <ins
+  //     className={cn("adsbygoogle", className)}
+  //     style={{
+  //       display: "inline-block",
+  //       width,
+  //       height,
+  //     }}
+  //     data-ad-client={env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID}
+  //     data-ad-slot={displayAdSlot}
+  //     data-ad-format={format}
+  //     data-ad-layout-key={layoutKey}
+  //     data-full-width-responsive={fullWidthResponsive}
+  //   ></ins>
+  // );
   return (
-    <ins
-      className={cn("adsbygoogle", className)}
-      style={{
-        display: "inline-block",
-        width,
-        height,
-      }}
-      data-ad-client={env.NEXT_PUBLIC_ADSENSE_KEY}
-      data-ad-slot={displayAdSlot}
-      data-ad-format={format}
-      data-ad-layout-key={layoutKey}
-      data-full-width-responsive={fullWidthResponsive}
-    ></ins>
+    <AdUnit
+      slotId={adSlot}
+      layout="custom"
+      publisherId={env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID}
+      customLayout={(() => (
+        <ins
+          className={cn("adsbygoogle", className)}
+          style={{
+            display: "inline-block",
+            width,
+            height,
+          }}
+          data-ad-client={env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID}
+          data-ad-slot={adSlot}
+          data-ad-format={format}
+          data-ad-layout-key={layoutKey}
+          data-full-width-responsive={fullWidthResponsive}
+        ></ins>
+      ))()}
+    />
   );
 }
