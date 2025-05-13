@@ -4,14 +4,14 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { getSoundsFromUser, getUserLikedSounds } from "~/utils/db";
+import { SoundQuery } from "~/utils/db/queries/sound";
 
 export const userRouter = createTRPCRouter({
   getSounds: publicProcedure.input(z.string()).query(async ({ input }) => {
-    return await getSoundsFromUser(input);
+    return await SoundQuery.getSoundsFromUser(input);
   }),
   me: protectedProcedure.query(async ({ ctx }) => {
-    const sounds = await getSoundsFromUser(ctx.session.user.id);
+    const sounds = await SoundQuery.getSoundsFromUser(ctx.session.user.id);
     const guildSounds = await ctx.db.guildSound.findMany({
       where: { soundId: { in: sounds.map((sound) => sound.id) } },
       include: { sound: { include: { createdBy: true } }, guild: true },
@@ -21,7 +21,7 @@ export const userRouter = createTRPCRouter({
   }),
   likedSounds: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id;
-    return getUserLikedSounds(userId);
+    return SoundQuery.getUserLikedSounds(userId);
   }),
   reports: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id;

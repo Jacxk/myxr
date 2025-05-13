@@ -5,13 +5,8 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import {
-  getGuild,
-  getGuildSounds,
-  getSoundMasterRoles,
-  handleSoundGuildCreate,
-  setSoundMasterRoles,
-} from "~/utils/db";
+import { GuildMutation } from "~/utils/db/mutations/guild";
+import { GuildQuery } from "~/utils/db/queries/guild";
 import {
   createSound,
   deleteSound,
@@ -22,7 +17,7 @@ import {
 
 export const guildRouter = createTRPCRouter({
   getGuild: publicProcedure.input(z.string()).query(async ({ input }) => {
-    return getGuild(input);
+    return GuildQuery.getGuild(input);
   }),
   isBotIn: publicProcedure.input(z.string()).mutation(async ({ input }) => {
     return {
@@ -56,7 +51,7 @@ export const guildRouter = createTRPCRouter({
         sound,
       });
 
-      await handleSoundGuildCreate({
+      await GuildMutation.handleSoundGuildCreate({
         discordSoundId: soundData.sound_id,
         ...input,
       });
@@ -91,13 +86,13 @@ export const guildRouter = createTRPCRouter({
   getGuildSounds: protectedProcedure
     .input(z.string())
     .query(async ({ input }) => {
-      return getGuildSounds(input);
+      return GuildQuery.getGuildSounds(input);
     }),
   getGuildRoles: protectedProcedure
     .input(z.string())
     .query(async ({ input }) => {
       const guildRoles = await getGuildRoles(input);
-      const roles = await getSoundMasterRoles(input);
+      const roles = await GuildQuery.getSoundMasterRoles(input);
 
       return guildRoles
         .filter(
@@ -116,7 +111,7 @@ export const guildRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input }) => {
-      return setSoundMasterRoles(input.guildId, input.roles);
+      return GuildMutation.setSoundMasterRoles(input.guildId, input.roles);
     }),
 });
 

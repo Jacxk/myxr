@@ -10,7 +10,7 @@ import {
 import { NextResponse } from "next/server";
 import nacl from "tweetnacl";
 import { env } from "~/env";
-import { upsertGuild } from "~/utils/db";
+import { GuildMutation } from "~/utils/db/mutations/guild";
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
       event.type === ApplicationWebhookEventType.ApplicationAuthorized &&
       guild
     ) {
-      await upsertGuild({
+      await GuildMutation.upsertGuild({
         id: guild.id,
         name: guild.name,
       } as APIGuild);

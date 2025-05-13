@@ -5,13 +5,8 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import {
-  getAllSounds,
-  getSound,
-  getSounds,
-  searchForSoundsInfinite,
-  SearchType,
-} from "~/utils/db";
+import { SoundQuery } from "~/utils/db/queries/sound";
+import { SearchType } from "~/utils/db/types";
 
 export const soundRouter = createTRPCRouter({
   me: protectedProcedure
@@ -33,7 +28,7 @@ export const soundRouter = createTRPCRouter({
   getLatests: publicProcedure
     .input(z.object({ limit: z.number().default(6) }))
     .query(({ input, ctx }) =>
-      getSounds({ take: input.limit, userId: ctx.session?.user.id }),
+      SoundQuery.getSounds({ take: input.limit, userId: ctx.session?.user.id }),
     ),
   getAllSounds: publicProcedure
     .input(
@@ -44,7 +39,7 @@ export const soundRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const sounds = await getAllSounds(
+      const sounds = await SoundQuery.getAllSounds(
         input.limit,
         input.cursor,
         ctx.session?.user.id,
@@ -68,7 +63,7 @@ export const soundRouter = createTRPCRouter({
       }),
     )
     .query(({ input, ctx }) => {
-      return getSound(input.id, ctx.session?.user.id);
+      return SoundQuery.getSound(input.id, ctx.session?.user.id);
     }),
   search: publicProcedure
     .input(
@@ -82,7 +77,7 @@ export const soundRouter = createTRPCRouter({
     )
     .query(async ({ input, ctx }) => {
       const userId = ctx.session?.user.id;
-      const sounds = await searchForSoundsInfinite(
+      const sounds = await SoundQuery.searchForSoundsInfinite(
         input.query,
         input.type,
         input.limit,
