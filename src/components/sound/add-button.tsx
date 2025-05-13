@@ -46,9 +46,6 @@ const handleInternalServerError = (message: string): void => {
     case "SOUND_NOT_FOUND":
       ErrorToast.soundNotFound();
       break;
-    default:
-      ErrorToast.internal(message);
-      break;
   }
 };
 
@@ -74,16 +71,13 @@ export function AddToGuildButton({
         });
 
         toast("Sound added to guild");
-        setOpen(false);
       },
       onError: (error) => {
-        if (error?.data?.code === "UNAUTHORIZED") {
-          ErrorToast.login();
-        } else if (error?.data?.code === "INTERNAL_SERVER_ERROR") {
-          handleInternalServerError(error.message);
-        }
-
+        handleInternalServerError(error.message);
         setUsageCount((usage) => usage - 1);
+      },
+      onSettled: () => {
+        setOpen(false);
       },
     }),
   );
