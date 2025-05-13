@@ -62,7 +62,7 @@ export default memo(function Sound({
   return (
     <div
       className={cn(
-        "flex aspect-square size-44 flex-col items-center justify-center gap-2 p-2",
+        "flex aspect-square size-40 flex-col items-center justify-center gap-2 p-2",
         className,
       )}
     >
