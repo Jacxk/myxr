@@ -176,3 +176,28 @@ export const allowedToManageGuildProtectedProcedure = protectedProcedure
       },
     });
   });
+
+/**
+ * Admin-only protected procedure
+ *
+ * This procedure extends the protected procedure by adding a check for admin role.
+ * It will throw an UNAUTHORIZED error if the user is not an admin.
+ *
+ * @see protectedProcedure
+ */
+export const adminProtectedProcedure = protectedProcedure.use(
+  async ({ ctx, next }) => {
+    if (ctx.session.user.role !== "ADMIN") {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "This action requires admin privileges",
+      });
+    }
+
+    return next({
+      ctx: {
+        session: { ...ctx.session, user: ctx.session.user },
+      },
+    });
+  },
+);

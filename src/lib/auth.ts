@@ -6,7 +6,7 @@ import { customSession } from "better-auth/plugins";
 import { headers } from "next/headers";
 import { env } from "~/env";
 import { db } from "~/server/db";
-import { getUserGuilds, updateGuildMemberShip } from "~/utils/db";
+import { getUserGuilds, getUserRole, updateGuildMemberShip } from "~/utils/db";
 
 export const auth = betterAuth({
   database: prismaAdapter(db, { provider: "postgresql" }),
@@ -21,12 +21,12 @@ export const auth = betterAuth({
       await updateGuildMemberShip(session.userId);
 
       const guilds = await getUserGuilds(session.userId);
-      guilds?.sort((a, b) => a.guild.name.localeCompare(b.guild.name));
+      const userRole = await getUserRole(session.userId);
 
       return {
         user: {
           ...user,
-          role: Role.USER,
+          role: userRole?.role ?? Role.USER,
           guilds: guilds?.map(({ guild }) => ({ ...guild })) ?? [],
         },
         session,

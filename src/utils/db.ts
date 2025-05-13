@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { GuildSound, LikedSound } from "@prisma/client";
+import type { ActionStatus, GuildSound, LikedSound } from "@prisma/client";
 import type { APIGuild } from "discord-api-types/v10";
 import { z } from "zod";
 import { db } from "~/server/db";
@@ -386,11 +386,41 @@ export const getUserCount = () => {
   return db.user.count();
 };
 
-export const getAllUsersIds = async () => {
+export const getAllUsersIds = () => {
   return db.user.findMany({
     select: {
       id: true,
       updatedAt: true,
     },
+  });
+};
+
+export const getUserRole = (userId: string) => {
+  return db.user.findFirst({
+    where: { id: userId },
+    select: { role: true },
+  });
+};
+
+export const getAllReports = () => {
+  return db.soundReport.findMany({
+    include: {
+      sound: true,
+      user: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};
+
+export const takeActionOnReport = async (
+  reportId: string,
+  actionTaken: ActionStatus,
+  actionText: string,
+) => {
+  return db.soundReport.update({
+    where: { id: reportId },
+    data: { actionTaken, actionText },
   });
 };
