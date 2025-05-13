@@ -44,6 +44,7 @@ export async function POST(req: Request) {
       await GuildMutation.upsertGuild({
         id: guild.id,
         name: guild.name,
+        icon: guild.icon,
       } as APIGuild);
     }
     return NextResponse.json({}, { status: 200 });

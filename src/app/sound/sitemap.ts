@@ -1,4 +1,4 @@
-import { MetadataRoute } from "next";
+import { type MetadataRoute } from "next";
 import { env } from "~/env";
 import { SoundQuery } from "~/utils/db/queries/sound";
 

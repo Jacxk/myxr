@@ -77,8 +77,6 @@ export function SelectFileStep() {
       return ErrorToast.invalidAudioFile();
     }
 
-    const fileName = file.name.split(".")[0] ?? "Unknown";
-
     initializeData(file);
     nextStep();
   }
@@ -87,10 +85,9 @@ export function SelectFileStep() {
     event.preventDefault();
     event.stopPropagation();
 
-    setIsDragging(true);
-
     const file = event.dataTransfer.items[0];
 
+    setIsDragging(true);
     validateFile(file);
   };
 
