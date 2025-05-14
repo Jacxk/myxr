@@ -41,6 +41,7 @@ const handleInternalServerError = (message: string): void => {
       ErrorToast.soundExistsInGuild();
       break;
     case "Unknown Guild":
+    case "Unknown Member":
       ErrorToast.guildNotFound();
       break;
     case "SOUND_NOT_FOUND":
