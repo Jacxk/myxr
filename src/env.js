@@ -20,6 +20,7 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+    DISCORD_NEW_SOUND_CHANNEL_ID: z.string().optional(),
   },
 
   /**
@@ -57,6 +58,7 @@ export const env = createEnv({
       process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID,
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
     NEXT_PUBLIC_IS_READY: process.env.NEXT_PUBLIC_IS_READY,
+    DISCORD_NEW_SOUND_CHANNEL_ID: process.env.DISCORD_NEW_SOUND_CHANNEL_ID,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

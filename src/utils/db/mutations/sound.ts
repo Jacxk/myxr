@@ -59,6 +59,15 @@ export const SoundMutations = {
           })),
         },
       },
+      include: {
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+      },
     });
 
     return {
