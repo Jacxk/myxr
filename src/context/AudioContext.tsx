@@ -84,6 +84,8 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
       audio.removeEventListener("play", handlePlay);
       audio.removeEventListener("pause", handleStop);
       audio.removeEventListener("ended", handleStop);
+      audio.pause();
+      audio.currentTime = 0;
     };
   }, []);
 
