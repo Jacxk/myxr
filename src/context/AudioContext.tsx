@@ -1,5 +1,6 @@
 "use client";
 
+import { usePostHog } from "posthog-js/react";
 import {
   createContext,
   type ReactNode,
@@ -42,6 +43,8 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentId, setCurrentId] = useState<string>("");
 
+  const posthog = usePostHog();
+
   const handlePlay = () => setIsPlaying(true);
   const handleStop = () => setIsPlaying(false);
 
@@ -75,6 +78,10 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
       audio.load();
     }
 
+    posthog.capture("Sound Played", {
+      sound_id: id,
+      sound_url: src,
+    });
     setCurrentId(id);
     void audio.play();
   };

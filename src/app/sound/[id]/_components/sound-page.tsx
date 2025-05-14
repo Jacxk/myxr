@@ -84,7 +84,7 @@ export function SoundPage({ id, sound, isPreview }: Readonly<SoundPageProps>) {
           <ActionButtons id={id} sound={sound} isPreview={isPreview} />
         </div>
       </div>
-      <SoundWaveForm url={sound.url} />
+      <SoundWaveForm id={id} url={sound.url} />
       <div className="border-b" />
       <div className="flex flex-col-reverse justify-between gap-4 sm:flex-row">
         <div className="flex w-full flex-col gap-4">

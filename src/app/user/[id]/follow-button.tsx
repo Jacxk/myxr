@@ -3,6 +3,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { usePostHog } from "posthog-js/react";
 import { useCallback, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { useSession } from "~/lib/auth-client";
@@ -16,6 +17,7 @@ export function FollowButton({
   const api = useTRPC();
   const router = useRouter();
   const { data: session } = useSession();
+  const posthog = usePostHog();
 
   const [following, setFollowing] = useState(isFollowing);
 
@@ -23,6 +25,10 @@ export function FollowButton({
     api.user.followUser.mutationOptions({
       onSuccess({ value }) {
         setFollowing(value.following);
+        posthog.capture("User Followed", {
+          user_id: id,
+          following: value.following,
+        });
       },
       onError() {
         setFollowing(false);
