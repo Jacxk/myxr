@@ -41,6 +41,7 @@ export function AuthenticatedMenu() {
             fetchOptions: {
               onSuccess() {
                 router.push("/");
+                localStorage.removeItem("selectedGuild");
               },
             },
           })
