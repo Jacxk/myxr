@@ -1,17 +1,15 @@
-"use client";
-
 import { User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 
 import { DropdownMenuTrigger } from "~/components/ui/dropdown-menu";
-import { useSession } from "~/lib/auth-client";
+import { getServerSession } from "~/lib/auth";
 import {
   AuthenticatedClient,
   NotAuthenticatedClient,
 } from "../authentication-client";
 
-export function MenuTrigger() {
-  const { data: session } = useSession();
+export async function MenuTrigger() {
+  const session = await getServerSession();
   const user = session?.user;
 
   return (
@@ -27,6 +25,7 @@ export function MenuTrigger() {
           </AvatarFallback>
         </AuthenticatedClient>
         <NotAuthenticatedClient>
+          <AvatarImage />
           <AvatarFallback delayMs={0}>
             <User />
           </AvatarFallback>
