@@ -11,26 +11,13 @@ export const userRouter = createTRPCRouter({
   getSounds: publicProcedure.input(z.string()).query(async ({ input }) => {
     return await SoundQuery.getSoundsFromUser(input);
   }),
-  me: protectedProcedure.query(async ({ ctx }) => {
-    const sounds = await SoundQuery.getSoundsFromUser(ctx.session.user.id);
-    const guildSounds = await ctx.db.guildSound.findMany({
-      where: { soundId: { in: sounds.map((sound) => sound.id) } },
-      include: { sound: { include: { createdBy: true } }, guild: true },
-    });
-
-    return { sounds, guildSounds };
-  }),
   likedSounds: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id;
     return SoundQuery.getUserLikedSounds(userId);
   }),
   reports: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id;
-    return ctx.db.soundReport.findMany({
-      where: { userId },
-      include: { sound: true },
-      orderBy: { createdAt: "desc" },
-    });
+    return UserQuery.getReports(userId);
   }),
   getUser: publicProcedure
     .input(z.object({ id: z.string() }))
