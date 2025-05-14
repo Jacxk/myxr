@@ -56,7 +56,8 @@ export default async function MeGuildIdPage({
 
   if (externalSounds.length + guildSounds.length === 0) {
     return (
-      <div className="flex w-full flex-wrap items-center justify-center">
+      <div className="flex w-full flex-col flex-wrap items-center justify-center gap-2">
+        <h2 className="text-muted-foreground text-xl">{guild.name}</h2>
         <span>No sounds found for this Guild...</span>
       </div>
     );
