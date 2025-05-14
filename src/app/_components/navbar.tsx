@@ -8,7 +8,7 @@ import {
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 import { AccountMenu } from "./account-menu";
-import { Authenticated } from "./authentication";
+import { AuthenticatedClient } from "./authentication-client";
 import { SearchBar } from "./search-bar";
 import { SelectGuild } from "./select-guild";
 
@@ -19,7 +19,7 @@ export default async function Navbar() {
         myxr
       </Link>
       <SearchBar />
-      <Authenticated>
+      <AuthenticatedClient>
         <div className="flex items-center gap-4">
           <SelectGuild />
         </div>
@@ -35,7 +35,7 @@ export default async function Navbar() {
             </Tooltip>
           </TooltipProvider>
         </Link>
-      </Authenticated>
+      </AuthenticatedClient>
       <AccountMenu />
     </nav>
   );

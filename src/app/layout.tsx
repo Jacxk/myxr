@@ -3,6 +3,7 @@ import "~/styles/globals.css";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
+import { GoogleAdSense } from "next-google-adsense";
 import { ThemeProvider } from "next-themes";
 import NextTopLoader from "nextjs-toploader";
 import { PostHogProvider } from "~/components/PostHogProvider";
@@ -44,11 +45,8 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
-      <meta
-        name="format-detection"
-        content="telephone=no, date=no, address=no, email=no"
-      />
       <body>
+        <GoogleAdSense />
         <ThemeProvider attribute="class">
           <PostHogProvider>
             <TRPCReactProvider>

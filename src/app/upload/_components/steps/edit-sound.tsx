@@ -4,6 +4,7 @@ import { usePostHog } from "posthog-js/react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { type Region } from "wavesurfer.js/dist/plugins/regions.esm.js";
+import AdDisplay from "~/components/ad/ad-display";
 import { SoundWaveForm } from "~/components/sound/sound-waveform";
 import { Button } from "~/components/ui/button";
 import {
@@ -141,6 +142,13 @@ export function EditSoundStep() {
           Continue
         </Button>
       </div>
+
+      <AdDisplay
+        adSlot="1944402367"
+        height="100%"
+        className="w-full"
+        showProbability={1}
+      />
     </div>
   );
 }

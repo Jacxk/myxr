@@ -5,29 +5,18 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import {
-  getGuild,
-  getGuildSounds,
-  getSoundMasterRoles,
-  handleSoundGuildCreate,
-  setSoundMasterRoles,
-} from "~/utils/db";
-import {
-  createSound,
-  deleteSound,
-  getGuildRoles,
-  getSoundBoard,
-  isBotInGuild,
-} from "~/utils/discord-requests";
+import { GuildMutation } from "~/utils/db/mutations/guild";
+import { GuildQuery } from "~/utils/db/queries/guild";
+import { BotDiscordApi } from "~/utils/discord/bot-api";
 
 export const guildRouter = createTRPCRouter({
   getGuild: publicProcedure.input(z.string()).query(async ({ input }) => {
-    return getGuild(input);
+    return GuildQuery.getGuild(input);
   }),
   isBotIn: publicProcedure.input(z.string()).mutation(async ({ input }) => {
     return {
       success: true,
-      value: await isBotInGuild(input),
+      value: await BotDiscordApi.isBotInGuild(input),
     };
   }),
   createSound: allowedToManageGuildProtectedProcedure
@@ -49,14 +38,14 @@ export const guildRouter = createTRPCRouter({
       if (guildSound) throw Error("SOUND_EXISTS");
 
       const sound = await downloadSoundToBase64(data?.url);
-      const soundData = await createSound({
+      const soundData = await BotDiscordApi.createSound({
         emoji: data.emoji,
         guildId: input.guildId,
         name: data.name,
         sound,
       });
 
-      await handleSoundGuildCreate({
+      await GuildMutation.handleSoundGuildCreate({
         discordSoundId: soundData.sound_id,
         ...input,
       });
@@ -66,7 +55,7 @@ export const guildRouter = createTRPCRouter({
   getSoundBoard: protectedProcedure
     .input(z.string())
     .query(async ({ input }) => {
-      return await getSoundBoard(input);
+      return await BotDiscordApi.getSoundBoard(input);
     }),
   deleteSound: allowedToManageGuildProtectedProcedure
     .input(
@@ -85,19 +74,21 @@ export const guildRouter = createTRPCRouter({
         });
       }
 
-      await deleteSound(input.guildId, input.soundId).catch(() => null);
+      await BotDiscordApi.deleteSound(input.guildId, input.soundId).catch(
+        () => null,
+      );
       return { success: true };
     }),
   getGuildSounds: protectedProcedure
     .input(z.string())
     .query(async ({ input }) => {
-      return getGuildSounds(input);
+      return GuildQuery.getGuildSounds(input);
     }),
   getGuildRoles: protectedProcedure
     .input(z.string())
     .query(async ({ input }) => {
-      const guildRoles = await getGuildRoles(input);
-      const roles = await getSoundMasterRoles(input);
+      const guildRoles = await BotDiscordApi.getGuildRoles(input);
+      const roles = await GuildQuery.getSoundMasterRoles(input);
 
       return guildRoles
         .filter(
@@ -116,7 +107,7 @@ export const guildRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input }) => {
-      return setSoundMasterRoles(input.guildId, input.roles);
+      return GuildMutation.setSoundMasterRoles(input.guildId, input.roles);
     }),
 });
 

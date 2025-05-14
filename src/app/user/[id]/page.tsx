@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
 import { cache } from "react";
+import AdDisplay from "~/components/ad/ad-display";
 import Sound from "~/components/sound/sound";
 import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
 import { getServerSession } from "~/lib/auth";
 import { api } from "~/trpc/server";
 import { FollowButton } from "./follow-button";
@@ -44,11 +46,7 @@ export default async function UserPage({
 
   const session = await getServerSession();
   const createdBy = sounds[0]?.createdBy;
-  const followerCount = user.followers.length;
-  const isFollowing =
-    user.followers.filter(
-      (follower) => follower.followerId === session?.user.id,
-    ).length === 1;
+  const followerCount = user._count.followers;
 
   return (
     <div className="flex w-full flex-col gap-20">
@@ -64,7 +62,14 @@ export default async function UserPage({
         </Avatar>
         <div className="flex w-full flex-col justify-between gap-4 sm:flex-row">
           <div className="flex w-full flex-col gap-2">
-            <h1 className="text-4xl font-bold">{user.name}</h1>
+            <h1 className="flex gap-4 text-4xl font-bold">
+              <span>{user.name}</span>
+              {user.role !== "USER" && (
+                <div className="flex items-start">
+                  <Badge variant="outline">{user.role}</Badge>
+                </div>
+              )}
+            </h1>
             <div className="flex gap-6">
               <div className="flex gap-1">
                 <span className="font-bold">
@@ -82,13 +87,19 @@ export default async function UserPage({
           </div>
           <div className="flex flex-col gap-2 sm:items-end">
             {session?.user.id !== id && (
-              <FollowButton id={id} isFollowing={isFollowing} />
+              <FollowButton id={id} isFollowing={user.isFollowing} />
             )}
           </div>
         </div>
       </div>
       <div className="flex flex-col gap-4">
         <h2 className="text-2xl font-bold">Sounds</h2>
+        <AdDisplay
+          adSlot="1970362642"
+          format="fluid"
+          layoutKey="-f9+4w+7x-eg+3a"
+          showProbability={1}
+        />
         <SoundsGrid>
           {sounds.map((sound) => (
             <Sound key={sound.id} sound={sound} />

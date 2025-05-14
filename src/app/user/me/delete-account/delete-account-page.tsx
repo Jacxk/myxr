@@ -3,6 +3,7 @@
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { type Metadata } from "next";
 import { useRouter } from "next/navigation";
+import { usePostHog } from "posthog-js/react";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import {
@@ -24,6 +25,7 @@ export const metadata: Metadata = {
 
 export default function DeleteAccountPage() {
   const router = useRouter();
+  const posthog = usePostHog();
 
   const { data: session } = useSession();
 
@@ -46,6 +48,9 @@ export default function DeleteAccountPage() {
     const deleted = await deleteUser();
     if (deleted.data?.success) {
       router.push("/");
+      posthog.capture("Account Deleted", {
+        user_id: session?.user.id,
+      });
     } else {
       ErrorToast.failedToDeleteAccount();
       setIsPending(false);

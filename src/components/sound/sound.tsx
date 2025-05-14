@@ -62,11 +62,13 @@ export default memo(function Sound({
   return (
     <div
       className={cn(
-        "flex shrink flex-col items-center justify-center",
+        "flex aspect-square size-40 flex-col items-center justify-center gap-2 p-2",
         className,
       )}
     >
-      <EmojiButton id={sound.id} url={sound.url} emoji={sound.emoji} />
+      <div className="flex flex-1 items-center justify-center">
+        <EmojiButton id={sound.id} url={sound.url} emoji={sound.emoji} />
+      </div>
       <Button
         className="p-0 text-center break-words whitespace-normal"
         variant="link"

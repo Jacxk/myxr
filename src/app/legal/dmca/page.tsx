@@ -1,4 +1,5 @@
 import { type Metadata } from "next";
+import { LEGAL_LAST_UPDATED } from "~/utils/constants";
 
 export const metadata: Metadata = {
   title: "DMCA Policy",
@@ -8,7 +9,9 @@ export default function DMCAPage() {
   return (
     <main className="mx-auto max-w-3xl p-6">
       <h1 className="mb-4 text-3xl font-bold">DMCA Policy</h1>
-      <p className="mb-6 text-sm text-gray-500">Last Updated: May 07, 2025</p>
+      <p className="mb-6 text-sm text-gray-500">
+        Last Updated: {LEGAL_LAST_UPDATED.DMCA.toLocaleDateString()}
+      </p>
 
       <section className="space-y-4">
         <p>

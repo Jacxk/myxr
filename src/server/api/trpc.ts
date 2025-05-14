@@ -14,7 +14,7 @@ import { z, ZodError } from "zod";
 import { auth } from "~/lib/auth";
 
 import { db } from "~/server/db";
-import { hasSoundBoardCreatePermission } from "~/utils/db";
+import { UserQuery } from "~/utils/db/queries/user";
 
 /**
  * 1. CONTEXT
@@ -156,7 +156,7 @@ export const allowedToManageGuildProtectedProcedure = protectedProcedure
     }),
   )
   .use(async ({ ctx, input, next }) => {
-    const hasPermission = await hasSoundBoardCreatePermission(
+    const hasPermission = await UserQuery.hasSoundBoardCreatePermission(
       input.guildId,
       ctx.session.session.userId,
     );

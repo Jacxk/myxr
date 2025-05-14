@@ -10,7 +10,7 @@ import { ErrorToast } from "~/lib/messages/toast.global";
 function onError(error: Error) {
   if (error.message === "UNAUTHORIZED") {
     ErrorToast.login();
-  } else {
+  } else if (error.message === "INTERNAL_SERVER_ERROR") {
     ErrorToast.internal();
   }
 }

@@ -4,73 +4,46 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { getSoundsFromUser, getUserLikedSounds } from "~/utils/db";
+import { ReportQuery } from "~/utils/db/queries/report";
+import { SoundQuery } from "~/utils/db/queries/sound";
+import { UserQuery } from "~/utils/db/queries/user";
 
 export const userRouter = createTRPCRouter({
   getSounds: publicProcedure.input(z.string()).query(async ({ input }) => {
-    return await getSoundsFromUser(input);
-  }),
-  me: protectedProcedure.query(async ({ ctx }) => {
-    const sounds = await getSoundsFromUser(ctx.session.user.id);
-    const guildSounds = await ctx.db.guildSound.findMany({
-      where: { soundId: { in: sounds.map((sound) => sound.id) } },
-      include: { sound: { include: { createdBy: true } }, guild: true },
-    });
-
-    return { sounds, guildSounds };
+    return await SoundQuery.getSoundsFromUser(input);
   }),
   likedSounds: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id;
-    return getUserLikedSounds(userId);
+    return SoundQuery.getUserLikedSounds(userId);
   }),
   reports: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id;
-    return ctx.db.soundReport.findMany({
-      where: { userId },
-      include: { sound: true },
-      orderBy: { createdAt: "desc" },
-    });
+    return ReportQuery.getReportsFromUser(userId);
   }),
   getUser: publicProcedure
     .input(z.object({ id: z.string() }))
-    .query(({ ctx, input }) => {
-      return ctx.db.user.findFirst({
-        where: { id: input.id },
-        include: { followers: true },
-      });
+    .query(async ({ ctx, input }) => {
+      const user = await UserQuery.getUser(input.id);
+
+      if (!user) return null;
+
+      const isFollowing = await UserQuery.isFollowing(
+        ctx.session?.user.id,
+        input.id,
+      );
+
+      return {
+        ...user,
+        isFollowing,
+      };
     }),
   followUser: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id;
-      const isFollow = await ctx.db.userFollow.findFirst({
-        where: {
-          followerId: userId,
-          followingId: input.id,
-        },
-      });
-
-      let following;
-
-      if (isFollow) {
-        await ctx.db.userFollow.delete({
-          where: {
-            followingId_followerId: {
-              followerId: userId,
-              followingId: input.id,
-            },
-          },
-        });
-        following = false;
-      } else {
-        await ctx.db.userFollow.create({
-          data: {
-            followerId: userId,
-            followingId: input.id,
-          },
-        });
-        following = true;
-      }
+      const following = await UserQuery.followUser(
+        ctx.session.user.id,
+        input.id,
+      );
 
       return { success: true, value: { following } };
     }),

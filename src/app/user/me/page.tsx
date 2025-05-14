@@ -1,3 +1,5 @@
-import SoundsRoute from "./sounds/page";
+import { redirect } from "next/navigation";
 
-export default SoundsRoute;
+export default function MePage() {
+  redirect("/user/me/sounds");
+}

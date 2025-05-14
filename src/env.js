@@ -20,6 +20,7 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+    DISCORD_NEW_SOUND_CHANNEL_ID: z.string().optional(),
   },
 
   /**
@@ -32,6 +33,9 @@ export const env = createEnv({
     NEXT_PUBLIC_POSTHOG_KEY: z.string(),
     NEXT_PUBLIC_POSTHOG_HOST: z.string(),
     NEXT_PUBLIC_DEV_MODE: z.boolean(),
+    NEXT_PUBLIC_ADSENSE_PUBLISHER_ID: z.string(),
+    NEXT_PUBLIC_BASE_URL: z.string(),
+    NEXT_PUBLIC_IS_READY: z.boolean().default(false),
   },
 
   /**
@@ -39,7 +43,7 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
-    BETTER_AUTH_SECRET: process.env.AUTH_SECRET,
+    BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
     AUTH_DISCORD_ID: process.env.AUTH_DISCORD_ID,
     AUTH_DISCORD_SECRET: process.env.AUTH_DISCORD_SECRET,
     DATABASE_URL: process.env.DATABASE_URL,
@@ -50,6 +54,11 @@ export const env = createEnv({
     NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
     NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
     NEXT_PUBLIC_DEV_MODE: process.env.NODE_ENV === "development",
+    NEXT_PUBLIC_ADSENSE_PUBLISHER_ID:
+      process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID,
+    NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+    NEXT_PUBLIC_IS_READY: process.env.NEXT_PUBLIC_IS_READY,
+    DISCORD_NEW_SOUND_CHANNEL_ID: process.env.DISCORD_NEW_SOUND_CHANNEL_ID,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

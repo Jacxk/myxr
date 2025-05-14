@@ -2,6 +2,7 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { Heart } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { usePostHog } from "posthog-js/react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -29,10 +30,10 @@ export function LikeButton({
 }>) {
   const api = useTRPC();
   const { data: session } = useSession();
+  const router = useRouter();
   const posthog = usePostHog();
 
   const [isLiked, setIsLiked] = useState<boolean>(liked ?? false);
-  const [likeCount, setLikeCount] = useState(likes ?? 0);
 
   const { mutate, isPending } = useMutation(
     api.sound.likeSound.mutationOptions({
@@ -45,6 +46,7 @@ export function LikeButton({
         if (!data.success) return;
 
         setIsLiked(data.value);
+        router.refresh();
       },
       onError() {
         setIsLiked(false);
@@ -61,7 +63,6 @@ export function LikeButton({
 
     const liked = !isLiked;
     setIsLiked(liked);
-    setLikeCount((likes) => likes + (!liked ? 1 : -1));
 
     if (isPreview) {
       toast(`Preview Mode: Sound like ${isLiked ? "removed" : "added"}`);
@@ -81,7 +82,7 @@ export function LikeButton({
             {likes &&
               Intl.NumberFormat(navigator.language, {
                 notation: "compact",
-              }).format(likeCount)}
+              }).format(likes)}
           </Button>
         </TooltipTrigger>
         <TooltipContent>{isLiked ? "Remove like" : "Like"}</TooltipContent>

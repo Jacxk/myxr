@@ -1,4 +1,5 @@
 "use client";
+
 import type { Sound, SoundReport } from "@prisma/client";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -85,7 +86,7 @@ export default function MeReportsPage() {
               disabled
             />
           </div>
-          <div className="text-muted-foreground flex justify-between">
+          <div className="text-muted-foreground flex flex-col justify-between sm:flex-row">
             <div>{selectedReport?.id}</div>
             <div>{selectedReport?.createdAt.toDateString()}</div>
           </div>

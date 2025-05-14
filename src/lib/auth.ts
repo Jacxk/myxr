@@ -6,7 +6,8 @@ import { customSession } from "better-auth/plugins";
 import { headers } from "next/headers";
 import { env } from "~/env";
 import { db } from "~/server/db";
-import { getUserGuilds, updateGuildMemberShip } from "~/utils/db";
+import { UserMutation } from "~/utils/db/mutations/user";
+import { GuildQuery } from "~/utils/db/queries/guild";
 
 export const auth = betterAuth({
   database: prismaAdapter(db, { provider: "postgresql" }),
@@ -18,9 +19,9 @@ export const auth = betterAuth({
   plugins: [
     nextCookies(),
     customSession(async ({ user, session }) => {
-      await updateGuildMemberShip(session.userId);
+      await UserMutation.updateGuildMemberShip(session.userId);
 
-      const guilds = await getUserGuilds(session.userId);
+      const guilds = await GuildQuery.getUserGuilds(session.userId);
       guilds?.sort((a, b) => a.guild.name.localeCompare(b.guild.name));
 
       return {

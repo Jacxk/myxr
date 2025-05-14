@@ -5,7 +5,7 @@ import {
   SoundTableList,
 } from "~/components/sound/sound-list";
 import { api } from "~/trpc/server";
-import { getSoundBoard } from "~/utils/discord-requests";
+import { BotDiscordApi } from "~/utils/discord/bot-api";
 import MasterRolesSelect from "./master-roles-select";
 
 const getGuild = cache(async (id: string) => {
@@ -43,7 +43,7 @@ export default async function MeGuildIdPage({
 }) {
   const { id } = await params;
   const guildSounds = await api.guild.getGuildSounds(id);
-  const externalSounds = await getSoundBoard(id);
+  const externalSounds = await BotDiscordApi.getSoundBoard(id);
   const guild = await getGuild(id);
 
   if (!guild) {
@@ -56,7 +56,8 @@ export default async function MeGuildIdPage({
 
   if (externalSounds.length + guildSounds.length === 0) {
     return (
-      <div className="flex w-full flex-wrap items-center justify-center">
+      <div className="flex w-full flex-col flex-wrap items-center justify-center gap-2">
+        <h2 className="text-muted-foreground text-xl">{guild.name}</h2>
         <span>No sounds found for this Guild...</span>
       </div>
     );
