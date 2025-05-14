@@ -105,7 +105,9 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       cleanup();
       audio.pause();
+      preloadAudio.pause();
       audio.currentTime = 0;
+      preloadAudio.currentTime = 0;
     };
   }, []);
 
