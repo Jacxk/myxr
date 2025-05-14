@@ -25,6 +25,7 @@ export default async function Layout({
                 className="rounded-full"
                 src={guild.image + "?size=32"}
                 alt={guild.name}
+                useNextImage
               />
               <AvatarFallback className="flex items-center justify-center text-xs">
                 {guild.name.slice(0, 1).toUpperCase()}

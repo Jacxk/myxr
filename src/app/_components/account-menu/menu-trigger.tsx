@@ -19,7 +19,11 @@ export async function MenuTrigger() {
     >
       <Avatar>
         <AuthenticatedClient>
-          <AvatarImage src={user?.image + "?size=40"} alt={user?.name} />
+          <AvatarImage
+            src={user?.image + "?size=40"}
+            alt={user?.name}
+            useNextImage
+          />
           <AvatarFallback delayMs={500}>
             {user?.name[0]?.toUpperCase()}
           </AvatarFallback>

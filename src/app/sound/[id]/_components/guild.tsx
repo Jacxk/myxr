@@ -11,6 +11,7 @@ export function Guild({
           className="w-8 rounded-full"
           src={image + "?size=32"}
           alt={name}
+          useNextImage
         />
         <AvatarFallback className="flex items-center justify-center text-xs">
           {name[0]?.toUpperCase()}

@@ -55,6 +55,7 @@ export default async function UserPage({
           <AvatarImage
             src={createdBy?.image + "?size=96"}
             alt={createdBy?.name ?? ""}
+            useNextImage
           />
           <AvatarFallback delayMs={500}>
             {user.name?.charAt(0).toUpperCase()}

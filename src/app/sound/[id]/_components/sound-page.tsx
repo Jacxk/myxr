@@ -72,6 +72,7 @@ export function SoundPage({ id, sound, isPreview }: Readonly<SoundPageProps>) {
                   <AvatarImage
                     src={sound.createdBy?.image + "?size=24"}
                     alt={sound.createdBy?.name ?? ""}
+                    useNextImage
                   />
                   <AvatarFallback delayMs={500}>
                     {sound.createdBy?.name?.charAt(0).toUpperCase()}
