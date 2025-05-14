@@ -1,5 +1,5 @@
 import { db } from "~/server/db";
-import { getDiscordGuilds } from "~/utils/discord-requests";
+import { UserDiscordApi } from "~/utils/discord/user-api";
 import { GuildMutation } from "../mutations/guild";
 
 export const UserMutation = {
@@ -14,7 +14,7 @@ export const UserMutation = {
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60000);
     if (!force && user.updatedAt > fiveMinutesAgo) return;
 
-    const guilds = await getDiscordGuilds(userId);
+    const guilds = await UserDiscordApi.getGuilds(userId);
 
     const existingGuildIds = guilds.map((guild) => guild.id);
     if (existingGuildIds.length > 0)

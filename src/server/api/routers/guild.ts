@@ -7,13 +7,7 @@ import {
 } from "~/server/api/trpc";
 import { GuildMutation } from "~/utils/db/mutations/guild";
 import { GuildQuery } from "~/utils/db/queries/guild";
-import {
-  createSound,
-  deleteSound,
-  getGuildRoles,
-  getSoundBoard,
-  isBotInGuild,
-} from "~/utils/discord-requests";
+import { BotDiscordApi } from "~/utils/discord/bot-api";
 
 export const guildRouter = createTRPCRouter({
   getGuild: publicProcedure.input(z.string()).query(async ({ input }) => {
@@ -22,7 +16,7 @@ export const guildRouter = createTRPCRouter({
   isBotIn: publicProcedure.input(z.string()).mutation(async ({ input }) => {
     return {
       success: true,
-      value: await isBotInGuild(input),
+      value: await BotDiscordApi.isBotInGuild(input),
     };
   }),
   createSound: allowedToManageGuildProtectedProcedure
@@ -44,7 +38,7 @@ export const guildRouter = createTRPCRouter({
       if (guildSound) throw Error("SOUND_EXISTS");
 
       const sound = await downloadSoundToBase64(data?.url);
-      const soundData = await createSound({
+      const soundData = await BotDiscordApi.createSound({
         emoji: data.emoji,
         guildId: input.guildId,
         name: data.name,
@@ -61,7 +55,7 @@ export const guildRouter = createTRPCRouter({
   getSoundBoard: protectedProcedure
     .input(z.string())
     .query(async ({ input }) => {
-      return await getSoundBoard(input);
+      return await BotDiscordApi.getSoundBoard(input);
     }),
   deleteSound: allowedToManageGuildProtectedProcedure
     .input(
@@ -80,7 +74,9 @@ export const guildRouter = createTRPCRouter({
         });
       }
 
-      await deleteSound(input.guildId, input.soundId).catch(() => null);
+      await BotDiscordApi.deleteSound(input.guildId, input.soundId).catch(
+        () => null,
+      );
       return { success: true };
     }),
   getGuildSounds: protectedProcedure
@@ -91,7 +87,7 @@ export const guildRouter = createTRPCRouter({
   getGuildRoles: protectedProcedure
     .input(z.string())
     .query(async ({ input }) => {
-      const guildRoles = await getGuildRoles(input);
+      const guildRoles = await BotDiscordApi.getGuildRoles(input);
       const roles = await GuildQuery.getSoundMasterRoles(input);
 
       return guildRoles

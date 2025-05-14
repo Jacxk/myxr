@@ -1,5 +1,5 @@
 import { db } from "~/server/db";
-import { getUserRoles } from "~/utils/discord-requests";
+import { BotDiscordApi } from "~/utils/discord/bot-api";
 
 export const UserQuery = {
   getDiscordId: async (userId: string) => {
@@ -35,7 +35,7 @@ export const UserQuery = {
 
     if (!discordId) return false;
 
-    const userRoles = await getUserRoles(guildId, discordId);
+    const userRoles = await BotDiscordApi.getUserRoles(guildId, discordId);
     const hasPermission = userRoles.roles.some((role) =>
       guildRoles?.soundMasterRoles.some((guildRole) => guildRole === role),
     );
