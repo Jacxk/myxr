@@ -38,9 +38,18 @@ function SoundRow({
     ? sound.emoji
     : getEmojiUrl(sound.emoji);
 
+  const handleRowClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (!target.closest('[role="button"]')) {
+      return;
+    }
+    play(discordSoundId, sound.url);
+  };
+
   return (
     <div
-      onClick={() => play(discordSoundId, sound.url)}
+      onClick={handleRowClick}
+      role="button"
       className={cn("hover:bg-accent p-2 text-sm", className)}
     >
       <div className="grid h-fit w-full cursor-pointer grid-cols-4 items-center">
@@ -52,12 +61,7 @@ function SoundRow({
             <span>{sound.name}</span>
           ) : (
             <Button className="p-0" variant="link" asChild>
-              <Link
-                onClick={(e) => e.stopPropagation()}
-                href={`/sound/${sound.id}`}
-              >
-                {sound.name}
-              </Link>
+              <Link href={`/sound/${sound.id}`}>{sound.name}</Link>
             </Button>
           )}
         </div>
@@ -66,10 +70,7 @@ function SoundRow({
             <span>{sound.createdBy.name}</span>
           ) : (
             <Button className="p-0" variant="link" asChild>
-              <Link
-                onClick={(e) => e.stopPropagation()}
-                href={`/user/${sound.createdBy.id}`}
-              >
+              <Link href={`/user/${sound.createdBy.id}`}>
                 {sound.createdBy.name}
               </Link>
             </Button>
