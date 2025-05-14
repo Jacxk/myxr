@@ -32,4 +32,38 @@ export const SoundMutations = {
       value: { downloadCount },
     };
   },
+
+  createSound: async ({
+    name,
+    url,
+    emoji,
+    userId,
+    tags,
+  }: {
+    name: string;
+    url: string;
+    emoji: string;
+    userId: string;
+    tags: { name: string }[];
+  }) => {
+    const sound = await db.sound.create({
+      data: {
+        url,
+        createdById: userId,
+        emoji,
+        name,
+        tags: {
+          connectOrCreate: tags.map(({ name }) => ({
+            create: { name },
+            where: { name },
+          })),
+        },
+      },
+    });
+
+    return {
+      success: true,
+      value: sound,
+    };
+  },
 };

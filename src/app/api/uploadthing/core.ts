@@ -2,7 +2,7 @@ import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
 import { z } from "zod";
 import { getServerSession } from "~/lib/auth";
-import { db } from "~/server/db";
+import { SoundMutations } from "~/utils/db/mutations/sound";
 
 const f = createUploadthing();
 
@@ -36,22 +36,15 @@ export const ourFileRouter = {
       console.log("Upload complete for userId:", metadata.userId);
       console.log("file url", file.ufsUrl);
 
-      const data = await db.sound.create({
-        data: {
-          url: file.ufsUrl,
-          createdById: metadata.userId,
-          emoji: metadata.emoji,
-          name: metadata.name,
-          tags: {
-            connectOrCreate: metadata.tags?.map(({ name }) => ({
-              create: { name },
-              where: { name },
-            })),
-          },
-        },
+      const data = await SoundMutations.createSound({
+        name: metadata.name,
+        url: file.ufsUrl,
+        emoji: metadata.emoji,
+        userId: metadata.userId,
+        tags: metadata.tags ?? [],
       });
 
-      return { createdBy: metadata.userId, id: data.id };
+      return { createdBy: metadata.userId, id: data.value.id };
     }),
 } satisfies FileRouter;
 
