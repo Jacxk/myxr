@@ -4,6 +4,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
+import { ReportQuery } from "~/utils/db/queries/report";
 import { SoundQuery } from "~/utils/db/queries/sound";
 import { UserQuery } from "~/utils/db/queries/user";
 
@@ -17,7 +18,7 @@ export const userRouter = createTRPCRouter({
   }),
   reports: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id;
-    return UserQuery.getReports(userId);
+    return ReportQuery.getReportsFromUser(userId);
   }),
   getUser: publicProcedure
     .input(z.object({ id: z.string() }))

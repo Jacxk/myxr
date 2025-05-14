@@ -94,12 +94,4 @@ export const UserQuery = {
       return true;
     }
   },
-
-  getReports: (userId: string) => {
-    return db.soundReport.findMany({
-      where: { userId },
-      include: { sound: true },
-      orderBy: { createdAt: "desc" },
-    });
-  },
 };
