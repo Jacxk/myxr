@@ -23,10 +23,12 @@ export function FollowButton({
     api.user.followUser.mutationOptions({
       onSuccess({ value }) {
         setFollowing(value.following);
-        router.refresh();
       },
       onError() {
         setFollowing(false);
+      },
+      onSettled() {
+        router.refresh();
       },
     }),
   );

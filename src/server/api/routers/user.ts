@@ -5,6 +5,7 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import { SoundQuery } from "~/utils/db/queries/sound";
+import { UserQuery } from "~/utils/db/queries/user";
 
 export const userRouter = createTRPCRouter({
   getSounds: publicProcedure.input(z.string()).query(async ({ input }) => {
@@ -33,44 +34,28 @@ export const userRouter = createTRPCRouter({
   }),
   getUser: publicProcedure
     .input(z.object({ id: z.string() }))
-    .query(({ ctx, input }) => {
-      return ctx.db.user.findFirst({
-        where: { id: input.id },
-        include: { followers: true },
-      });
+    .query(async ({ ctx, input }) => {
+      const user = await UserQuery.getUser(input.id);
+
+      if (!user) return null;
+
+      const isFollowing = await UserQuery.isFollowing(
+        ctx.session?.user.id,
+        input.id,
+      );
+
+      return {
+        ...user,
+        isFollowing,
+      };
     }),
   followUser: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id;
-      const isFollow = await ctx.db.userFollow.findFirst({
-        where: {
-          followerId: userId,
-          followingId: input.id,
-        },
-      });
-
-      let following;
-
-      if (isFollow) {
-        await ctx.db.userFollow.delete({
-          where: {
-            followingId_followerId: {
-              followerId: userId,
-              followingId: input.id,
-            },
-          },
-        });
-        following = false;
-      } else {
-        await ctx.db.userFollow.create({
-          data: {
-            followerId: userId,
-            followingId: input.id,
-          },
-        });
-        following = true;
-      }
+      const following = await UserQuery.followUser(
+        ctx.session.user.id,
+        input.id,
+      );
 
       return { success: true, value: { following } };
     }),

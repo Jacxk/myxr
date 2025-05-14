@@ -42,4 +42,56 @@ export const UserQuery = {
 
     return hasPermission;
   },
+
+  getUser: async (id: string) => {
+    return db.user.findFirst({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        image: true,
+        role: true,
+        _count: {
+          select: {
+            followers: true,
+          },
+        },
+      },
+    });
+  },
+
+  isFollowing: async (followerId: string | undefined, userId: string) => {
+    if (!followerId) return false;
+
+    const isFollow = await db.userFollow.findFirst({
+      where: {
+        followerId,
+        userId,
+      },
+    });
+
+    return !!isFollow;
+  },
+
+  followUser: async (followerId: string, userId: string) => {
+    const data = {
+      followerId,
+      userId,
+    };
+    const isFollow = await UserQuery.isFollowing(followerId, userId);
+
+    if (isFollow) {
+      await db.userFollow.delete({
+        where: {
+          followerId_userId: data,
+        },
+      });
+      return false;
+    } else {
+      await db.userFollow.create({
+        data,
+      });
+      return true;
+    }
+  },
 };

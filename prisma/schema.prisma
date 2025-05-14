@@ -175,13 +175,13 @@ model SoundReport {
 }
 
 model UserFollow {
-    followerId  String
-    followingId String
-    createdAt   DateTime @default(now())
+    followerId String
+    userId     String
+    createdAt  DateTime @default(now())
 
-    following User @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
-    follower  User @relation("Followers", fields: [followerId], references: [id], onDelete: Cascade)
+    follower User @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+    user     User @relation("Followers", fields: [userId], references: [id], onDelete: Cascade)
 
-    @@id([followingId, followerId])
+    @@id([followerId, userId])
     @@map("user_follow")
 }

@@ -46,11 +46,7 @@ export default async function UserPage({
 
   const session = await getServerSession();
   const createdBy = sounds[0]?.createdBy;
-  const followerCount = user.followers.length;
-  const isFollowing =
-    user.followers.filter(
-      (follower) => follower.followerId === session?.user.id,
-    ).length === 1;
+  const followerCount = user._count.followers;
 
   return (
     <div className="flex w-full flex-col gap-20">
@@ -91,7 +87,7 @@ export default async function UserPage({
           </div>
           <div className="flex flex-col gap-2 sm:items-end">
             {session?.user.id !== id && (
-              <FollowButton id={id} isFollowing={isFollowing} />
+              <FollowButton id={id} isFollowing={user.isFollowing} />
             )}
           </div>
         </div>
