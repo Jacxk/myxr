@@ -24,7 +24,7 @@ type SoundPageProps = {
 
 function ActionButtons({ id, sound, isPreview }: SoundPageProps) {
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-wrap gap-2">
       <TooltipProvider delayDuration={0}>
         <AddToGuildButton
           soundId={id}
@@ -45,8 +45,6 @@ function ActionButtons({ id, sound, isPreview }: SoundPageProps) {
           soundName={sound.name}
           downloads={sound.downloadCount}
         />
-
-        <ReportButton id={id} isPreview={isPreview} />
       </TooltipProvider>
     </div>
   );
@@ -129,6 +127,8 @@ export function SoundPage({ id, sound, isPreview }: Readonly<SoundPageProps>) {
               ))}
             </SoundData>
           )}
+
+          <ReportButton id={id} isPreview={isPreview} />
         </div>
       </div>
     </div>

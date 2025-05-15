@@ -13,7 +13,7 @@ export function SoundsGrid({
   return (
     <div
       className={cn(
-        "grid w-full auto-rows-fr grid-cols-[repeat(auto-fit,160px)] gap-2",
+        "grid w-full auto-rows-fr grid-cols-[repeat(auto-fit,160px)] justify-center gap-2 sm:justify-normal",
         className,
       )}
     >

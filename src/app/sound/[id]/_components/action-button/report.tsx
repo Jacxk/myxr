@@ -19,6 +19,7 @@ import { Textarea } from "~/components/ui/textarea";
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 import { useSession } from "~/lib/auth-client";
@@ -158,7 +159,7 @@ export function ReportButton({
   };
 
   return (
-    <>
+    <TooltipProvider delayDuration={0}>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent>
           <DialogHeader>
@@ -184,16 +185,13 @@ export function ReportButton({
 
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button
-            size="icon"
-            variant="destructive"
-            onClick={() => onOpenChange(true)}
-          >
+          <Button variant="destructive" onClick={() => onOpenChange(true)}>
             <Flag />
+            Report
           </Button>
         </TooltipTrigger>
         <TooltipContent>Report</TooltipContent>
       </Tooltip>
-    </>
+    </TooltipProvider>
   );
 }
