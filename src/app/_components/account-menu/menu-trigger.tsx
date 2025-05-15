@@ -30,7 +30,7 @@ export async function MenuTrigger() {
         </AuthenticatedClient>
         <NotAuthenticatedClient>
           <AvatarImage />
-          <AvatarFallback delayMs={0}>
+          <AvatarFallback className="bg-background/30" delayMs={0}>
             <User />
           </AvatarFallback>
         </NotAuthenticatedClient>

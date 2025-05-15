@@ -76,7 +76,11 @@ export function LikeButton({
     <TooltipProvider delayDuration={0}>
       <Tooltip disableHoverableContent>
         <TooltipTrigger asChild>
-          <Button variant="outline" onClick={likeClick}>
+          <Button
+            size={typeof likes === "number" ? "default" : "icon"}
+            variant="outline"
+            onClick={likeClick}
+          >
             <Heart fill={isLiked ? "currentColor" : "none"} />
 
             {likes &&

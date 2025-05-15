@@ -51,7 +51,7 @@ export default function RootLayout({
           <PostHogProvider>
             <TRPCReactProvider>
               <HydrateClient>
-                <div className="flex h-screen flex-col">
+                <div className="bg-background flex h-screen flex-col">
                   <Navbar />
                   <NextTopLoader
                     showSpinner={false}
@@ -59,9 +59,9 @@ export default function RootLayout({
                     initialPosition={0.2}
                     crawlSpeed={100}
                   />
-                  <div className="mx-auto w-full max-w-7xl flex-1 grow p-6 sm:py-10">
-                    {children}
-                  </div>
+                  {/* <div className="bg-background mx-auto w-full max-w-7xl flex-1 grow sm:py-10"> */}
+                  {children}
+                  {/* </div> */}
                   <Footer />
                 </div>
                 <Toaster />

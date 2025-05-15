@@ -155,6 +155,7 @@ export function AddToGuildButton({
               variant="outline"
               onClick={addSoundToGuild}
               disabled={isPending}
+              size={typeof usage === "number" ? "default" : "icon"}
             >
               <Plus />
               {usage &&

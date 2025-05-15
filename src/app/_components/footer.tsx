@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="text-muted-foreground mx-auto flex w-full max-w-7xl grow-0 flex-row items-center justify-between border-t p-6 text-sm">
+    <footer className="text-muted-foreground bg-background mx-auto flex w-full max-w-7xl grow-0 flex-row items-center justify-between border-t p-6 text-sm">
       <div className="text-foreground text-xl font-semibold">
         <Link href="/">myxr</Link>
       </div>

@@ -238,7 +238,7 @@ function GuildSelect({
 
   return (
     <Select onValueChange={onGuildSelect} value={value}>
-      <SelectTrigger className="sm:min-w-[180px]" asChild>
+      <SelectTrigger className="bg-background/30 sm:min-w-[180px]" asChild>
         <div className="hidden sm:flex">
           <SelectValue placeholder="Select a Guild" />
         </div>

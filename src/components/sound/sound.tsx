@@ -66,11 +66,11 @@ export default memo(function Sound({
         className,
       )}
     >
-      <div className="flex flex-1 items-center justify-center">
+      <div className="mb-3 flex flex-1 items-center justify-center">
         <EmojiButton id={sound.id} url={sound.url} emoji={sound.emoji} />
       </div>
       <Button
-        className="p-0 text-center break-words whitespace-normal"
+        className="p-0 text-center text-sm font-medium break-words whitespace-normal"
         variant="link"
         asChild
       >

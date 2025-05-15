@@ -31,4 +31,8 @@ export const GuildQuery = {
 
     return data?.guilds;
   },
+
+  getGuildCount: () => {
+    return db.guild.count();
+  },
 };

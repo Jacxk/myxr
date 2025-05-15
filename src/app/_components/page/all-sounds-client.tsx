@@ -35,7 +35,9 @@ export function AllSoundsClient({ initialData }: AllSoundsClient) {
       hasMore={hasNextPage}
       isLoading={isPending}
       title={
-        <h1 className="col-span-full text-3xl font-bold">Trending Sounds</h1>
+        <h1 className="text-center text-5xl font-bold sm:text-left sm:text-3xl">
+          Trending Sounds
+        </h1>
       }
     >
       <SoundsGrid>

@@ -35,7 +35,7 @@ export function InfiniteScroll({
   };
 
   return (
-    <>
+    <div className="flex flex-col gap-4">
       {title}
       {children}
       <InView
@@ -52,6 +52,6 @@ export function InfiniteScroll({
           </Button>
         )}
       </div>
-    </>
+    </div>
   );
 }

@@ -6,10 +6,7 @@ interface SoundGridProps {
   className?: string;
 }
 
-export function SoundsGrid({
-  children,
-  className = "",
-}: Readonly<SoundGridProps>) {
+export function SoundsGrid({ children, className = "" }: SoundGridProps) {
   return (
     <div
       className={cn(

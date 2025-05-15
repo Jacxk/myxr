@@ -9,7 +9,9 @@ export async function LatestSounds() {
 
   return (
     <div className="flex w-full flex-col gap-4">
-      <h1 className="text-3xl font-bold">Latest Sounds</h1>
+      <h1 className="text-center text-5xl font-bold sm:text-left sm:text-3xl">
+        Latest Sounds
+      </h1>
       <SoundsGrid>
         {latestSounds.map((sound, i) => (
           <Fragment key={sound.id}>

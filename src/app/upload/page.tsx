@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Main } from "~/components/main";
 import { Step } from "~/components/step";
 import { StepsProvider } from "~/context/StepsContext";
 import { getServerSession } from "~/lib/auth";
@@ -16,16 +17,18 @@ export default async function UploadPage() {
   if (!session) return notFound();
 
   return (
-    <StepsProvider>
-      <Step>
-        <SelectFileStep />
-      </Step>
-      <Step>
-        <EditSoundStep />
-      </Step>
-      <Step>
-        <EditDetailsStep />
-      </Step>
-    </StepsProvider>
+    <Main>
+      <StepsProvider>
+        <Step>
+          <SelectFileStep />
+        </Step>
+        <Step>
+          <EditSoundStep />
+        </Step>
+        <Step>
+          <EditDetailsStep />
+        </Step>
+      </StepsProvider>
+    </Main>
   );
 }
