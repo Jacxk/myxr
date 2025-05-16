@@ -16,7 +16,7 @@ import { SelectGuild } from "./select-guild";
 function NavbarContent() {
   return (
     <>
-      <header className="fixed top-0 right-0 left-0 z-10 flex w-full grow-0 items-center justify-between backdrop-blur-2xl">
+      <header className="sticky top-0 right-0 left-0 z-10 flex w-full grow-0 items-center justify-between backdrop-blur-2xl">
         <nav className="relative mx-auto flex w-full max-w-7xl grow-0 items-center justify-between gap-2 border-b p-6">
           <Link href="/" className="text-4xl font-bold">
             myxr

@@ -17,7 +17,7 @@ export async function HeroSection() {
     await api.global.getGlobalStats();
 
   return (
-    <div className="mx-0 mb-20 flex min-h-screen flex-col items-center justify-center gap-8 bg-gradient-to-b pt-20 sm:-mt-10">
+    <div className="mx-0 -mt-[89px] mb-20 flex min-h-screen flex-col items-center justify-center gap-8 bg-gradient-to-b">
       <div className="flex flex-col items-center gap-4 text-center">
         <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
           Welcome to <span className="underline">myxr</span>
