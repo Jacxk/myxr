@@ -17,10 +17,10 @@ export async function HeroSection() {
     await api.global.getGlobalStats();
 
   return (
-    <div className="to-background mx-0 mb-20 flex min-h-screen flex-col items-center justify-center gap-8 bg-gradient-to-b from-blue-500/30 pt-20 sm:-mt-10">
+    <div className="mx-0 mb-20 flex min-h-screen flex-col items-center justify-center gap-8 bg-gradient-to-b pt-20 sm:-mt-10">
       <div className="flex flex-col items-center gap-4 text-center">
         <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-          Welcome to myxr
+          Welcome to <span className="underline">myxr</span>
         </h1>
         <p className="text-muted-foreground max-w-2xl text-lg">
           Create, share, and discover amazing sound effects for your Discord
@@ -38,7 +38,12 @@ export async function HeroSection() {
         <Button size="lg" asChild>
           <Link href="/upload">Upload Sound</Link>
         </Button>
-        <Button size="lg" variant="outline" asChild>
+        <Button
+          size="lg"
+          variant="secondary"
+          className="bg-background/30"
+          asChild
+        >
           <Link href="/sound">Browse Sounds</Link>
         </Button>
       </div>
