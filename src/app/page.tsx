@@ -9,7 +9,7 @@ export default async function Home() {
   void api.sound.getAllSounds.prefetchInfinite({});
 
   return (
-    <main className="to-background bg-gradient-to-b from-blue-500/20">
+    <main className="to-background bg-gradient-to-b from-purple-500/20 dark:from-blue-600/30">
       <HeroSection />
       <Main>
         <LatestSounds />
