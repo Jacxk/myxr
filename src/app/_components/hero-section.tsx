@@ -12,12 +12,13 @@ function CountSection({ title, count }: { title: string; count: number }) {
     </div>
   );
 }
+
 export async function HeroSection() {
   const { soundCount, userCount, guildCount } =
     await api.global.getGlobalStats();
 
   return (
-    <div className="mx-0 -mt-[89px] mb-20 flex min-h-screen flex-col items-center justify-center gap-8 bg-gradient-to-b">
+    <div className="mx-0 -mt-[89px] mb-20 flex min-h-screen flex-col items-center justify-center gap-8">
       <div className="flex flex-col items-center gap-4 text-center">
         <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
           Welcome to <span className="underline">myxr</span>
@@ -29,9 +30,9 @@ export async function HeroSection() {
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-8">
-        <CountSection title="Total Sounds" count={soundCount} />
-        <CountSection title="Active Users" count={userCount} />
-        <CountSection title="Total Guilds" count={guildCount} />
+        <CountSection title="Sounds" count={soundCount} />
+        <CountSection title="Users" count={userCount} />
+        <CountSection title="Guilds" count={guildCount} />
       </div>
 
       <div className="flex gap-4">
