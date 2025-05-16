@@ -24,7 +24,7 @@ function SearchInput({
 }: Readonly<SearchInputProps>) {
   return (
     <Input
-      className={cn("border-r-none rounded-r-none", className)}
+      className={cn("border-r-none bg-background/30 rounded-r-none", className)}
       type="search"
       placeholder="Search for a sound"
       value={value}
