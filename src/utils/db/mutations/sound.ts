@@ -1,4 +1,17 @@
+import "server-only";
+
+import { type RESTPostAPIChannelMessageJSONBody } from "discord-api-types/v10";
+import { getEmojiUrl } from "~/components/emoji-image";
+import { env } from "~/env";
+import { DiscordNotificationHandler } from "~/lib/notifications/handlers/DiscordNotificationHandler";
+import { NotificationService } from "~/lib/notifications/NotificationService";
 import { db } from "~/server/db";
+
+const notificationService =
+  new NotificationService<RESTPostAPIChannelMessageJSONBody>();
+const discordHandler = new DiscordNotificationHandler("1372217001048674445");
+
+notificationService.addHandler(discordHandler);
 
 export const SoundMutations = {
   likeSound: async (userId: string, soundId: string, liked: boolean) => {
@@ -67,6 +80,32 @@ export const SoundMutations = {
             image: true,
           },
         },
+      },
+    });
+
+    void notificationService.notify({
+      userId: sound.createdById,
+      title: "New Sound",
+      description: "A new sound has been created",
+      createdAt: new Date(),
+      metadata: {
+        embeds: [
+          {
+            color: 39129,
+            timestamp: sound.createdAt.toISOString(),
+            url: `${env.NEXT_PUBLIC_BASE_URL}/sound/${sound.id}`,
+            author: {
+              url: `${env.NEXT_PUBLIC_BASE_URL}/user/${sound.createdById}`,
+              name: sound.createdBy.name ?? "",
+              icon_url: sound.createdBy.image ?? "",
+            },
+            title: sound.name,
+            description: "New sound uploaded",
+            thumbnail: {
+              url: getEmojiUrl(sound.emoji),
+            },
+          },
+        ],
       },
     });
 

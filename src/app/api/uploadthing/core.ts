@@ -1,10 +1,8 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
 import { z } from "zod";
-import { env } from "~/env";
 import { getServerSession } from "~/lib/auth";
 import { SoundMutations } from "~/utils/db/mutations/sound";
-import { BotDiscordApi } from "~/utils/discord/bot-api";
 
 const f = createUploadthing();
 
@@ -45,11 +43,6 @@ export const ourFileRouter = {
         userId: metadata.userId,
         tags: metadata.tags ?? [],
       });
-
-      void BotDiscordApi.sendNewSoundNotification(
-        data.value,
-        env.DISCORD_NEW_SOUND_CHANNEL_ID,
-      );
 
       return { createdBy: metadata.userId, id: data.value.id };
     }),
