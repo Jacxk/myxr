@@ -38,18 +38,16 @@ export default async function Layout({
 }) {
   const session = await getServerSession();
 
-  if (session?.user) {
-    const {
-      user: { id: userId, guilds },
-    } = session;
+  if (!session?.user) return redirect("/");
 
-    void api.guild.getGuildSounds.prefetch(userId);
+  const {
+    user: { id: userId, guilds },
+  } = session;
 
-    if (guilds.length > 0 && guilds[0]?.id) {
-      void api.guild.getGuildSounds.prefetch(guilds[0].id);
-    }
-  } else {
-    return redirect("/");
+  void api.guild.getGuildSounds.prefetch(userId);
+
+  if (guilds.length > 0 && guilds[0]?.id) {
+    void api.guild.getGuildSounds.prefetch(guilds[0].id);
   }
 
   return (
@@ -67,7 +65,7 @@ export default async function Layout({
           icon={<Heart className="shrink-0" />}
         />
         <Tab
-          path="guilds"
+          path={`guilds/${guilds[0]?.id ?? ""}`}
           label="Guilds"
           icon={<Castle className="shrink-0" />}
         />

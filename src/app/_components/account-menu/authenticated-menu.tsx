@@ -29,8 +29,8 @@ export function AuthenticatedMenu() {
         </Button>
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
-      <Link href={"/user/me"}>
-        <DropdownMenuItem>Profile</DropdownMenuItem>
+      <Link href={"/user/me/sounds"}>
+        <DropdownMenuItem>Account</DropdownMenuItem>
       </Link>
       <DropdownMenuSeparator />
       <ThemeSwitch />
