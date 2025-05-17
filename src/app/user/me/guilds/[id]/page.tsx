@@ -18,9 +18,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }>) {
   const { id } = await params;
-
   const guild = await getGuild(id);
-
   return {
     title: `${guild?.name} - Guild`,
   };
@@ -36,12 +34,7 @@ const getEmoji = (sound: APISoundboardSound) => {
   }
 };
 
-export default async function MeGuildIdPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
+async function GuildContent({ id }: { id: string }) {
   const guildSounds = await api.guild.getGuildSounds(id);
   const externalSounds = await BotDiscordApi.getSoundBoard(id);
   const guild = await getGuild(id);
@@ -105,4 +98,14 @@ export default async function MeGuildIdPage({
       </div>
     </>
   );
+}
+
+export default async function MeGuildIdPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
+  return <GuildContent id={id} />;
 }
