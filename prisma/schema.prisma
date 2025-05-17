@@ -22,15 +22,16 @@ model User {
     updatedAt     DateTime @updatedAt
     removed       Boolean? @default(false)
 
-    role         Role              @default(USER)
-    accounts     Account[]
-    sessions     Session[]
-    sounds       Sound[]
-    guilds       GuildMembership[]
-    likedSounds  LikedSound[]
-    soundReports SoundReport[]
-    followers    UserFollow[]      @relation("Followers")
-    following    UserFollow[]      @relation("Following")
+    role          Role              @default(USER)
+    accounts      Account[]
+    sessions      Session[]
+    sounds        Sound[]
+    guilds        GuildMembership[]
+    likedSounds   LikedSound[]
+    soundReports  SoundReport[]
+    followers     UserFollow[]      @relation("Followers")
+    following     UserFollow[]      @relation("Following")
+    notifications Notification[]
 
     @@map("user")
 }
@@ -184,4 +185,18 @@ model UserFollow {
 
     @@id([followerId, userId])
     @@map("user_follow")
+}
+
+model Notification {
+    id          String   @id @default(cuid())
+    title       String
+    description String
+    read        Boolean  @default(false)
+    createdAt   DateTime @default(now())
+    metadata    Json?
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("notification")
 }

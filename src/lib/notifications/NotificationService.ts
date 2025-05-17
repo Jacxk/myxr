@@ -1,16 +1,3 @@
-import { z } from "zod";
-
-// Base notification payload schema with generic metadata type
-export const createBaseNotificationPayloadSchema = <T extends z.ZodType>(
-  metadataSchema: T,
-) =>
-  z.object({
-    title: z.string(),
-    message: z.string(),
-    timestamp: z.date().default(() => new Date()),
-    metadata: metadataSchema.optional(),
-  });
-
 // Abstract base class for all notifications with generic metadata type
 export abstract class NotificationHandler<T = unknown> {
   abstract handle(payload: BaseNotificationPayload<T>): Promise<void>;
@@ -18,9 +5,10 @@ export abstract class NotificationHandler<T = unknown> {
 
 // Type for the notification payload with generic metadata
 export type BaseNotificationPayload<T = unknown> = {
+  userId: string;
   title: string;
-  message: string;
-  timestamp: Date;
+  description: string;
+  createdAt: Date;
   metadata?: T;
 };
 

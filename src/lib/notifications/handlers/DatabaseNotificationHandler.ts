@@ -1,3 +1,6 @@
+import "server-only";
+
+import { NotificationMutations } from "~/utils/db/mutations/notification";
 import {
   NotificationHandler,
   type BaseNotificationPayload,
@@ -8,17 +11,7 @@ export class DatabaseNotificationHandler<
 > extends NotificationHandler<T> {
   async handle(payload: BaseNotificationPayload<T>): Promise<void> {
     try {
-      // Here you would implement your database storage logic
-      // For example, using Prisma:
-      // await prisma.notification.create({
-      //   data: {
-      //     title: payload.title,
-      //     message: payload.message,
-      //     timestamp: payload.timestamp,
-      //     metadata: payload.metadata,
-      //   },
-      // });
-      console.log("Storing notification in database:", payload);
+      await NotificationMutations.createNotifications(payload);
     } catch (error) {
       console.error("Failed to store notification in database:", error);
       throw error;

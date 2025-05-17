@@ -4,6 +4,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
+import { NotificationQueries } from "~/utils/db/queries/notification";
 import { ReportQuery } from "~/utils/db/queries/report";
 import { SoundQuery } from "~/utils/db/queries/sound";
 import { UserQuery } from "~/utils/db/queries/user";
@@ -47,4 +48,8 @@ export const userRouter = createTRPCRouter({
 
       return { success: true, value: { following } };
     }),
+  getNotifications: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+    return NotificationQueries.getNotifications(userId);
+  }),
 });
