@@ -8,10 +8,11 @@ import {
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 import { SearchProvider } from "~/context/SearchContext";
-import { AccountMenu } from "./account-menu";
 import { AuthenticatedClient } from "./authentication-client";
-import { MobileSearch, SearchBar } from "./search-bar";
-import { SelectGuild } from "./select-guild";
+import { AccountMenu } from "./navbar/account-menu";
+import { Notifications } from "./navbar/notifications";
+import { MobileSearch, SearchBar } from "./navbar/search-bar";
+import { SelectGuild } from "./navbar/select-guild";
 
 function NavbarContent() {
   return (
@@ -43,6 +44,7 @@ function NavbarContent() {
                   </Tooltip>
                 </TooltipProvider>
               </Link>
+              <Notifications />
             </AuthenticatedClient>
             <AccountMenu />
           </div>
