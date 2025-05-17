@@ -129,8 +129,8 @@ export function SelectFileStep() {
     <label
       htmlFor="file-dropzone"
       className={cn(
-        "flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed",
-        "h-full border-gray-300 p-4 transition hover:border-blue-600 hover:bg-blue-600/20",
+        "flex flex-1 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed",
+        "h-full w-full border-gray-300 p-4 transition hover:border-blue-600 hover:bg-blue-600/20",
         {
           "animate-pulse": isDragging && !validFileType,
           "border-green-600 bg-green-600/20": isDragging,

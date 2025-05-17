@@ -59,7 +59,7 @@ export default function RootLayout({
                     initialPosition={0.2}
                     crawlSpeed={100}
                   />
-                  <main className="flex-1">{children}</main>
+                  {children}
                   <Footer />
                 </div>
                 <Toaster />

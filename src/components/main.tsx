@@ -1,6 +1,19 @@
-export function Main({ children }: { children: React.ReactNode }) {
+import { cn } from "~/lib/utils";
+
+export function Main({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <div className="mx-auto flex w-full max-w-7xl grow flex-col gap-10 p-6">
+    <div
+      className={cn(
+        "mx-auto flex min-h-full w-full max-w-7xl grow flex-col gap-10 p-6",
+        className,
+      )}
+    >
       {children}
     </div>
   );
