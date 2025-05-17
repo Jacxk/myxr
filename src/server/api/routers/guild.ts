@@ -1,29 +1,28 @@
 import { z } from "zod";
 import {
+  allowedToManageGuildProtectedProcedure,
   createTRPCRouter,
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { handleSoundGuildCreate } from "~/utils/db";
-import {
-  createSound,
-  deleteSound,
-  getSoundBoard,
-  isBotInGuild,
-} from "~/utils/discord-requests";
+import { GuildMutation } from "~/utils/db/mutations/guild";
+import { GuildQuery } from "~/utils/db/queries/guild";
+import { BotDiscordApi } from "~/utils/discord/bot-api";
 
 export const guildRouter = createTRPCRouter({
+  getGuild: publicProcedure.input(z.string()).query(async ({ input }) => {
+    return GuildQuery.getGuild(input);
+  }),
   isBotIn: publicProcedure.input(z.string()).mutation(async ({ input }) => {
     return {
       success: true,
-      value: await isBotInGuild(input),
+      value: await BotDiscordApi.isBotInGuild(input),
     };
   }),
-  createSound: protectedProcedure
+  createSound: allowedToManageGuildProtectedProcedure
     .input(
       z.object({
         soundId: z.string(),
-        guildId: z.string(),
         guildName: z.string(),
       }),
     )
@@ -31,24 +30,22 @@ export const guildRouter = createTRPCRouter({
       const data = await ctx.db.sound.findFirst({
         where: { id: input.soundId },
       });
-
       if (!data) throw Error("SOUND_NOT_FOUND");
-      const sound = await downloadSoundToBase64(data?.url);
 
       const guildSound = await ctx.db.guildSound.findFirst({
         where: { guildId: input.guildId, soundId: input.soundId },
       });
-
       if (guildSound) throw Error("SOUND_EXISTS");
 
-      const soundData = await createSound({
+      const sound = await downloadSoundToBase64(data?.url);
+      const soundData = await BotDiscordApi.createSound({
         emoji: data.emoji,
         guildId: input.guildId,
         name: data.name,
         sound,
       });
 
-      await handleSoundGuildCreate({
+      await GuildMutation.handleSoundGuildCreate({
         discordSoundId: soundData.sound_id,
         ...input,
       });
@@ -58,12 +55,11 @@ export const guildRouter = createTRPCRouter({
   getSoundBoard: protectedProcedure
     .input(z.string())
     .query(async ({ input }) => {
-      return await getSoundBoard(input);
+      return await BotDiscordApi.getSoundBoard(input);
     }),
-  deleteSound: protectedProcedure
+  deleteSound: allowedToManageGuildProtectedProcedure
     .input(
       z.object({
-        guildId: z.string(),
         soundId: z.string(),
       }),
     )
@@ -78,8 +74,40 @@ export const guildRouter = createTRPCRouter({
         });
       }
 
-      await deleteSound(input.guildId, input.soundId).catch(() => null);
+      await BotDiscordApi.deleteSound(input.guildId, input.soundId).catch(
+        () => null,
+      );
       return { success: true };
+    }),
+  getGuildSounds: protectedProcedure
+    .input(z.string())
+    .query(async ({ input }) => {
+      return GuildQuery.getGuildSounds(input);
+    }),
+  getGuildRoles: protectedProcedure
+    .input(z.string())
+    .query(async ({ input }) => {
+      const guildRoles = await BotDiscordApi.getGuildRoles(input);
+      const roles = await GuildQuery.getSoundMasterRoles(input);
+
+      return guildRoles
+        .filter(
+          (role) => !["@everyone", "Myxr"].includes(role.name) && !role.managed,
+        )
+        .sort((a, b) => a.position - b.position)
+        .map((role) => ({
+          ...role,
+          isMasterRole: !!roles?.soundMasterRoles.includes(role.id),
+        }));
+    }),
+  setSoundMasterRoles: allowedToManageGuildProtectedProcedure
+    .input(
+      z.object({
+        roles: z.array(z.string()),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      return GuildMutation.setSoundMasterRoles(input.guildId, input.roles);
     }),
 });
 

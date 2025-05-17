@@ -1,7 +1,8 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { Heart, HeartOff } from "lucide-react";
+import { Heart } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { usePostHog } from "posthog-js/react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -29,10 +30,10 @@ export function LikeButton({
 }>) {
   const api = useTRPC();
   const { data: session } = useSession();
+  const router = useRouter();
   const posthog = usePostHog();
 
   const [isLiked, setIsLiked] = useState<boolean>(liked ?? false);
-  const [likeCount, setLikeCount] = useState(likes ?? 0);
 
   const { mutate, isPending } = useMutation(
     api.sound.likeSound.mutationOptions({
@@ -44,11 +45,12 @@ export function LikeButton({
 
         if (!data.success) return;
 
-        toast(data.value ? "Sound liked" : "Liked removed");
         setIsLiked(data.value);
+        router.refresh();
       },
       onError() {
         setIsLiked(false);
+        ErrorToast.internal();
       },
     }),
   );
@@ -59,31 +61,35 @@ export function LikeButton({
       return;
     }
 
-    setIsLiked((liked) => !liked);
-    setLikeCount((likes) => likes + (!isLiked ? 1 : -1));
+    const liked = !isLiked;
+    setIsLiked(liked);
 
     if (isPreview) {
       toast(`Preview Mode: Sound like ${isLiked ? "removed" : "added"}`);
       return;
     }
 
-    if (!isPending) mutate({ soundId, liked: !liked });
+    if (!isPending) mutate({ soundId, liked });
   };
 
   return (
     <TooltipProvider delayDuration={0}>
       <Tooltip disableHoverableContent>
         <TooltipTrigger asChild>
-          <Button variant="outline" onClick={likeClick}>
-            {isLiked ? <HeartOff /> : <Heart />}
+          <Button
+            size={typeof likes === "number" ? "default" : "icon"}
+            variant="outline"
+            onClick={likeClick}
+          >
+            <Heart fill={isLiked ? "currentColor" : "none"} />
 
             {likes &&
               Intl.NumberFormat(navigator.language, {
                 notation: "compact",
-              }).format(likeCount)}
+              }).format(likes)}
           </Button>
         </TooltipTrigger>
-        <TooltipContent>{isLiked ? "UnLike" : "Like"}</TooltipContent>
+        <TooltipContent>{isLiked ? "Remove like" : "Like"}</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );

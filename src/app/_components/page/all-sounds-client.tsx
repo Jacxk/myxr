@@ -5,6 +5,8 @@ import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { useTRPC, type RouterOutputs } from "~/trpc/react";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { Fragment } from "react";
+import AdDisplay from "~/components/ad/ad-display";
 
 type AllSoundsClient = {
   initialData: RouterOutputs["sound"]["getAllSounds"];
@@ -33,12 +35,22 @@ export function AllSoundsClient({ initialData }: AllSoundsClient) {
       hasMore={hasNextPage}
       isLoading={isPending}
       title={
-        <h1 className="col-span-full text-3xl font-bold">Trending Sounds</h1>
+        <h1 className="text-center text-5xl font-bold sm:text-left sm:text-3xl">
+          Trending Sounds
+        </h1>
       }
     >
       <SoundsGrid>
-        {allSounds.map((sound) => (
-          <Sound key={sound.id} sound={sound} />
+        {allSounds.map((sound, i) => (
+          <Fragment key={sound.id}>
+            <Sound sound={sound} />
+            <AdDisplay
+              adSlot="1944402367"
+              width="100%"
+              height="100%"
+              showProbability={i === allSounds.length - 1 ? 1 : 0.4}
+            />
+          </Fragment>
         ))}
       </SoundsGrid>
     </InfiniteScroll>

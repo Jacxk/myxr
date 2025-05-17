@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import AdDisplay from "~/components/ad/ad-display";
+import { EmojiImage } from "~/components/emoji-image";
 import { AddToGuildButton } from "~/components/sound/add-button";
 import { LikeButton } from "~/components/sound/like-button";
 import { SoundWaveForm } from "~/components/sound/sound-waveform";
@@ -11,7 +13,6 @@ import type { RouterOutputs } from "~/trpc/react";
 import { DownloadButton } from "./action-button/download";
 import { ReportButton } from "./action-button/report";
 import { CreatedDate } from "./created-date";
-import { SoundEmoji } from "./emoji";
 import { Guild } from "./guild";
 import { SoundData } from "./sound-data";
 
@@ -23,7 +24,7 @@ type SoundPageProps = {
 
 function ActionButtons({ id, sound, isPreview }: SoundPageProps) {
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-wrap gap-2">
       <TooltipProvider delayDuration={0}>
         <AddToGuildButton
           soundId={id}
@@ -44,8 +45,6 @@ function ActionButtons({ id, sound, isPreview }: SoundPageProps) {
           soundName={sound.name}
           downloads={sound.downloadCount}
         />
-
-        <ReportButton id={id} isPreview={isPreview} />
       </TooltipProvider>
     </div>
   );
@@ -56,9 +55,9 @@ export function SoundPage({ id, sound, isPreview }: Readonly<SoundPageProps>) {
     <div className="flex w-full flex-col gap-6">
       <div className="flex w-full flex-row gap-10">
         <div className="flex shrink-0">
-          <SoundEmoji emoji={sound.emoji} />
+          <EmojiImage emoji={sound.emoji} />
         </div>
-        <div className="flex flex-grow flex-col justify-between gap-6 sm:flex-row">
+        <div className="flex grow flex-col justify-between gap-6 sm:flex-row">
           <div className="flex flex-col">
             <h1 className="text-3xl font-extrabold">{sound.name}</h1>
             <Button
@@ -71,6 +70,7 @@ export function SoundPage({ id, sound, isPreview }: Readonly<SoundPageProps>) {
                   <AvatarImage
                     src={sound.createdBy?.image + "?size=24"}
                     alt={sound.createdBy?.name ?? ""}
+                    useNextImage
                   />
                   <AvatarFallback delayMs={500}>
                     {sound.createdBy?.name?.charAt(0).toUpperCase()}
@@ -83,10 +83,17 @@ export function SoundPage({ id, sound, isPreview }: Readonly<SoundPageProps>) {
           <ActionButtons id={id} sound={sound} isPreview={isPreview} />
         </div>
       </div>
-      <SoundWaveForm url={sound.url} />
+      <SoundWaveForm id={id} url={sound.url} />
       <div className="border-b" />
       <div className="flex flex-col-reverse justify-between gap-4 sm:flex-row">
-        <div className="flex flex-col gap-4">
+        <div className="flex w-full flex-col gap-4">
+          <AdDisplay
+            adSlot="1970362642"
+            format="fluid"
+            layoutKey="-f9+4w+7x-eg+3a"
+            showProbability={1}
+          />
+
           {sound.guildSounds.length === 0 ? (
             <span>No guilds are using this sound.</span>
           ) : (
@@ -120,6 +127,8 @@ export function SoundPage({ id, sound, isPreview }: Readonly<SoundPageProps>) {
               ))}
             </SoundData>
           )}
+
+          <ReportButton id={id} isPreview={isPreview} />
         </div>
       </div>
     </div>

@@ -1,10 +1,28 @@
 import type { APISoundboardSound } from "discord-api-types/v10";
+import { cache } from "react";
 import {
   type SoundListData,
   SoundTableList,
 } from "~/components/sound/sound-list";
 import { api } from "~/trpc/server";
-import { getSoundBoard } from "~/utils/discord-requests";
+import { BotDiscordApi } from "~/utils/discord/bot-api";
+import MasterRolesSelect from "./master-roles-select";
+
+const getGuild = cache(async (id: string) => {
+  return api.guild.getGuild(id);
+});
+
+export async function generateMetadata({
+  params,
+}: Readonly<{
+  params: Promise<{ id: string }>;
+}>) {
+  const { id } = await params;
+  const guild = await getGuild(id);
+  return {
+    title: `${guild?.name} - Guild`,
+  };
+}
 
 const getEmoji = (sound: APISoundboardSound) => {
   if (sound.emoji_id) {
@@ -16,26 +34,27 @@ const getEmoji = (sound: APISoundboardSound) => {
   }
 };
 
-export default async function MeGuildIdPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  const guildSounds = await api.user.getGuildSounds(id);
-  const externalSounds = await getSoundBoard(id);
+async function GuildContent({ id }: { id: string }) {
+  const guildSounds = await api.guild.getGuildSounds(id);
+  const externalSounds = await BotDiscordApi.getSoundBoard(id);
+  const guild = await getGuild(id);
 
-  if (externalSounds.length + guildSounds.length === 0) {
+  if (!guild) {
     return (
-      <>
-        <div className="flex w-full flex-wrap items-center justify-center">
-          <span>No sounds found for this Guild...</span>
-        </div>
-      </>
+      <div className="flex w-full flex-wrap items-center justify-center">
+        <span>This guild does not exist... weird.</span>
+      </div>
     );
   }
 
-  const guild = guildSounds[0]?.guild;
+  if (externalSounds.length + guildSounds.length === 0) {
+    return (
+      <div className="flex w-full flex-col flex-wrap items-center justify-center gap-2">
+        <h2 className="text-muted-foreground text-xl">{guild.name}</h2>
+        <span>No sounds found for this Guild...</span>
+      </div>
+    );
+  }
 
   const convertedExternalSound = externalSounds
     .filter(
@@ -50,6 +69,7 @@ export default async function MeGuildIdPage({
           discordSoundId: sound.sound_id,
           guildId: sound.guild_id,
           external: true,
+          available: sound.available,
           sound: {
             id: sound.sound_id,
             name: sound.name,
@@ -65,9 +85,10 @@ export default async function MeGuildIdPage({
 
   return (
     <>
-      <title>{`${guild?.name} - Guild Sounds`}</title>
+      <title>{`${guild.name} - Guild Sounds`}</title>
       <div className="flex w-full flex-col items-center">
-        <h2 className="text-xl text-muted-foreground">{guild?.name}</h2>
+        <h2 className="text-muted-foreground text-xl">{guild.name}</h2>
+        <MasterRolesSelect guildId={guild.id} />
         <SoundTableList
           data={[
             guildSounds as unknown as SoundListData,
@@ -77,4 +98,14 @@ export default async function MeGuildIdPage({
       </div>
     </>
   );
+}
+
+export default async function MeGuildIdPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
+  return <GuildContent id={id} />;
 }

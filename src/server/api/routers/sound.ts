@@ -5,13 +5,11 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import {
-  getAllSounds,
-  getSound,
-  getSounds,
-  searchForSoundsInfinite,
-  SearchType,
-} from "~/utils/db";
+import { ReportMutations } from "~/utils/db/mutations/report";
+import { SoundMutations } from "~/utils/db/mutations/sound";
+import { ReportQuery } from "~/utils/db/queries/report";
+import { SoundQuery } from "~/utils/db/queries/sound";
+import { SearchType } from "~/utils/db/types";
 
 export const soundRouter = createTRPCRouter({
   me: protectedProcedure
@@ -33,7 +31,7 @@ export const soundRouter = createTRPCRouter({
   getLatests: publicProcedure
     .input(z.object({ limit: z.number().default(6) }))
     .query(({ input, ctx }) =>
-      getSounds({ take: input.limit, userId: ctx.session?.user.id }),
+      SoundQuery.getSounds({ take: input.limit, userId: ctx.session?.user.id }),
     ),
   getAllSounds: publicProcedure
     .input(
@@ -44,7 +42,7 @@ export const soundRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const sounds = await getAllSounds(
+      const sounds = await SoundQuery.getAllSounds(
         input.limit,
         input.cursor,
         ctx.session?.user.id,
@@ -68,7 +66,7 @@ export const soundRouter = createTRPCRouter({
       }),
     )
     .query(({ input, ctx }) => {
-      return getSound(input.id, ctx.session?.user.id);
+      return SoundQuery.getSound(input.id, ctx.session?.user.id);
     }),
   search: publicProcedure
     .input(
@@ -82,7 +80,7 @@ export const soundRouter = createTRPCRouter({
     )
     .query(async ({ input, ctx }) => {
       const userId = ctx.session?.user.id;
-      const sounds = await searchForSoundsInfinite(
+      const sounds = await SoundQuery.searchForSoundsInfinite(
         input.query,
         input.type,
         input.limit,
@@ -109,44 +107,27 @@ export const soundRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session?.user.id;
-      const data = {
-        userId,
-        soundId: input.soundId,
-      };
-
-      const existingLike = await ctx.db.likedSound.findFirst({ where: data });
-      let liked;
-
-      if (existingLike) {
-        await ctx.db.likedSound.delete({ where: { userId_soundId: data } });
-        liked = false;
-      } else {
-        await ctx.db.likedSound.create({ data });
-        liked = true;
-      }
-
-      return { success: true, value: liked };
+      return SoundMutations.likeSound(
+        ctx.session?.user.id,
+        input.soundId,
+        input.liked,
+      );
     }),
   reportSound: protectedProcedure
     .input(z.object({ id: z.string(), reason: z.string().trim().min(1) }))
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session?.user.id;
-      const data = {
-        userId,
-        soundId: input.id,
-        reason: input.reason,
-      };
-
-      const existingReport = await ctx.db.soundReport.findFirst({
-        where: { userId: data.userId, soundId: data.soundId },
-      });
+      const existingReport = await ReportQuery.getReport(userId, input.id);
 
       if (existingReport) {
         return { success: false, error: "REPORT_EXISTS" };
       }
 
-      const report = await ctx.db.soundReport.create({ data });
+      const report = await ReportMutations.createReport(
+        userId,
+        input.id,
+        input.reason,
+      );
       return { success: true, value: { caseId: report.id } };
     }),
   download: publicProcedure
@@ -155,15 +136,7 @@ export const soundRouter = createTRPCRouter({
         soundId: z.string(),
       }),
     )
-    .mutation(async ({ ctx, input }) => {
-      const { downloadCount } = await ctx.db.sound.update({
-        where: { id: input.soundId },
-        data: { downloadCount: { increment: 1 } },
-      });
-
-      return {
-        success: true,
-        value: { downloadCount: downloadCount },
-      };
+    .mutation(async ({ input }) => {
+      return SoundMutations.incrementDownloadCount(input.soundId);
     }),
 });

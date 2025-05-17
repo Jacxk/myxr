@@ -13,8 +13,16 @@ const config = {
   },
   images: {
     remotePatterns: [
-      new URL("https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/**"),
-      new URL("https://cdn.discordapp.com/emojis/**"),
+      {
+        protocol: "https",
+        hostname: "cdn.jsdelivr.net",
+        pathname: "/gh/jdecked/twemoji@15.1.0/assets/**",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.discordapp.com",
+        pathname: "/**",
+      },
     ],
   },
   async rewrites() {

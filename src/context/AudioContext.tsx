@@ -1,5 +1,6 @@
 "use client";
 
+import { usePostHog } from "posthog-js/react";
 import {
   createContext,
   type ReactNode,
@@ -14,12 +15,27 @@ interface AudioContextType {
   audio: HTMLAudioElement | null;
   isPlaying: boolean;
   currentId: string;
-  play: (id: string, src: string, fromStart?: boolean) => void;
+  play: (id: string, src: string) => void;
   preload: (src: string) => void;
   pause: () => void;
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
+
+const setupAudioElement = (
+  audio: HTMLAudioElement,
+  onPlay: () => void,
+  onStop: () => void,
+) => {
+  audio.addEventListener("play", onPlay);
+  audio.addEventListener("pause", onStop);
+  audio.addEventListener("ended", onStop);
+  return () => {
+    audio.removeEventListener("play", onPlay);
+    audio.removeEventListener("pause", onStop);
+    audio.removeEventListener("ended", onStop);
+  };
+};
 
 export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -27,33 +43,80 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentId, setCurrentId] = useState<string>("");
 
+  const posthog = usePostHog();
+
+  const handlePlay = () => setIsPlaying(true);
+  const handleStop = () => setIsPlaying(false);
+
+  const swapAudioElements = (
+    current: HTMLAudioElement,
+    preloaded: HTMLAudioElement,
+  ) => {
+    current.pause();
+    current.currentTime = 0;
+
+    setupAudioElement(current, handlePlay, handleStop);
+    setupAudioElement(preloaded, handlePlay, handleStop);
+
+    audioRef.current = preloaded;
+    preloadAudioRef.current = current;
+
+    return preloaded;
+  };
+
   const play = (id: string, src: string) => {
-    const audio = audioRef.current;
+    let audio = audioRef.current;
     if (!audio) return;
 
-    audio.pause();
-    audio.currentTime = 0;
-
-    if (audio.src !== src) {
+    const preloadAudio = preloadAudioRef.current;
+    if (preloadAudio?.src === src) {
+      audio = swapAudioElements(audio, preloadAudio);
+    } else {
+      audio.pause();
+      audio.currentTime = 0;
       audio.src = src;
       audio.load();
     }
 
+    posthog.capture("Sound Played", {
+      sound_id: id,
+      sound_url: src,
+    });
     setCurrentId(id);
     void audio.play();
   };
 
   const preload = (src: string) => {
     const preloadAudio = preloadAudioRef.current;
-    if (preloadAudio && preloadAudio.src !== src) {
-      preloadAudio.src = src;
-      preloadAudio.load();
-    }
+    if (!preloadAudio || preloadAudio.src === src) return;
+
+    preloadAudio.pause();
+    preloadAudio.currentTime = 0;
+    preloadAudio.src = src;
+    preloadAudio.load();
   };
 
   const pause = () => {
     audioRef.current?.pause();
   };
+
+  useEffect(() => {
+    const audio = new Audio();
+    const preloadAudio = new Audio();
+
+    audioRef.current = audio;
+    preloadAudioRef.current = preloadAudio;
+
+    const cleanup = setupAudioElement(audio, handlePlay, handleStop);
+
+    return () => {
+      cleanup();
+      audio.pause();
+      preloadAudio.pause();
+      audio.currentTime = 0;
+      preloadAudio.currentTime = 0;
+    };
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -67,27 +130,9 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
     [isPlaying, currentId],
   );
 
-  useEffect(() => {
-    const audio = new Audio();
-
-    audioRef.current = audio;
-    preloadAudioRef.current = new Audio();
-
-    const handlePlay = () => setIsPlaying(true);
-    const handleStop = () => setIsPlaying(false);
-
-    audio.addEventListener("play", handlePlay);
-    audio.addEventListener("pause", handleStop);
-    audio.addEventListener("ended", handleStop);
-
-    return () => {
-      audio.removeEventListener("play", handlePlay);
-      audio.removeEventListener("pause", handleStop);
-      audio.removeEventListener("ended", handleStop);
-    };
-  }, []);
-
-  return <AudioContext value={value}>{children}</AudioContext>;
+  return (
+    <AudioContext.Provider value={value}>{children}</AudioContext.Provider>
+  );
 };
 
 export const useAudio = () => {

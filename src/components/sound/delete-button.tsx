@@ -55,7 +55,7 @@ export function DeleteSoundButton({
     mutate({ soundId: discordSoundId, guildId: guildId });
   };
 
-  const onDeleteClick = (event: MouseEvent<HTMLButtonElement>) => {
+  const onRemoveClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     setOpen(true);
   };
@@ -65,9 +65,9 @@ export function DeleteSoundButton({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Sound</DialogTitle>
+            <DialogTitle>Remove Sound From Guild</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this sound?
+              Are you sure you want to remove this sound from the guild?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -75,8 +75,9 @@ export function DeleteSoundButton({
               variant="destructive"
               disabled={isPending}
               onClick={onConfirmDeleteClick}
+              loading={isPending}
             >
-              Delete
+              Remove
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -85,7 +86,7 @@ export function DeleteSoundButton({
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button variant="destructive" onClick={onDeleteClick} size="icon">
+            <Button variant="destructive" onClick={onRemoveClick} size="icon">
               <Trash />
             </Button>
           </TooltipTrigger>

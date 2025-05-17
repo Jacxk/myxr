@@ -1,10 +1,10 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
 import { usePostHog } from "posthog-js/react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { type Region } from "wavesurfer.js/dist/plugins/regions.esm.js";
+import AdDisplay from "~/components/ad/ad-display";
 import { SoundWaveForm } from "~/components/sound/sound-waveform";
 import { Button } from "~/components/ui/button";
 import {
@@ -104,7 +104,7 @@ export function EditSoundStep() {
               that&apos;s the maximum discord allows.
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col gap-6 text-muted-foreground">
+          <CardContent className="text-muted-foreground flex flex-col gap-6">
             <div className="flex flex-col">
               <span>Name: {data.file?.name}</span>
               <span>Audio Length: {totalTime.toFixed(2)}s</span>
@@ -138,17 +138,17 @@ export function EditSoundStep() {
         <Button variant="destructive" onClick={reset}>
           Cancel
         </Button>
-        <Button disabled={loading} onClick={goToNextStep}>
-          {loading ? (
-            <>
-              <Loader2 className="animate-spin" />
-              Loading
-            </>
-          ) : (
-            "Continue"
-          )}
+        <Button disabled={loading} onClick={goToNextStep} loading={loading}>
+          Continue
         </Button>
       </div>
+
+      <AdDisplay
+        adSlot="1944402367"
+        height="100%"
+        className="w-full"
+        showProbability={1}
+      />
     </div>
   );
 }

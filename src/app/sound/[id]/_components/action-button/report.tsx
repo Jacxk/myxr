@@ -2,7 +2,7 @@
 
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useMutation } from "@tanstack/react-query";
-import { Flag, Loader2 } from "lucide-react";
+import { Flag } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { usePostHog } from "posthog-js/react";
 import { useState } from "react";
@@ -19,6 +19,7 @@ import { Textarea } from "~/components/ui/textarea";
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 import { useSession } from "~/lib/auth-client";
@@ -69,8 +70,12 @@ function PendingButton({
   onClick?: () => void;
 }>) {
   return (
-    <Button type="button" disabled={isPending} onClick={onClick}>
-      {isPending && <Loader2 className="animate-spin" />}
+    <Button
+      type="button"
+      disabled={isPending}
+      onClick={onClick}
+      loading={isPending}
+    >
       Report
     </Button>
   );
@@ -154,7 +159,7 @@ export function ReportButton({
   };
 
   return (
-    <>
+    <TooltipProvider delayDuration={0}>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent>
           <DialogHeader>
@@ -180,16 +185,13 @@ export function ReportButton({
 
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button
-            size="icon"
-            variant="destructive"
-            onClick={() => onOpenChange(true)}
-          >
+          <Button variant="destructive" onClick={() => onOpenChange(true)}>
             <Flag />
+            Report
           </Button>
         </TooltipTrigger>
         <TooltipContent>Report</TooltipContent>
       </Tooltip>
-    </>
+    </TooltipProvider>
   );
 }

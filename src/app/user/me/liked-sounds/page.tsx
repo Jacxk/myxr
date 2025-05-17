@@ -1,6 +1,11 @@
+import { type Metadata } from "next";
 import Sound from "~/components/sound/sound";
 import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { api } from "~/trpc/server";
+
+export const metadata: Metadata = {
+  title: "My Liked Sounds",
+};
 
 export default async function MeLikedSounds() {
   const sounds = await api.user.likedSounds();
@@ -13,7 +18,7 @@ export default async function MeLikedSounds() {
     );
 
   return (
-    <SoundsGrid sm={4} md={5} lg={6} xl={8}>
+    <SoundsGrid>
       {sounds.map((sound) => (
         <Sound key={sound.id} sound={sound} />
       ))}

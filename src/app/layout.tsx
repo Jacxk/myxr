@@ -3,6 +3,7 @@ import "~/styles/globals.css";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
+import { GoogleAdSense } from "next-google-adsense";
 import { ThemeProvider } from "next-themes";
 import NextTopLoader from "nextjs-toploader";
 import { PostHogProvider } from "~/components/PostHogProvider";
@@ -13,9 +14,30 @@ import { Footer } from "./_components/footer";
 import Navbar from "./_components/navbar";
 
 export const metadata: Metadata = {
-  title: "Myxr",
+  metadataBase: new URL("https://myxr.cc"),
+  title: {
+    default: "myxr",
+    template: "%s | myxr",
+  },
   description: "Upload sounds to Discord with ease",
   icons: { icon: "/favicon.ico" },
+  openGraph: {
+    title: "Myxr",
+    description: "Upload sounds to Discord with ease",
+    url: "https://myxr.cc",
+    siteName: "Myxr",
+    type: "website",
+    locale: "en_US",
+    // TODO: Add images
+    // images: "/og.png",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Myxr",
+    description: "Upload sounds to Discord with ease",
+    // TODO: Add images
+    // images: "/og.png",
+  },
 };
 
 export default function RootLayout({
@@ -24,11 +46,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
       <body>
-        <PostHogProvider>
-          <TRPCReactProvider>
-            <ThemeProvider attribute="class">
+        <GoogleAdSense />
+        <ThemeProvider attribute="class">
+          <PostHogProvider>
+            <TRPCReactProvider>
               <HydrateClient>
-                <div className="flex h-screen flex-col">
+                <div className="bg-background flex min-h-screen flex-col">
                   <Navbar />
                   <NextTopLoader
                     showSpinner={false}
@@ -36,16 +59,14 @@ export default function RootLayout({
                     initialPosition={0.2}
                     crawlSpeed={100}
                   />
-                  <div className="mx-auto w-full max-w-7xl flex-1 grow p-4 sm:py-10">
-                    {children}
-                  </div>
+                  {children}
                   <Footer />
                 </div>
                 <Toaster />
               </HydrateClient>
-            </ThemeProvider>
-          </TRPCReactProvider>
-        </PostHogProvider>
+            </TRPCReactProvider>
+          </PostHogProvider>
+        </ThemeProvider>
         <SpeedInsights />
       </body>
     </html>

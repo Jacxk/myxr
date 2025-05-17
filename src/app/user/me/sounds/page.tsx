@@ -6,7 +6,7 @@ import { getServerSession } from "~/lib/auth";
 import { api } from "~/trpc/server";
 
 export const metadata: Metadata = {
-  title: "My Sounds - Myxr",
+  title: "My Sounds",
 };
 
 export default async function MeSoundsPage() {
@@ -25,7 +25,7 @@ export default async function MeSoundsPage() {
   }
 
   return (
-    <SoundsGrid sm={4} md={5} lg={6} xl={8}>
+    <SoundsGrid>
       {sounds.map((sound) => (
         <Sound key={sound.id} sound={sound} />
       ))}

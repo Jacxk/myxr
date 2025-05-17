@@ -1,6 +1,7 @@
 "use client";
 
 import { Pause, Play } from "lucide-react";
+import { usePostHog } from "posthog-js/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
 import RegionsPlugin, {
@@ -9,9 +10,9 @@ import RegionsPlugin, {
 import ZoomPlugin from "wavesurfer.js/dist/plugins/zoom.esm.js";
 import { cn } from "~/lib/utils";
 import { Button } from "../ui/button";
-
 type SoundWaveFromProps = {
   url: string;
+  id?: string;
   editable?: boolean;
   regionData?: Region;
   onDecode?: (time: number) => void;
@@ -22,6 +23,7 @@ type SoundWaveFromProps = {
 
 export function SoundWaveForm({
   url,
+  id,
   editable,
   regionData,
   onDecode,
@@ -35,6 +37,8 @@ export function SoundWaveForm({
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [isReady, setIsReady] = useState<boolean>(false);
+
+  const posthog = usePostHog();
 
   const initializeWaveSurfer = useCallback(() => {
     waveSurfer.current = WaveSurfer.create({
@@ -140,13 +144,20 @@ export function SoundWaveForm({
         if (singleRegion) singleRegion.play(true);
       } else {
         void waveSurfer.current?.play();
+
+        if (id) {
+          posthog.capture("Sound Played", {
+            sound_id: id,
+            sound_url: url,
+          });
+        }
       }
       return !playing;
     });
-  }, [editable]);
+  }, [editable, id, url, posthog]);
 
   return (
-    <div className="w-full touch-none rounded-2xl border p-4 text-muted-foreground">
+    <div className="text-muted-foreground w-full touch-none rounded-2xl border p-4">
       <div className="flex flex-row gap-4">
         <div className="relative flex flex-col items-center justify-center">
           <Button
@@ -162,7 +173,7 @@ export function SoundWaveForm({
         </div>
         <div
           className={cn("w-full overflow-hidden transition-all duration-500", {
-            "animate-pulse bg-muted": !isReady,
+            "bg-muted animate-pulse": !isReady,
             "scale-100 opacity-100": isReady,
             "scale-95 opacity-50": !isReady,
           })}

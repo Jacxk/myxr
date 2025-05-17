@@ -10,7 +10,10 @@ export function AccountMenu() {
   return (
     <DropdownMenu>
       <MenuTrigger />
-      <DropdownMenuContent className="w-40" align="end">
+      <DropdownMenuContent
+        className="bg-background/30 w-40 backdrop-blur-2xl"
+        align="end"
+      >
         <AuthenticatedMenu />
         <UnAuthenticatedMenu />
       </DropdownMenuContent>

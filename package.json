@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "build": "next build",
     "check": "next lint && tsc --noEmit",
     "db:generate": "prisma migrate dev",
@@ -18,7 +19,8 @@
     "lint:fix": "next lint --fix",
     "preview": "next build && next start",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "create-ads-txt": "create-ads-txt"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.0",
@@ -52,6 +54,7 @@
     "lucide-react": "^0.475.0",
     "myxr": "file:",
     "next": "15.3.0",
+    "next-google-adsense": "^1.0.13",
     "next-themes": "^0.4.6",
     "nextjs-toploader": "^3.8.16",
     "posthog-js": "^1.239.1",
@@ -73,6 +76,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^9.7.0",
+    "@tailwindcss/postcss": "^4.1.5",
     "@types/eslint": "^8.56.12",
     "@types/node": "^20.17.32",
     "@types/react": "19.1.2",
@@ -86,13 +90,12 @@
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "prisma": "^6.7.0",
-    "tailwindcss": "^3.4.17",
+    "tailwindcss": "^4.1.5",
     "typescript": "^5.8.3"
   },
   "ct3aMetadata": {
     "initVersion": "7.38.1"
   },
-  "packageManager": "npm@11.3.0",
   "overrides": {
     "@types/react": "19.1.2",
     "@types/react-dom": "19.1.2"
