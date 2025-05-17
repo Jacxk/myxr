@@ -1,12 +1,11 @@
 "use client";
 
 import type { Snowflake } from "discord-api-types/globals";
-import Image from "next/image";
 import Link from "next/link";
 import { AudioProvider, useAudio } from "~/context/AudioContext";
 import { cn } from "~/lib/utils";
 import type { RouterOutputs } from "~/trpc/react";
-import { getEmojiUrl } from "../emoji-image";
+import { EmojiImage } from "../emoji-image";
 import { Button } from "../ui/button";
 import { DeleteSoundButton } from "./delete-button";
 
@@ -34,9 +33,6 @@ function SoundRow({
 }: SoundListData & { className: string }) {
   const { play } = useAudio();
   const size = 34;
-  const emoji = sound.emoji.startsWith("http")
-    ? sound.emoji
-    : getEmojiUrl(sound.emoji);
 
   const handleRowClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
@@ -54,7 +50,10 @@ function SoundRow({
     >
       <div className="grid h-fit w-full cursor-pointer grid-cols-4 items-center">
         <div>
-          <Image src={emoji} alt={sound.emoji} width={size} height={size} />
+          <EmojiImage
+            emoji={sound.emoji}
+            size={{ width: size, height: size }}
+          />
         </div>
         <div className="col-span-2">
           {external ? (

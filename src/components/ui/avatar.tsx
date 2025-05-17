@@ -33,6 +33,7 @@ const AvatarImage = React.forwardRef<
         ref={ref}
         asChild
         className={cn("aspect-square h-full w-full", className)}
+        draggable={false}
         {...props}
       >
         <Image

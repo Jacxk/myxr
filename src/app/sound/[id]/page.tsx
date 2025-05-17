@@ -32,10 +32,5 @@ export default async function SoundIDPage({
   const { id } = await params;
   const sound = await getSound(id);
 
-  return (
-    <>
-      <title>{`${sound.name} - Sound`}</title>
-      <SoundPage sound={sound} id={id} />
-    </>
-  );
+  return <SoundPage sound={sound} id={id} />;
 }

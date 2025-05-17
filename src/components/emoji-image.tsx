@@ -32,7 +32,8 @@ export function EmojiImage({
 }: EmojiImageProps) {
   if (!emoji && !displayIfEmpty) return null;
 
-  const emojiUrl = getEmojiUrl(emoji, true);
+  const emojiUrl = emoji.startsWith("http") ? emoji : getEmojiUrl(emoji);
+
   return (
     <Image
       src={emojiUrl}
@@ -40,6 +41,7 @@ export function EmojiImage({
       width={size?.width ?? 100}
       height={size?.height ?? 100}
       className={className}
+      draggable={false}
     />
   );
 }
