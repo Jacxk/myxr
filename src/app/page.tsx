@@ -1,7 +1,7 @@
 import { Main } from "~/components/main";
 import { api } from "~/trpc/server";
-import { HeroSection } from "./_components/hero-section";
 import { AllSounds } from "./_components/page/all-sounds";
+import { HeroSection } from "./_components/page/hero-section";
 import { LatestSounds } from "./_components/page/latest-sounds";
 
 export default async function Home() {
