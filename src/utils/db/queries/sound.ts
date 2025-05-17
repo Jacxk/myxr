@@ -1,3 +1,5 @@
+import "server-only";
+
 import { db } from "~/server/db";
 import type { SearchType } from "../types";
 import { populateLike, soundInclude } from "../types";

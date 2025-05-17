@@ -1,3 +1,5 @@
+import "server-only";
+
 import { db } from "~/server/db";
 import { UserDiscordApi } from "~/utils/discord/user-api";
 import { GuildMutation } from "../mutations/guild";

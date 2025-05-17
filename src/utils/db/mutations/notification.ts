@@ -1,3 +1,6 @@
+import "server-only";
+
+import { type Prisma } from "@prisma/client";
 import { type BaseNotificationPayload } from "~/lib/notifications/NotificationService";
 import { db } from "~/server/db";
 

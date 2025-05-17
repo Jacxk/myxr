@@ -1,3 +1,5 @@
+import "server-only";
+
 import { db } from "~/server/db";
 
 export const discordAuthorization = async (id: string) => {

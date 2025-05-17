@@ -1,3 +1,5 @@
+import "server-only";
+
 import { type APIGuild } from "discord-api-types/v10";
 import { discordAuthorization } from "../db";
 import { DiscordPermission } from "./types";
