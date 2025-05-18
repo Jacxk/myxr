@@ -49,7 +49,7 @@ function NotificationItem({ notification }: { notification: Notification }) {
 
 export function Notifications() {
   const api = useTRPC();
-  const { data, isLoading, isRefetching, refetch, fetchNextPage, hasNextPage } =
+  const { data, isLoading, isRefetching, hasNextPage, refetch, fetchNextPage } =
     useInfiniteQuery(
       api.user.getNotifications.infiniteQueryOptions(
         { limit: 5 },
@@ -109,31 +109,26 @@ export function Notifications() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup className="max-h-[300px] overflow-y-auto">
-          {isLoading ? (
-            <DropdownMenuItem className="flex justify-center" disabled>
-              Loading...
-            </DropdownMenuItem>
-          ) : (
-            <InfiniteScroll
-              loadMore={fetchNextPage}
-              hasMore={hasNextPage}
-              isLoading={isLoading}
-              endMessage={
-                notifications.length === 0 ? (
-                  <DropdownMenuItem className="flex justify-center" disabled>
-                    No notifications
-                  </DropdownMenuItem>
-                ) : null
-              }
-            >
-              {notifications.map((notification) => (
-                <NotificationItem
-                  key={notification.id}
-                  notification={notification}
-                />
-              ))}
-            </InfiniteScroll>
-          )}
+          <InfiniteScroll
+            loadMore={fetchNextPage}
+            hasMore={hasNextPage}
+            isLoading={isLoading}
+            endMessage={
+              notifications.length === 0 ? (
+                <DropdownMenuItem className="flex justify-center" disabled>
+                  No notifications
+                </DropdownMenuItem>
+              ) : null
+            }
+            manualTrigger={false}
+          >
+            {notifications.map((notification) => (
+              <NotificationItem
+                key={notification.id}
+                notification={notification}
+              />
+            ))}
+          </InfiniteScroll>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem
