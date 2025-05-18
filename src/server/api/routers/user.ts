@@ -49,10 +49,32 @@ export const userRouter = createTRPCRouter({
 
       return { success: true, value: { following } };
     }),
-  getNotifications: protectedProcedure.query(async ({ ctx }) => {
-    const userId = ctx.session.user.id;
-    return NotificationQueries.getNotifications(userId);
-  }),
+  getNotifications: protectedProcedure
+    .input(
+      z.object({
+        limit: z.number().default(10),
+        cursor: z.string().nullish(),
+        direction: z.enum(["forward", "backward"]).default("forward"),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+      const notifications = await NotificationQueries.getNotifications(userId, {
+        limit: input.limit,
+        cursor: input.cursor,
+      });
+
+      let nextCursor: typeof input.cursor | undefined = undefined;
+      if (notifications.length > input.limit) {
+        const nextItem = notifications.pop();
+        nextCursor = nextItem!.id;
+      }
+
+      return {
+        notifications,
+        nextCursor,
+      };
+    }),
 
   handleNotification: protectedProcedure
     .input(

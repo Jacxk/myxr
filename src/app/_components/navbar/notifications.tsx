@@ -1,9 +1,10 @@
 "use client";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { Bell, BellDot, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import TimeAgo from "react-timeago";
+import { InfiniteScroll } from "~/components/infinite-scroll";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -48,12 +49,16 @@ function NotificationItem({ notification }: { notification: Notification }) {
 
 export function Notifications() {
   const api = useTRPC();
-  const {
-    data: notifications,
-    isLoading,
-    isRefetching,
-    refetch,
-  } = useQuery(api.user.getNotifications.queryOptions());
+  const { data, isLoading, isRefetching, refetch, fetchNextPage, hasNextPage } =
+    useInfiniteQuery(
+      api.user.getNotifications.infiniteQueryOptions(
+        { limit: 5 },
+
+        {
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
+        },
+      ),
+    );
   const { mutate } = useMutation(
     api.user.handleNotification.mutationOptions({
       onSuccess: () => {
@@ -64,8 +69,9 @@ export function Notifications() {
 
   const [open, setOpen] = useState(false);
 
+  const notifications = data?.pages.flatMap((page) => page.notifications) ?? [];
   const isAnyUnread =
-    !open && notifications?.some((notification) => !notification.read);
+    !open && notifications.some((notification) => !notification.read);
 
   useEffect(() => {
     if (open) {
@@ -107,17 +113,26 @@ export function Notifications() {
             <DropdownMenuItem className="flex justify-center" disabled>
               Loading...
             </DropdownMenuItem>
-          ) : !notifications || notifications.length === 0 ? (
-            <DropdownMenuItem className="flex justify-center" disabled>
-              No notifications
-            </DropdownMenuItem>
           ) : (
-            notifications.map((notification) => (
-              <NotificationItem
-                key={notification.id}
-                notification={notification}
-              />
-            ))
+            <InfiniteScroll
+              loadMore={fetchNextPage}
+              hasMore={hasNextPage}
+              isLoading={isLoading}
+              endMessage={
+                notifications.length === 0 ? (
+                  <DropdownMenuItem className="flex justify-center" disabled>
+                    No notifications
+                  </DropdownMenuItem>
+                ) : null
+              }
+            >
+              {notifications.map((notification) => (
+                <NotificationItem
+                  key={notification.id}
+                  notification={notification}
+                />
+              ))}
+            </InfiniteScroll>
           )}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
