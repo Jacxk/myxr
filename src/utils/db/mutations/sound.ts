@@ -6,7 +6,7 @@ import { env } from "~/env";
 import { DatabaseNotificationHandler } from "~/lib/notifications/handlers/DatabaseNotificationHandler";
 import { NotificationService } from "~/lib/notifications/NotificationService";
 import { db } from "~/server/db";
-import { checkSoundMilestone, MilestoneType } from "./milestone";
+import { checkSoundMilestone, MilestoneType } from "../milestone";
 
 export const SoundMutations = {
   likeSound: async (userId: string, soundId: string, liked: boolean) => {

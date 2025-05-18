@@ -16,4 +16,43 @@ export const NotificationMutations = {
       },
     });
   },
+
+  markAllAsRead: (userId: string) => {
+    return db.notification.updateMany({
+      where: { userId },
+      data: { read: true },
+    });
+  },
+
+  markAsRead: (notificationId: string) => {
+    return db.notification.update({
+      where: { id: notificationId },
+      data: { read: true },
+    });
+  },
+
+  markManyAsRead: (notificationIds: string[]) => {
+    return db.notification.updateMany({
+      where: { id: { in: notificationIds } },
+      data: { read: true },
+    });
+  },
+
+  deleteAll: (userId: string) => {
+    return db.notification.deleteMany({
+      where: { userId },
+    });
+  },
+
+  deleteMany: (notificationIds: string[]) => {
+    return db.notification.deleteMany({
+      where: { id: { in: notificationIds } },
+    });
+  },
+
+  deleteSingle: (id: string) => {
+    return db.notification.delete({
+      where: { id },
+    });
+  },
 };

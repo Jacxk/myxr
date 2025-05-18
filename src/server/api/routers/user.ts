@@ -4,6 +4,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
+import { NotificationMutations } from "~/utils/db/mutations/notification";
 import { NotificationQueries } from "~/utils/db/queries/notification";
 import { ReportQuery } from "~/utils/db/queries/report";
 import { SoundQuery } from "~/utils/db/queries/sound";
@@ -52,4 +53,45 @@ export const userRouter = createTRPCRouter({
     const userId = ctx.session.user.id;
     return NotificationQueries.getNotifications(userId);
   }),
+
+  handleNotification: protectedProcedure
+    .input(
+      z.discriminatedUnion("type", [
+        z.object({ type: z.literal("markAllAsRead") }),
+        z.object({
+          type: z.literal("markManyAsRead"),
+          ids: z.array(z.string()),
+        }),
+        z.object({ type: z.literal("markAsRead"), id: z.string() }),
+        z.object({ type: z.literal("deleteAll") }),
+        z.object({ type: z.literal("deleteMany"), ids: z.array(z.string()) }),
+        z.object({ type: z.literal("deleteSingle"), id: z.string() }),
+      ]),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+      if (input.type === "markAllAsRead") {
+        return NotificationMutations.markAllAsRead(userId);
+      }
+
+      if (input.type === "markAsRead") {
+        return NotificationMutations.markAsRead(input.id);
+      }
+
+      if (input.type === "markManyAsRead") {
+        return NotificationMutations.markManyAsRead(input.ids);
+      }
+
+      if (input.type === "deleteAll") {
+        return NotificationMutations.deleteAll(userId);
+      }
+
+      if (input.type === "deleteSingle") {
+        return NotificationMutations.deleteSingle(input.id);
+      }
+
+      if (input.type === "deleteMany") {
+        return NotificationMutations.deleteMany(input.ids);
+      }
+    }),
 });

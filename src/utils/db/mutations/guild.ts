@@ -4,7 +4,7 @@ import type { GuildSound } from "@prisma/client";
 import type { APIGuild } from "discord-api-types/v10";
 import { db } from "~/server/db";
 import { BotDiscordApi } from "~/utils/discord/bot-api";
-import { checkSoundMilestone, MilestoneType } from "./milestone";
+import { checkSoundMilestone, MilestoneType } from "../milestone";
 
 async function downloadSoundToBase64(url: string) {
   const file = await fetch(url);

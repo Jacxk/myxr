@@ -1,7 +1,8 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Bell, BellDot, RefreshCw } from "lucide-react";
+import { useEffect, useState } from "react";
 import TimeAgo from "react-timeago";
 import { Button } from "~/components/ui/button";
 import {
@@ -53,12 +54,39 @@ export function Notifications() {
     isRefetching,
     refetch,
   } = useQuery(api.user.getNotifications.queryOptions());
+  const { mutate } = useMutation(
+    api.user.handleNotification.mutationOptions({
+      onSuccess: () => {
+        void refetch();
+      },
+    }),
+  );
+
+  const [open, setOpen] = useState(false);
+
+  const isAnyUnread =
+    !open && notifications?.some((notification) => !notification.read);
+
+  useEffect(() => {
+    if (open) {
+      void refetch();
+      return;
+    }
+
+    if (isAnyUnread) {
+      mutate({ type: "markAllAsRead" });
+    }
+  }, [open]);
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon" className="bg-background/30">
-          {notifications && notifications.length > 0 ? <BellDot /> : <Bell />}
+          {isAnyUnread ? (
+            <BellDot className={cn(isAnyUnread && "animate-pulse")} />
+          ) : (
+            <Bell />
+          )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
@@ -93,8 +121,11 @@ export function Notifications() {
           )}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="flex justify-center">
-          Mark all read
+        <DropdownMenuItem
+          className="flex justify-center"
+          onClick={() => mutate({ type: "deleteAll" })}
+        >
+          Delete all notifications
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
