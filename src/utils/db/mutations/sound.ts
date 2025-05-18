@@ -1,17 +1,12 @@
 import "server-only";
 
-import { type RESTPostAPIChannelMessageJSONBody } from "discord-api-types/v10";
+import { type RESTPostAPIChannelMessageJSONBody as MessageBody } from "discord-api-types/v10";
 import { getEmojiUrl } from "~/components/emoji-image";
 import { env } from "~/env";
-import { DiscordNotificationHandler } from "~/lib/notifications/handlers/DiscordNotificationHandler";
+import { DatabaseNotificationHandler } from "~/lib/notifications/handlers/DatabaseNotificationHandler";
 import { NotificationService } from "~/lib/notifications/NotificationService";
 import { db } from "~/server/db";
-
-const notificationService =
-  new NotificationService<RESTPostAPIChannelMessageJSONBody>();
-const discordHandler = new DiscordNotificationHandler("1372217001048674445");
-
-notificationService.addHandler(discordHandler);
+import { checkSoundMilestone, MilestoneType } from "./milestone";
 
 export const SoundMutations = {
   likeSound: async (userId: string, soundId: string, liked: boolean) => {
@@ -27,18 +22,32 @@ export const SoundMutations = {
       await db.likedSound.delete({ where: { userId_soundId: data } });
       newLiked = false;
     } else if (liked && !existingLike) {
-      await db.likedSound.create({ data });
+      const { sound } = await db.likedSound.create({
+        data,
+        include: {
+          sound: { select: { likedBy: true, createdById: true, name: true } },
+        },
+      });
       newLiked = true;
+
+      checkSoundMilestone(sound.likedBy.length, sound, MilestoneType.LIKES);
     }
 
     return { success: true, value: newLiked };
   },
 
   incrementDownloadCount: async (soundId: string) => {
-    const { downloadCount } = await db.sound.update({
+    const { downloadCount, ...sound } = await db.sound.update({
       where: { id: soundId },
       data: { downloadCount: { increment: 1 } },
+      select: {
+        name: true,
+        createdById: true,
+        downloadCount: true,
+      },
     });
+
+    checkSoundMilestone(downloadCount, sound, MilestoneType.DOWNLOADS);
 
     return {
       success: true,
@@ -59,6 +68,10 @@ export const SoundMutations = {
     userId: string;
     tags: { name: string }[];
   }) => {
+    const notificationService = new NotificationService<MessageBody>();
+
+    notificationService.addHandler(new DatabaseNotificationHandler());
+
     const sound = await db.sound.create({
       data: {
         url,
