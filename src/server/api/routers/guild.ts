@@ -86,4 +86,36 @@ export const guildRouter = createTRPCRouter({
     .mutation(async ({ input }) => {
       return GuildMutation.setSoundMasterRoles(input.guildId, input.roles);
     }),
+
+  getAllTextChannels: protectedProcedure
+    .input(
+      z.object({
+        guildId: z.string(),
+      }),
+    )
+    .query(async ({ input }) => {
+      const [discordChannels, query] = await Promise.all([
+        BotDiscordApi.getAllTextChannels(input.guildId),
+        GuildQuery.getNotificationChannel(input.guildId),
+      ]);
+
+      console.log("🚀 ~ .query ~ query:", query);
+      return discordChannels.map((channel) => ({
+        ...channel,
+        selected: query?.notificationsChannel === channel.id,
+      }));
+    }),
+
+  setNotificationsChannel: allowedToManageGuildProtectedProcedure
+    .input(
+      z.object({
+        channelId: z.string().nullish(),
+      }),
+    )
+    .mutation(({ input }) => {
+      return GuildMutation.setNotificationsChannel(
+        input.guildId,
+        input.channelId,
+      );
+    }),
 });

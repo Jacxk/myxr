@@ -103,4 +103,13 @@ export const GuildMutation = {
 
     return soundData;
   },
+
+  setNotificationsChannel: (guildId: string, channelId?: string | null) => {
+    return db.guild.update({
+      where: { id: guildId },
+      data: {
+        notificationsChannel: channelId,
+      },
+    });
+  },
 };

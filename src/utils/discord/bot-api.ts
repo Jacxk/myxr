@@ -1,6 +1,8 @@
 import "server-only";
 
 import {
+  ChannelType,
+  type APIChannel,
   type APIGuild,
   type APIGuildMember,
   type APIRole,
@@ -83,5 +85,14 @@ export const BotDiscordApi = {
     return {
       roles: data.roles,
     };
+  },
+
+  async getAllTextChannels(guildId: string) {
+    const channels = await createDiscordRequest<APIChannel[]>(
+      `/guilds/${guildId}/channels`,
+      BOT_AUTHORIZATION,
+    );
+
+    return channels.filter((channel) => channel.type === ChannelType.GuildText);
   },
 };

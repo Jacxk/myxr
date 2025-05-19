@@ -115,12 +115,13 @@ model Tag {
 }
 
 model Guild {
-    id               String            @id
-    name             String
-    image            String?
-    sounds           GuildSound[]
-    soundMasterRoles String[]          @default([])
-    users            GuildMembership[]
+    id                   String            @id
+    name                 String
+    image                String?
+    sounds               GuildSound[]
+    soundMasterRoles     String[]          @default([])
+    notificationsChannel String?
+    users                GuildMembership[]
 }
 
 model GuildSound {
