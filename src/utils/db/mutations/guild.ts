@@ -2,6 +2,10 @@ import "server-only";
 
 import type { GuildSound } from "@prisma/client";
 import type { APIGuild } from "discord-api-types/v10";
+import { getEmojiUrl } from "~/components/emoji-image";
+import { env } from "~/env";
+import { NotificationService } from "~/lib/notifications/NotificationService";
+import { DiscordNotificationHandler } from "~/lib/notifications/handlers/DiscordNotificationHandler";
 import { db } from "~/server/db";
 import { BotDiscordApi } from "~/utils/discord/bot-api";
 import { checkSoundMilestone, MilestoneType } from "../milestone";
@@ -12,6 +16,8 @@ async function downloadSoundToBase64(url: string) {
   const base64String = Buffer.from(arrayBuffer).toString("base64");
   return `data:audio/mp3;base64,${base64String}`;
 }
+
+const notificationService = new NotificationService();
 
 export const GuildMutation = {
   upsertGuild: async (guild: APIGuild) => {
@@ -32,7 +38,7 @@ export const GuildMutation = {
     soundId,
     discordSoundId,
   }: GuildSound & { guildName: string }) => {
-    const [, , sound] = await Promise.all([
+    const [, guild, sound] = await Promise.all([
       db.guildSound.create({
         data: {
           guildId,
@@ -43,19 +49,49 @@ export const GuildMutation = {
       db.guild.update({
         where: { id: guildId },
         data: { name: guildName },
+        select: { notificationsChannel: true },
       }),
       db.sound.update({
         where: { id: soundId },
         data: { usegeCount: { increment: 1 } },
         select: {
+          id: true,
           usegeCount: true,
           name: true,
           createdById: true,
+          emoji: true,
         },
       }),
     ]);
 
     checkSoundMilestone(sound.usegeCount, sound, MilestoneType.USAGE);
+
+    if (!guild.notificationsChannel) return;
+
+    notificationService.addHandler(
+      new DiscordNotificationHandler(guild.notificationsChannel),
+    );
+
+    void notificationService.notify({
+      userId: sound.createdById,
+      title: "Sound Added",
+      description: "A new sound has been added",
+      createdAt: new Date(),
+      metadata: {
+        embeds: [
+          {
+            color: 39129,
+            timestamp: new Date().toISOString(),
+            url: `${env.NEXT_PUBLIC_BASE_URL}/sound/${sound.id}`,
+            title: sound.name,
+            description: "New sound added to the guild",
+            thumbnail: {
+              url: getEmojiUrl(sound.emoji),
+            },
+          },
+        ],
+      },
+    });
   },
 
   setSoundMasterRoles: async (guildId: string, roles: string[]) => {
