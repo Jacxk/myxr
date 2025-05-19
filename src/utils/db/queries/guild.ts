@@ -1,3 +1,5 @@
+import "server-only";
+
 import { db } from "~/server/db";
 
 export const GuildQuery = {
@@ -34,5 +36,14 @@ export const GuildQuery = {
 
   getGuildCount: () => {
     return db.guild.count();
+  },
+
+  getNotificationChannel: (guildId: string) => {
+    return db.guild.findFirst({
+      where: { id: guildId },
+      select: {
+        notificationsChannel: true,
+      },
+    });
   },
 };

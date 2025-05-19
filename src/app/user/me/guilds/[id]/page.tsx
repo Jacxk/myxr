@@ -6,7 +6,7 @@ import {
 } from "~/components/sound/sound-list";
 import { api } from "~/trpc/server";
 import { BotDiscordApi } from "~/utils/discord/bot-api";
-import MasterRolesSelect from "./master-roles-select";
+import ConfigSelect from "./_components/config-select";
 
 const getGuild = cache(async (id: string) => {
   return api.guild.getGuild(id);
@@ -88,7 +88,7 @@ async function GuildContent({ id }: { id: string }) {
       <title>{`${guild.name} - Guild Sounds`}</title>
       <div className="flex w-full flex-col items-center">
         <h2 className="text-muted-foreground text-xl">{guild.name}</h2>
-        <MasterRolesSelect guildId={guild.id} />
+        <ConfigSelect guildId={guild.id} />
         <SoundTableList
           data={[
             guildSounds as unknown as SoundListData,

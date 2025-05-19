@@ -1,3 +1,5 @@
+import "server-only";
+
 import { env } from "~/env";
 import { type DiscordError, type DiscordPermissionValue } from "./types";
 
