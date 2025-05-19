@@ -40,16 +40,8 @@ export const guildRouter = createTRPCRouter({
         soundId: z.string(),
       }),
     )
-    .mutation(async ({ input, ctx }) => {
-      const guildSound = await ctx.db.guildSound.findFirst({
-        where: { guildId: input.guildId, discordSoundId: input.soundId },
-      });
-
-      if (guildSound) {
-        await ctx.db.guildSound.delete({
-          where: { discordSoundId: input.soundId },
-        });
-      }
+    .mutation(async ({ input }) => {
+      void GuildMutation.deleteSound(input.guildId, input.soundId);
 
       await BotDiscordApi.deleteSound(input.guildId, input.soundId).catch(
         () => null,

@@ -148,4 +148,48 @@ export const GuildMutation = {
       },
     });
   },
+
+  deleteSound: async (guildId: string, soundId: string) => {
+    const guildSound = await db.guildSound.findFirst({
+      where: { guildId: guildId, discordSoundId: soundId },
+      select: {
+        guild: { select: { notificationsChannel: true } },
+        soundId: true,
+        sound: { select: { name: true, emoji: true } },
+      },
+    });
+
+    if (guildSound) {
+      await db.guildSound.delete({
+        where: { discordSoundId: soundId },
+      });
+
+      if (!guildSound.guild.notificationsChannel) return;
+
+      notificationService.addHandler(
+        new DiscordNotificationHandler(guildSound.guild.notificationsChannel),
+      );
+
+      void notificationService.notify({
+        userId: "",
+        title: "Sound Removed",
+        description: "A sound has been removed",
+        createdAt: new Date(),
+        metadata: {
+          embeds: [
+            {
+              color: 39129,
+              timestamp: new Date().toISOString(),
+              url: `${env.NEXT_PUBLIC_BASE_URL}/sound/${guildSound.soundId}`,
+              title: guildSound.sound.name,
+              description: "A sound was removed from the guild",
+              thumbnail: {
+                url: getEmojiUrl(guildSound.sound.emoji),
+              },
+            },
+          ],
+        },
+      });
+    }
+  },
 };
