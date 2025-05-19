@@ -48,7 +48,7 @@ export default function NotificationsSelect({ guildId }: { guildId: string }) {
   }, []);
 
   return (
-    <div className="max-h-[300px] w-56 overflow-y-auto">
+    <div className="max-h-[300px] w-40 overflow-y-auto sm:w-56">
       <DropdownMenuLabel className="text-muted-foreground text-xs">
         Select where notifications appear on the guild.
       </DropdownMenuLabel>

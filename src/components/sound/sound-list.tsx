@@ -48,7 +48,7 @@ function SoundRow({
       role="button"
       className={cn("hover:bg-accent p-2 text-sm", className)}
     >
-      <div className="grid h-fit w-full cursor-pointer grid-cols-4 items-center">
+      <div className="grid h-fit w-full cursor-pointer grid-cols-5 items-center">
         <div>
           <EmojiImage
             emoji={sound.emoji}
@@ -74,6 +74,8 @@ function SoundRow({
               </Link>
             </Button>
           )}
+        </div>
+        <div className="flex justify-end">
           <DeleteSoundButton
             discordSoundId={discordSoundId}
             guildId={guildId}
@@ -86,7 +88,7 @@ function SoundRow({
 
 function SoundTableHeader() {
   return (
-    <div className="grid h-full w-full grid-cols-4 items-center p-4">
+    <div className="grid h-full w-full grid-cols-5 items-center p-4">
       <span>Emoji</span>
       <span className="col-span-2">Name</span>
       <span>Created By</span>

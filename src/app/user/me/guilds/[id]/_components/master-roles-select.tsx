@@ -56,7 +56,7 @@ export default function MasterRolesSelect({ guildId }: { guildId: string }) {
   }, []);
 
   return (
-    <div className="max-h-[300px] w-56 overflow-y-auto">
+    <div className="max-h-[300px] w-40 overflow-y-auto sm:w-56">
       <DropdownMenuLabel className="text-muted-foreground text-xs">
         Select the roles that can manage the sound of the guild.
       </DropdownMenuLabel>
