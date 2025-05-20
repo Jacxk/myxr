@@ -5,6 +5,8 @@ export const metadata: Metadata = {
   title: "Privacy Policy",
 };
 
+export const dynamic = "force-static";
+
 export default function PrivacyPolicyPage() {
   return (
     <main className="mx-auto max-w-3xl p-6">

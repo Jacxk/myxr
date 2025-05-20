@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   title: "Terms of Service",
 };
 
+export const dynamic = "force-static";
+
 export default function TermsOfServicePage() {
   return (
     <main className="mx-auto max-w-3xl p-6">
