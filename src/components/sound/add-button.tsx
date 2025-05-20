@@ -132,15 +132,11 @@ export function AddToGuildButton({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{`Add sound to ${guild?.name}`}</DialogTitle>
+            <DialogTitle>Add Sound To Guild</DialogTitle>
           </DialogHeader>
-          <p>Are you sure you want to add this sound?</p>
+          <p>Choose which guild you want to add this sound.</p>
           <DialogFooter>
-            <Button
-              onClick={onAddClick}
-              disabled={isPending}
-              loading={isPending}
-            >
+            <Button onClick={onAddClick} loading={isPending}>
               Add
             </Button>
           </DialogFooter>
@@ -154,7 +150,7 @@ export function AddToGuildButton({
             <Button
               variant="outline"
               onClick={addSoundToGuild}
-              disabled={isPending}
+              loading={isPending}
               size={typeof usage === "number" ? "default" : "icon"}
             >
               <Plus />

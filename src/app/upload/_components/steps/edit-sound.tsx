@@ -138,7 +138,7 @@ export function EditSoundStep() {
         <Button variant="destructive" onClick={reset}>
           Cancel
         </Button>
-        <Button disabled={loading} onClick={goToNextStep} loading={loading}>
+        <Button onClick={goToNextStep} loading={loading}>
           Continue
         </Button>
       </div>

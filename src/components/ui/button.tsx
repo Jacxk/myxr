@@ -50,20 +50,24 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       variant,
       size,
       asChild = false,
-      loading = false,
+      loading,
       loadingText = "Loading...",
       ...props
     },
     ref,
   ) => {
-    const Comp = asChild ? Slot : "button";
-    props.children = loading ? (
-      <>
-        <Loader2 className="size-4 animate-spin" /> {loadingText}
-      </>
-    ) : (
-      props.children
-    );
+    const Comp = asChild && !loading ? Slot : "button";
+    props.disabled = loading ?? props.disabled;
+    if (loading) {
+      props.children =
+        size === "icon" ? (
+          <Loader2 className="size-4 animate-spin" />
+        ) : (
+          <>
+            <Loader2 className="size-4 animate-spin" /> {loadingText}
+          </>
+        );
+    }
 
     return (
       <Comp

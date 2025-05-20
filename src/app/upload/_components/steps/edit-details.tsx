@@ -157,7 +157,6 @@ export function EditDetailsStep() {
             <Button
               className="w-full"
               onClick={uploadFile}
-              disabled={uploading}
               loading={uploading}
               loadingText="Saving..."
             >

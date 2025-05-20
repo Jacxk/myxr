@@ -73,7 +73,6 @@ export function DeleteSoundButton({
           <DialogFooter>
             <Button
               variant="destructive"
-              disabled={isPending}
               onClick={onConfirmDeleteClick}
               loading={isPending}
             >

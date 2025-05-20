@@ -70,12 +70,7 @@ function PendingButton({
   onClick?: () => void;
 }>) {
   return (
-    <Button
-      type="button"
-      disabled={isPending}
-      onClick={onClick}
-      loading={isPending}
-    >
+    <Button type="button" onClick={onClick} loading={isPending}>
       Report
     </Button>
   );
