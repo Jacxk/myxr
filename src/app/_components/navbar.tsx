@@ -11,7 +11,7 @@ import { SearchProvider } from "~/context/SearchContext";
 import { AuthenticatedClient } from "./authentication-client";
 import { AccountMenu } from "./navbar/account-menu";
 import { Notifications } from "./navbar/notifications";
-import { MobileSearch, SearchBar } from "./navbar/search-bar";
+import { SearchBar } from "./navbar/search-bar";
 import { SelectGuild } from "./navbar/select-guild";
 
 function NavbarContent() {
@@ -50,7 +50,6 @@ function NavbarContent() {
           </div>
         </nav>
       </header>
-      <MobileSearch />
     </>
   );
 }
