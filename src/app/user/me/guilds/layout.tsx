@@ -17,8 +17,7 @@ export default async function Layout({
           <TabLink
             className="rounded-b-none"
             key={guild.id}
-            href={`/user/me/guilds/${guild.id}`}
-            matchExact={i === 0 ? `/user/me/guilds` : undefined}
+            path={`/user/me/guilds/${guild.id}`}
           >
             <Avatar title={guild.name}>
               <AvatarImage

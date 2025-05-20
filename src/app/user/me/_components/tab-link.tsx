@@ -6,23 +6,21 @@ import { cn } from "~/lib/utils";
 
 export function TabLink({
   children,
-  href,
+  path,
   className = "",
-  matchExact,
 }: Readonly<{
   children: React.ReactNode;
-  href: string;
+  path: string;
   className?: string;
-  matchExact?: string;
 }>) {
   const pathname = usePathname();
-  const isActive = pathname.startsWith(href) || pathname === matchExact;
+  const isActive = pathname.startsWith(path);
 
   return (
     <Link
-      href={href}
+      href={path}
       className={cn(
-        "block rounded-md p-2 px-4 hover:bg-secondary",
+        "hover:bg-secondary block rounded-md p-2 px-4",
         isActive ? "bg-secondary/50 text-primary/75" : "text-primary/50",
         className,
       )}
