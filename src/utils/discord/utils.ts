@@ -7,9 +7,10 @@ import { type DiscordPermissionValue } from "./types";
 export const BOT_AUTHORIZATION = `Bot ${env.DISCORD_BOT_TOKEN}`;
 
 export function hasPermission(
-  permissions: string | number,
+  permissions: string | number | undefined,
   permission: DiscordPermissionValue,
 ): boolean {
+  if (typeof permissions === "undefined") return false;
   const perms = BigInt(permissions);
   return (perms & BigInt(permission)) === BigInt(permission);
 }

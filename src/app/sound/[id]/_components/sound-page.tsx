@@ -28,6 +28,7 @@ function ActionButtons({ id, sound, isPreview }: SoundPageProps) {
       <TooltipProvider delayDuration={0}>
         <AddToGuildButton
           soundId={id}
+          soundName={sound.name}
           isPreview={isPreview}
           usage={sound.usegeCount}
         />
