@@ -74,7 +74,7 @@ export function SearchProvider<T>({ children }: { children: ReactNode }) {
     closeMobileSearch();
     setIsSearching(false);
     addRecentSearch(query);
-    router.push(`/sound?query=${encodeURIComponent(query.trim())}`);
+    router.push(`/sounds/search?query=${encodeURIComponent(query.trim())}`);
   };
 
   const value = {

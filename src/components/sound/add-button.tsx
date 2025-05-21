@@ -7,7 +7,7 @@ import { Check, Loader2, Plus } from "lucide-react";
 import { usePostHog } from "posthog-js/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { type Guild } from "~/app/sound/[id]/_components/guild";
+import { type Guild } from "~/app/sounds/[id]/_components/guild";
 import { useSession } from "~/lib/auth-client";
 import { ErrorToast } from "~/lib/messages/toast.global";
 import { useTRPC } from "~/trpc/react";

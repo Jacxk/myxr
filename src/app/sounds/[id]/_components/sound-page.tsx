@@ -120,7 +120,11 @@ export function SoundPage({ id, sound, isPreview }: Readonly<SoundPageProps>) {
               {sound.tags?.map((tag) => (
                 <Button key={tag.name} variant="secondary" asChild>
                   <Link
-                    href={isPreview ? "" : `/sound?query=${tag.name}&type=tag`}
+                    href={
+                      isPreview
+                        ? ""
+                        : `/sounds/search?query=${tag.name}&type=tag`
+                    }
                   >
                     {tag.name}
                   </Link>

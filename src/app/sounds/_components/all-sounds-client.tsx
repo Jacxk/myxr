@@ -1,5 +1,9 @@
 "use client";
-import { InfiniteScroll } from "~/components/infinite-scroll";
+
+import {
+  InfiniteScroll,
+  type InfiniteScrollProps,
+} from "~/components/infinite-scroll";
 import Sound from "~/components/sound/sound";
 import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { useTRPC, type RouterOutputs } from "~/trpc/react";
@@ -12,7 +16,10 @@ type AllSoundsClient = {
   initialData: RouterOutputs["sound"]["getAllSounds"];
 };
 
-export function AllSoundsClient({ initialData }: AllSoundsClient) {
+export function AllSoundsClient({
+  initialData,
+  ...infititeScrollProps
+}: AllSoundsClient & Partial<InfiniteScrollProps>) {
   const api = useTRPC();
   const { data, fetchNextPage, hasNextPage, isPending } = useInfiniteQuery(
     api.sound.getAllSounds.infiniteQueryOptions(
@@ -31,14 +38,10 @@ export function AllSoundsClient({ initialData }: AllSoundsClient) {
 
   return (
     <InfiniteScroll
+      {...infititeScrollProps}
       loadMore={fetchNextPage}
       hasMore={hasNextPage}
       isLoading={isPending}
-      title={
-        <h1 className="text-center text-5xl font-bold sm:text-left sm:text-3xl">
-          Trending Sounds
-        </h1>
-      }
     >
       <SoundsGrid>
         {allSounds.map((sound, i) => (

@@ -1,8 +1,8 @@
 import { Main } from "~/components/main";
 import { api } from "~/trpc/server";
-import { AllSounds } from "./_components/page/all-sounds";
 import { HeroSection } from "./_components/page/hero-section";
 import { LatestSounds } from "./_components/page/latest-sounds";
+import { TrendingSounds } from "./_components/page/trending-sounds";
 
 export default async function Home() {
   void api.sound.getLatests.prefetch({});
@@ -13,7 +13,7 @@ export default async function Home() {
       <HeroSection />
       <Main>
         <LatestSounds />
-        <AllSounds />
+        <TrendingSounds />
       </Main>
     </main>
   );

@@ -3,7 +3,7 @@
 import { InView } from "react-intersection-observer";
 import { Button } from "./ui/button";
 
-type InfiniteScrollProps = {
+export type InfiniteScrollProps = {
   loadMore: () => void;
   hasMore: boolean;
   isLoading: boolean;
@@ -11,6 +11,7 @@ type InfiniteScrollProps = {
   title?: React.ReactNode;
   loader?: React.ReactNode;
   endMessage?: React.ReactNode;
+  displayEndMessage?: boolean;
   offsetPx?: number;
   threshold?: number;
   manualTrigger?: boolean;
@@ -24,6 +25,7 @@ export function InfiniteScroll({
   title,
   loader = <p className="text-center text-gray-500">Loading...</p>,
   endMessage = <p className="text-center text-gray-500">No more results.</p>,
+  displayEndMessage = true,
   offsetPx = 300,
   threshold = 0,
   manualTrigger = true,
@@ -45,7 +47,7 @@ export function InfiniteScroll({
       />
       <div className="py-4 text-center">
         {isLoading && loader}
-        {!isLoading && !hasMore && endMessage}
+        {!isLoading && !hasMore && displayEndMessage && endMessage}
         {manualTrigger && hasMore && !isLoading && (
           <Button onClick={loadMore} variant="link">
             Load more

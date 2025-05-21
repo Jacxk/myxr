@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { notFound, useSearchParams } from "next/navigation";
 import type { z } from "zod";
 import { InfiniteScroll } from "~/components/infinite-scroll";
 import Sound from "~/components/sound/sound";
@@ -8,18 +8,10 @@ import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { useTRPC } from "~/trpc/react";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Fragment, Suspense } from "react";
+import { Fragment } from "react";
 import AdDisplay from "~/components/ad/ad-display";
 
-export default function SoundsHomePage() {
-  return (
-    <Suspense>
-      <SoundsHomePageSuspended />
-    </Suspense>
-  );
-}
-
-function SoundsHomePageSuspended() {
+export default function SoundsSearchPage() {
   const api = useTRPC();
   const searchParams = useSearchParams();
   const query = searchParams.get("query") ?? "";
@@ -39,6 +31,8 @@ function SoundsHomePageSuspended() {
       },
     ),
   );
+
+  if (!query) return notFound();
 
   const hasData = data && (data.pages[0]?.sounds?.length ?? 0) > 0;
   const sounds = data?.pages.flatMap((p) => p.sounds) ?? [];

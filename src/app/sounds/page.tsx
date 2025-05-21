@@ -1,7 +1,7 @@
 import { api } from "~/trpc/server";
-import { AllSoundsClient } from "./all-sounds-client";
+import { AllSoundsClient } from "./_components/all-sounds-client";
 
-export async function AllSounds() {
+export default async function SoundsPage() {
   const firstPage = await api.sound.getAllSounds({ cursor: null });
 
   return <AllSoundsClient initialData={firstPage} />;
