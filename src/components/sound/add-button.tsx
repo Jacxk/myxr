@@ -5,7 +5,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { type Snowflake } from "discord-api-types/v10";
 import { Check, Loader2, Plus } from "lucide-react";
 import { usePostHog } from "posthog-js/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { type Guild } from "~/app/sound/[id]/_components/guild";
 import { useSession } from "~/lib/auth-client";
@@ -98,10 +98,13 @@ function GuildSelect({
 
   const isWaitingForJoin = (guildId: string) =>
     invitedGuildId === guildId && isFetching;
-  const hasBotJoined = (guildId: string) =>
-    invitedGuildId === guildId &&
-    !isFetching &&
-    guilds?.some((guild) => guild.id === guildId && guild.available);
+  const hasBotJoined = useMemo(
+    () => (guildId: string) =>
+      invitedGuildId === guildId &&
+      !isFetching &&
+      guilds?.some((guild) => guild.id === guildId && guild.available),
+    [invitedGuildId, isFetching, guilds],
+  );
 
   const onSelect = (guild: Guild) => {
     if (!guild.available) {
@@ -133,7 +136,7 @@ function GuildSelect({
     onSelectGuild(selectedGuild);
 
     void refetch();
-  }, [guilds]);
+  }, [guilds, refetch, onSelectGuild]);
 
   useEffect(() => {
     if (!invitedGuildId) return;
@@ -150,7 +153,7 @@ function GuildSelect({
     return () => {
       window.removeEventListener("focus", checkBotJoined);
     };
-  }, [invitedGuildId, guilds, isFetching, hasBotJoined]);
+  }, [invitedGuildId, guilds, isFetching, hasBotJoined, refetch]);
 
   if (isLoading)
     return (
@@ -272,7 +275,7 @@ export function AddToGuildButton({
 
     setUsageCount((usage) => usage + 1);
     mutate({ soundId, guildId: guild.id, guildName: guild.name });
-  }, [mutate, soundId, guild]);
+  }, [mutate, soundId, guild, session]);
 
   const addSoundToGuild = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>): void => {
@@ -289,7 +292,7 @@ export function AddToGuildButton({
 
       setOpen(true);
     },
-    [isPreview],
+    [isPreview, session],
   );
 
   return (
