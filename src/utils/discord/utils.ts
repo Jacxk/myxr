@@ -1,16 +1,17 @@
 import "server-only";
 
 import { env } from "~/env";
-import { type DiscordError, type DiscordPermissionValue } from "./types";
+import { rateLimiter } from "./rate-limiter";
+import { type DiscordPermissionValue } from "./types";
 
 export const BOT_AUTHORIZATION = `Bot ${env.DISCORD_BOT_TOKEN}`;
 
 export function hasPermission(
-  userPermission: string | undefined | null,
+  permissions: string | number,
   permission: DiscordPermissionValue,
-) {
-  if (!userPermission) return false;
-  return (Number(userPermission) & permission) === permission;
+): boolean {
+  const perms = BigInt(permissions);
+  return (perms & BigInt(permission)) === BigInt(permission);
 }
 
 export async function createDiscordRequest<T>(
@@ -30,17 +31,11 @@ export async function createDiscordRequest<T>(
   const url = `https://discord.com/api/v10/${path}`;
 
   console.log(`[Discord Request] ${url}`);
-  const res = await fetch(url, {
-    ...opts,
-    headers,
-  });
 
-  const data = (await res.json()) as T;
-
-  if (!res.ok) {
-    const { message } = data as DiscordError;
-    throw new Error(message || "Failed to fetch data from Discord");
-  }
-
-  return data;
+  return rateLimiter.executeRequest<T>(path, () =>
+    fetch(url, {
+      ...opts,
+      headers,
+    }),
+  );
 }
