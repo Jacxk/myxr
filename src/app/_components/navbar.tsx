@@ -12,7 +12,6 @@ import { AuthenticatedClient } from "./authentication-client";
 import { AccountMenu } from "./navbar/account-menu";
 import { Notifications } from "./navbar/notifications";
 import { SearchBar } from "./navbar/search-bar";
-import { SelectGuild } from "./navbar/select-guild";
 
 function NavbarContent() {
   return (
@@ -25,9 +24,6 @@ function NavbarContent() {
           <div className="flex flex-1 items-center justify-end gap-2">
             <SearchBar />
             <AuthenticatedClient>
-              <div className="flex items-center gap-4">
-                <SelectGuild />
-              </div>
               <Link href="/upload">
                 <TooltipProvider>
                   <Tooltip>

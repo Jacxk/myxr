@@ -95,4 +95,13 @@ export const BotDiscordApi = {
 
     return channels.filter((channel) => channel.type === ChannelType.GuildText);
   },
+
+  async getAllGuilds() {
+    const data = await createDiscordRequest<APIGuild[]>(
+      "users/@me/guilds",
+      BOT_AUTHORIZATION,
+    );
+
+    return data;
+  },
 };

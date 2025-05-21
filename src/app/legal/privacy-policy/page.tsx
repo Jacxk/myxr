@@ -55,9 +55,9 @@ export default function PrivacyPolicyPage() {
           you with relevant advertisements and helps support our service.
         </p>
         <p>
-          You can opt out of personalized advertising by visiting Google's Ads
-          Settings page. Additionally, you can opt out of third-party vendor's
-          use of cookies for personalized advertising by visiting
+          You can opt out of personalized advertising by visiting Google&apos;s
+          Ads Settings page. Additionally, you can opt out of third-party
+          vendor&apos;s use of cookies for personalized advertising by visiting
           www.aboutads.info.
         </p>
 

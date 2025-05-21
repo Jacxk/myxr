@@ -83,7 +83,11 @@ export default memo(function Sound({
 
       <div className="flex flex-row gap-2">
         {displayAddButton ? (
-          <AddToGuildButton soundId={sound.id} isPreview={isPreview} />
+          <AddToGuildButton
+            soundName={sound.name}
+            soundId={sound.id}
+            isPreview={isPreview}
+          />
         ) : null}
         {displayAddButton ? (
           <LikeButton

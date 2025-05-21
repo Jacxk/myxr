@@ -19,6 +19,24 @@ export const guildRouter = createTRPCRouter({
       value: await BotDiscordApi.isBotInGuild(input),
     };
   }),
+  getAvailableGuilds: publicProcedure
+    .input(
+      z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          image: z.string().nullable(),
+        }),
+      ),
+    )
+    .query(async ({ input }) => {
+      const allGuilds = await BotDiscordApi.getAllGuilds();
+
+      return input.map((guild) => ({
+        ...guild,
+        available: allGuilds.some((ag) => ag.id === guild.id),
+      }));
+    }),
   createSound: allowedToManageGuildProtectedProcedure
     .input(
       z.object({
