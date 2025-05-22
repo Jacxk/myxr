@@ -4,6 +4,7 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { type Snowflake } from "discord-api-types/v10";
 import { Check, Loader2, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { usePostHog } from "posthog-js/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -237,9 +238,9 @@ export function AddToGuildButton({
   const { data: session } = useSession();
   const api = useTRPC();
   const posthog = usePostHog();
+  const router = useRouter();
 
   const [open, setOpen] = useState<boolean>(false);
-  const [usageCount, setUsageCount] = useState(usage ?? 0);
   const [guild, setGuild] = useState<Guild>();
 
   const { mutate, isPending } = useMutation(
@@ -254,10 +255,10 @@ export function AddToGuildButton({
       },
       onError: (error) => {
         handleInternalServerError(error.message);
-        setUsageCount((usage) => usage - 1);
       },
       onSettled: () => {
         setOpen(false);
+        router.refresh();
       },
     }),
   );
@@ -273,7 +274,6 @@ export function AddToGuildButton({
       return;
     }
 
-    setUsageCount((usage) => usage + 1);
     mutate({ soundId, guildId: guild.id, guildName: guild.name });
   }, [mutate, soundId, guild, session]);
 
@@ -331,7 +331,7 @@ export function AddToGuildButton({
               {usage &&
                 Intl.NumberFormat(navigator.language, {
                   notation: "compact",
-                }).format(usageCount)}
+                }).format(usage)}
             </Button>
           </TooltipTrigger>
           <TooltipContent>Add Sound to Guild</TooltipContent>

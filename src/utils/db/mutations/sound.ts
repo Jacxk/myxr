@@ -47,14 +47,13 @@ export const SoundMutations = {
           select: {
             name: true,
             createdById: true,
+            downloadedSound: { select: { id: true } },
           },
         },
       },
     });
 
-    const downloadCount = await db.downloadedSound.count({
-      where: { soundId },
-    });
+    const downloadCount = sound.downloadedSound.length;
 
     checkSoundMilestone(downloadCount, sound, MilestoneType.DOWNLOADS);
 

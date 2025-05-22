@@ -46,11 +46,13 @@ export function LikeButton({
         if (!data.success) return;
 
         setIsLiked(data.value);
-        router.refresh();
       },
       onError() {
         setIsLiked(false);
         ErrorToast.internal();
+      },
+      onSettled() {
+        router.refresh();
       },
     }),
   );

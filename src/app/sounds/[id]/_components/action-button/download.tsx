@@ -2,8 +2,8 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { Download } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { usePostHog } from "posthog-js/react";
-import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import {
@@ -42,27 +42,24 @@ export function DownloadButton({
   downloads: number;
 }>) {
   const posthog = usePostHog();
-
+  const router = useRouter();
   const api = useTRPC();
-  const [currentDownloads, setCurrentDownloads] = useState(downloads);
+
   const { mutate } = useMutation(
     api.sound.download.mutationOptions({
-      onSuccess({ success, value }) {
-        if (success) setCurrentDownloads(value.downloadCount);
+      onSettled() {
+        router.refresh();
       },
     }),
   );
 
-  const onDownloadClick = async () => {
+  const onDownloadClick = () => {
+    void downloadFile(soundUrl, soundName);
+
     mutate({ soundId });
-    setCurrentDownloads((currentDownloads) => currentDownloads + 1);
 
     posthog.capture("Sound downloaded", {
       soundId,
-    });
-
-    await downloadFile(soundUrl, soundName).catch(() => {
-      setCurrentDownloads((currentDownloads) => currentDownloads - 1);
     });
   };
 
@@ -75,7 +72,7 @@ export function DownloadButton({
           {downloads &&
             Intl.NumberFormat(navigator.language, {
               notation: "compact",
-            }).format(currentDownloads)}
+            }).format(downloads)}
         </Button>
       </TooltipTrigger>
       <TooltipContent>Download</TooltipContent>
