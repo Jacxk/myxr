@@ -75,7 +75,7 @@ export default memo(function Sound({
         asChild
       >
         {!isPreview ? (
-          <Link href={`/sound/${sound.id}`}>{sound.name}</Link>
+          <Link href={`/sounds/${sound.id}`}>{sound.name}</Link>
         ) : (
           <span>{sound.name}</span>
         )}

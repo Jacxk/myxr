@@ -9,10 +9,12 @@ export default async function sitemap() {
     lastModified,
   }));
 
-  const sitemaps = ["/sound/sitemap.xml", "/user/sitemap.xml"].map((route) => ({
-    url: `${env.NEXT_PUBLIC_BASE_URL}${route}`,
-    lastModified,
-  }));
+  const sitemaps = ["/sounds/sitemap.xml", "/user/sitemap.xml"].map(
+    (route) => ({
+      url: `${env.NEXT_PUBLIC_BASE_URL}${route}`,
+      lastModified,
+    }),
+  );
 
   const legalPages = ["/legal/dmca", "/legal/privacy", "/legal/terms"].map(
     (route) => ({

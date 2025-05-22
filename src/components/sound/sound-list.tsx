@@ -60,7 +60,7 @@ function SoundRow({
             <span>{sound.name}</span>
           ) : (
             <Button className="p-0" variant="link" asChild>
-              <Link href={`/sound/${sound.id}`}>{sound.name}</Link>
+              <Link href={`/sounds/${sound.id}`}>{sound.name}</Link>
             </Button>
           )}
         </div>
