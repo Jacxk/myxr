@@ -1,10 +1,10 @@
-import type { LikedSound, Prisma } from "@prisma/client";
+import { type LikedSound } from "@prisma/client";
 import { z } from "zod";
 
 export const SearchType = z.enum(["normal", "tag"]);
 export type SearchType = z.infer<typeof SearchType>;
 
-export const soundInclude: Prisma.SoundInclude = {
+export const soundInclude = {
   tags: true,
   createdBy: {
     select: {

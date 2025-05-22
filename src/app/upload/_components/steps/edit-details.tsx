@@ -180,7 +180,14 @@ export function EditDetailsStep() {
             likes: Array(Math.floor(Math.random() * 1000)).length,
             likedByUser: Math.random() > 0.5,
             usegeCount: Math.floor(Math.random() * 10000),
-            downloadCount: Math.floor(Math.random() * 10000),
+            downloadedSound: Array(Math.floor(Math.random() * 10000)).map(
+              (_, id) => ({
+                id: id + "",
+                createdAt: new Date(),
+                soundId: "",
+                userId: "",
+              }),
+            ),
             id: "none",
             guildSounds: [],
             deletedAt: null,
