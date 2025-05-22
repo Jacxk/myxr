@@ -36,17 +36,14 @@ export const soundRouter = createTRPCRouter({
   getAllSounds: publicProcedure
     .input(
       z.object({
+        filter: z.string().nullish(),
         limit: z.number().min(1).max(100).default(50),
         cursor: z.string().nullish(),
         direction: z.enum(["forward", "backward"]).default("forward"),
       }),
     )
     .query(async ({ ctx, input }) => {
-      const sounds = await SoundQuery.getAllSounds(
-        input.limit,
-        input.cursor,
-        ctx.session?.user.id,
-      );
+      const sounds = await SoundQuery.getAllSounds(ctx.session?.user.id, input);
 
       let nextCursor: typeof input.cursor | undefined = undefined;
       if (sounds.length > input.limit) {

@@ -1,5 +1,6 @@
 import "server-only";
 
+import { type Prisma } from "@prisma/client";
 import { db } from "~/server/db";
 import type { SearchType } from "../types";
 import { populateLike, soundInclude } from "../types";
@@ -152,15 +153,35 @@ export const SoundQuery = {
   },
 
   getAllSounds: async (
-    limit: number,
-    cursor?: string | null,
-    userId?: string,
+    userId: string | undefined,
+    {
+      limit,
+      cursor,
+      filter,
+    }: {
+      limit: number;
+      cursor?: string | null;
+      filter?: string | null;
+    },
   ) => {
+    const getOrderBy = (): Prisma.SoundOrderByWithRelationInput[] => {
+      switch (filter) {
+        case "trending":
+          return [{ usegeCount: "desc" }, { likedBy: { _count: "desc" } }];
+        case "most-used":
+          return [{ usegeCount: "desc" }];
+        case "most-liked":
+          return [{ likedBy: { _count: "desc" } }];
+        default:
+          return [{ createdAt: "desc" }];
+      }
+    };
+
     const sounds = await db.sound.findMany({
       take: limit + 1,
       skip: cursor ? 1 : 0,
       cursor: cursor ? { id: cursor } : undefined,
-      orderBy: { usegeCount: "desc" },
+      orderBy: getOrderBy(),
       include: {
         createdBy: true,
         likedBy: { where: { userId } },

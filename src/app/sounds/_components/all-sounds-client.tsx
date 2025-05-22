@@ -9,6 +9,7 @@ import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { useTRPC, type RouterOutputs } from "~/trpc/react";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
 import { Fragment } from "react";
 import AdDisplay from "~/components/ad/ad-display";
 
@@ -20,10 +21,12 @@ export function AllSoundsClient({
   initialData,
   ...infititeScrollProps
 }: AllSoundsClient & Partial<InfiniteScrollProps>) {
+  const searchParams = useSearchParams();
+
   const api = useTRPC();
   const { data, fetchNextPage, hasNextPage, isPending } = useInfiniteQuery(
     api.sound.getAllSounds.infiniteQueryOptions(
-      {},
+      { filter: searchParams.get("filter") },
       {
         initialData: {
           pages: [initialData],

@@ -45,7 +45,7 @@ export async function HeroSection() {
           className="bg-background/30"
           asChild
         >
-          <Link href="/sound">Browse Sounds</Link>
+          <Link href="/sounds">Browse Sounds</Link>
         </Button>
       </div>
     </div>

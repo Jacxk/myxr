@@ -5,7 +5,9 @@ import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { api } from "~/trpc/server";
 
 export async function LatestSounds() {
-  const latestSounds = await api.sound.getLatests({ limit: 9 });
+  const { sounds: latestSounds } = await api.sound.getAllSounds({
+    limit: 14,
+  });
 
   return (
     <div className="flex w-full flex-col gap-4">
