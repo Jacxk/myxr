@@ -36,15 +36,24 @@ export const SoundMutations = {
     return { success: true, value: newLiked };
   },
 
-  incrementDownloadCount: async (soundId: string) => {
-    const { downloadCount, ...sound } = await db.sound.update({
-      where: { id: soundId },
-      data: { downloadCount: { increment: 1 } },
-      select: {
-        name: true,
-        createdById: true,
-        downloadCount: true,
+  incrementDownloadCount: async (soundId: string, userId?: string) => {
+    const { sound } = await db.downloadedSound.create({
+      data: {
+        soundId,
+        userId,
       },
+      select: {
+        sound: {
+          select: {
+            name: true,
+            createdById: true,
+          },
+        },
+      },
+    });
+
+    const downloadCount = await db.downloadedSound.count({
+      where: { soundId },
     });
 
     checkSoundMilestone(downloadCount, sound, MilestoneType.DOWNLOADS);

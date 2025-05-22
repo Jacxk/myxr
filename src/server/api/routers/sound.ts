@@ -133,7 +133,10 @@ export const soundRouter = createTRPCRouter({
         soundId: z.string(),
       }),
     )
-    .mutation(async ({ input }) => {
-      return SoundMutations.incrementDownloadCount(input.soundId);
+    .mutation(async ({ input, ctx }) => {
+      return SoundMutations.incrementDownloadCount(
+        input.soundId,
+        ctx.session?.user.id,
+      );
     }),
 });

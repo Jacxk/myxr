@@ -19,9 +19,11 @@ export default async function SoundsPage({
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Explore Sounds</h1>
+      <h1 className="text-center text-2xl font-semibold sm:text-start">
+        Explore Sounds
+      </h1>
       <Filter
-        className="flex-1 justify-end"
+        className="flex-1 sm:justify-end"
         defaultValue={defaultValue}
         filterOnUrl
       >

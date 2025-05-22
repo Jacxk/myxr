@@ -22,16 +22,17 @@ model User {
     updatedAt     DateTime @updatedAt
     removed       Boolean? @default(false)
 
-    role          Role              @default(USER)
-    accounts      Account[]
-    sessions      Session[]
-    sounds        Sound[]
-    guilds        GuildMembership[]
-    likedSounds   LikedSound[]
-    soundReports  SoundReport[]
-    followers     UserFollow[]      @relation("Followers")
-    following     UserFollow[]      @relation("Following")
-    notifications Notification[]
+    role             Role              @default(USER)
+    accounts         Account[]
+    sessions         Session[]
+    sounds           Sound[]
+    guilds           GuildMembership[]
+    likedSounds      LikedSound[]
+    soundReports     SoundReport[]
+    followers        UserFollow[]      @relation("Followers")
+    following        UserFollow[]      @relation("Following")
+    notifications    Notification[]
+    downloadedSounds DownloadedSound[]
 
     @@map("user")
 }
@@ -90,21 +91,21 @@ enum Role {
 }
 
 model Sound {
-    id            String        @id @default(cuid())
-    name          String
-    emoji         String
-    url           String        @unique
-    usegeCount    Int           @default(0)
-    downloadCount Int           @default(0)
-    createdAt     DateTime      @default(now())
-    updatedAt     DateTime      @updatedAt
-    createdById   String
-    deletedAt     DateTime?
-    guildSounds   GuildSound[]
-    createdBy     User          @relation(fields: [createdById], references: [id], onDelete: Cascade)
-    tags          Tag[]
-    likedBy       LikedSound[]
-    reports       SoundReport[]
+    id              String            @id @default(cuid())
+    name            String
+    emoji           String
+    url             String            @unique
+    usegeCount      Int               @default(0)
+    createdAt       DateTime          @default(now())
+    updatedAt       DateTime          @updatedAt
+    createdById     String
+    deletedAt       DateTime?
+    guildSounds     GuildSound[]
+    createdBy       User              @relation(fields: [createdById], references: [id], onDelete: Cascade)
+    tags            Tag[]
+    likedBy         LikedSound[]
+    reports         SoundReport[]
+    downloadedSound DownloadedSound[]
 
     @@index([name])
 }
@@ -145,12 +146,22 @@ model GuildMembership {
 }
 
 model LikedSound {
-    userId  String
-    soundId String
-    user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-    sound   Sound  @relation(fields: [soundId], references: [id])
+    userId    String
+    soundId   String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    sound     Sound    @relation(fields: [soundId], references: [id])
+    createdAt DateTime @default(now())
 
     @@id([userId, soundId])
+}
+
+model DownloadedSound {
+    id        String   @id @default(cuid())
+    sound     Sound    @relation(fields: [soundId], references: [id], onDelete: Cascade)
+    soundId   String
+    user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+    userId    String?
+    createdAt DateTime @default(now())
 }
 
 enum ActionStatus {
