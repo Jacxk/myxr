@@ -166,8 +166,6 @@ export const SoundQuery = {
   ) => {
     const getOrderBy = (): Prisma.SoundOrderByWithRelationInput[] => {
       switch (filter) {
-        case "trending":
-          return [{ usegeCount: "desc" }, { likedBy: { _count: "desc" } }];
         case "most-used":
           return [{ usegeCount: "desc" }];
         case "most-liked":
@@ -177,16 +175,55 @@ export const SoundQuery = {
       }
     };
 
-    const sounds = await db.sound.findMany({
-      take: limit + 1,
-      skip: cursor ? 1 : 0,
-      cursor: cursor ? { id: cursor } : undefined,
-      orderBy: getOrderBy(),
-      include: {
-        createdBy: true,
-        likedBy: { where: { userId } },
-      },
-    });
+    let sounds;
+
+    if (filter === "trending") {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      const trendingSounds = await db.sound.findMany({
+        take: limit + 1,
+        skip: cursor ? 1 : 0,
+        cursor: cursor ? { id: cursor } : undefined,
+        include: {
+          createdBy: true,
+          downloadedSound: true,
+          likedBy: true,
+        },
+      });
+
+      sounds = trendingSounds
+        .map((sound) => {
+          const recentLikes = sound.likedBy.filter(
+            (like) => like.createdAt >= thirtyDaysAgo,
+          );
+          const recentDownloads = sound.downloadedSound.filter(
+            (download) => download.createdAt >= thirtyDaysAgo,
+          );
+
+          const trendingScore =
+            recentLikes.length * 3 +
+            recentDownloads.length * 2 +
+            sound.usegeCount * 5;
+
+          return {
+            ...sound,
+            trendingScore,
+          };
+        })
+        .sort((a, b) => b.trendingScore - a.trendingScore);
+    } else {
+      sounds = await db.sound.findMany({
+        take: limit + 1,
+        skip: cursor ? 1 : 0,
+        cursor: cursor ? { id: cursor } : undefined,
+        orderBy: getOrderBy(),
+        include: {
+          createdBy: true,
+          likedBy: { where: { userId } },
+        },
+      });
+    }
 
     return sounds.map((sound) => ({
       ...sound,
