@@ -44,14 +44,14 @@ function ActionButtons({ id, sound, isPreview }: SoundPageProps) {
           soundUrl={sound.url}
           soundId={sound.id}
           soundName={sound.name}
-          downloads={sound.downloadCount}
+          downloads={sound.downloadedSound.length}
         />
       </TooltipProvider>
     </div>
   );
 }
 
-export function SoundPage({ id, sound, isPreview }: Readonly<SoundPageProps>) {
+export function SoundPage({ id, sound, isPreview }: SoundPageProps) {
   return (
     <div className="flex w-full flex-col gap-6">
       <div className="flex w-full flex-row gap-10">
