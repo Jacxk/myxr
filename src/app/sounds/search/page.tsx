@@ -1,66 +1,30 @@
-"use client";
-
-import { notFound, useSearchParams } from "next/navigation";
+import { notFound } from "next/navigation";
 import type { z } from "zod";
-import { InfiniteScroll } from "~/components/infinite-scroll";
-import Sound from "~/components/sound/sound";
-import { SoundsGrid } from "~/components/sound/sounds-grid";
-import { useTRPC } from "~/trpc/react";
+import { SoundsSearchClient } from "~/components/sound/sounds-search-client";
+import { api } from "~/trpc/server";
 
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { Fragment } from "react";
-import AdDisplay from "~/components/ad/ad-display";
-
-export default function SoundsSearchPage() {
-  const api = useTRPC();
-  const searchParams = useSearchParams();
-  const query = searchParams.get("query") ?? "";
-  const type = searchParams.get("type") as z.infer<
+export default async function SoundsSearchPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ query?: string; type?: string }>;
+}) {
+  const params = await searchParams;
+  const query = params.query ?? "";
+  const type = (params.type ?? "normal") as z.infer<
     z.ZodEnum<["normal", "tag"]>
   >;
 
-  const { data, fetchNextPage, hasNextPage, isPending } = useInfiniteQuery(
-    api.sound.search.infiniteQueryOptions(
-      {
-        type,
-        query,
-      },
-      {
-        refetchOnWindowFocus: false,
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-      },
-    ),
-  );
-
   if (!query) return notFound();
 
-  const hasData = data && (data.pages[0]?.sounds?.length ?? 0) > 0;
-  const sounds = data?.pages.flatMap((p) => p.sounds) ?? [];
+  const initialData = await api.sound.search({
+    query,
+    type,
+  });
 
   return (
     <>
       <title>{`${query} - Search`}</title>
-      <h1 className="mb-4 text-xl">Searching Sounds: {query}</h1>
-      <InfiniteScroll
-        loadMore={fetchNextPage}
-        hasMore={hasNextPage}
-        isLoading={isPending}
-        endMessage={!hasData ? "No sounds where found." : ""}
-      >
-        <SoundsGrid>
-          {sounds.map((sound, i) => (
-            <Fragment key={sound.id}>
-              <Sound sound={sound} />
-              <AdDisplay
-                adSlot="1944402367"
-                width="100%"
-                height="100%"
-                showProbability={i === sounds.length - 1 ? 1 : 0.4}
-              />
-            </Fragment>
-          ))}
-        </SoundsGrid>
-      </InfiniteScroll>
+      <SoundsSearchClient initialData={initialData} query={query} type={type} />
     </>
   );
 }
