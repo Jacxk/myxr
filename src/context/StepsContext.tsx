@@ -4,8 +4,10 @@ import {
   Children,
   cloneElement,
   createContext,
+  type Dispatch,
   isValidElement,
   type ReactNode,
+  type SetStateAction,
   useContext,
   useMemo,
   useState,
@@ -17,7 +19,7 @@ interface StepsContextProps<D> {
   data: D;
   totalSteps: number;
   setCurrentStep: (step: number) => void;
-  setData: (data: D) => void;
+  setData: Dispatch<SetStateAction<D>>;
   reset: () => void;
   registerStep: () => number;
   nextStep: () => void;

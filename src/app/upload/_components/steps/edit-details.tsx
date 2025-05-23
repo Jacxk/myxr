@@ -94,31 +94,34 @@ export function EditDetailsStep() {
     const name = e.target.value.length > 0 ? e.target.value : data.file?.name;
     if (!name) return;
 
-    setData({
-      ...data,
-      fileProps: { ...data.fileProps, name: name.split(".")[0] ?? name },
-    });
+    setData((prevData) => ({
+      ...prevData,
+      fileProps: { ...prevData.fileProps, name: name.split(".")[0] ?? name },
+    }));
   };
 
   const setSoundTags = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setData({
-      ...data,
+    setData((prevData) => ({
+      ...prevData,
       fileProps: {
-        ...data.fileProps,
+        ...prevData.fileProps,
         tags: e.target.value
           .trim()
           .split(" ")
           .filter((tag) => tag !== "")
           .map((tag) => ({ name: tag.trim() })),
       },
-    });
+    }));
   };
 
   const setSoundEmoji = (emojiData: EmojiClickData) => {
-    setData({
-      ...data,
-      fileProps: { ...data.fileProps, emoji: emojiData.emoji },
-    });
+    setData((prevData) => ({
+      ...prevData,
+      fileProps: {
+        ...prevData.fileProps,
+        emoji: emojiData.emoji,
+      },
+    }));
   };
 
   return (

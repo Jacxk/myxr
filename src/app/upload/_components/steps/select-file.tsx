@@ -49,8 +49,8 @@ export function SelectFileStep() {
     });
 
     toast("File selected " + fileName, { id: "fileSelected" });
-    setData({
-      ...data,
+    setData((prevData) => ({
+      ...prevData,
       file,
       user: session.user as UploadUser,
       fileProps: {
@@ -58,7 +58,7 @@ export function SelectFileStep() {
         emoji: "🎵",
         url: URL.createObjectURL(file as Blob),
       },
-    });
+    }));
   }
 
   function validateFile(file: File | DataTransferItem | null | undefined) {

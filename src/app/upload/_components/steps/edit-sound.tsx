@@ -66,16 +66,16 @@ export function EditSoundStep() {
 
     trimAudioAndConvertToMp3(data.file, currentRegion.start, currentRegion.end)
       .then((newFile) => {
-        setData({
-          ...data,
+        setData((prevData) => ({
+          ...prevData,
           editedFile: newFile,
           region: region.current,
           file: data.file,
           fileProps: {
-            ...data.fileProps,
+            ...prevData.fileProps,
             url: URL.createObjectURL(newFile as Blob),
           },
-        });
+        }));
 
         posthog.capture("Sound create - edited", {
           fileName: data.file.name,
