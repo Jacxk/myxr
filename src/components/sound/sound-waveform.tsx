@@ -47,9 +47,10 @@ export function SoundWaveForm({
       barWidth: 2,
       barRadius: 30,
       minPxPerSec: 1,
-      dragToSeek: true,
+      dragToSeek: false,
       normalize: true,
       autoCenter: false,
+      interact: false,
       url,
     });
     if (editable) {
@@ -88,6 +89,7 @@ export function SoundWaveForm({
 
       regionsPlugin.current?.on("region-update", (region) => {
         onRegionUpdate?.(region);
+        waveSurfer.current?.pause();
         waveSurfer.current?.setTime(region.start);
       });
     }
