@@ -17,11 +17,13 @@ export type SoundListData = {
   discordSoundId: Snowflake;
   external?: boolean;
   available?: boolean;
+  isGuildAvailable?: boolean;
 };
 
 type SoundTableListProps = {
   className?: string;
   data: SoundListData[];
+  isGuildAvailable?: boolean;
 };
 
 function SoundRow({
@@ -30,6 +32,7 @@ function SoundRow({
   guildId,
   external,
   className,
+  isGuildAvailable = true,
 }: SoundListData & { className: string }) {
   const { play } = useAudio();
   const size = 34;
@@ -76,31 +79,45 @@ function SoundRow({
           )}
         </div>
         <div className="flex justify-end">
-          <DeleteSoundButton
-            discordSoundId={discordSoundId}
-            guildId={guildId}
-          />
+          {isGuildAvailable && (
+            <DeleteSoundButton
+              discordSoundId={discordSoundId}
+              guildId={guildId}
+            />
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-function SoundTableHeader() {
+function SoundTableHeader({
+  isGuildAvailable = true,
+}: {
+  isGuildAvailable?: boolean;
+}) {
   return (
-    <div className="grid h-full w-full grid-cols-5 items-center p-4">
-      <span>Emoji</span>
-      <span className="col-span-2">Name</span>
-      <span>Created By</span>
+    <div>
+      {isGuildAvailable === false && (
+        <h1 className="text-muted-foreground text-right italic">ready only</h1>
+      )}
+      <div className="grid h-full w-full grid-cols-5 items-center p-4">
+        <span>Emoji</span>
+        <span className="col-span-2">Name</span>
+        <span>Created By</span>
+      </div>
     </div>
   );
 }
 
-export function SoundTableList({ data }: SoundTableListProps) {
+export function SoundTableList({
+  data,
+  isGuildAvailable,
+}: SoundTableListProps) {
   return (
     <AudioProvider>
       <div className="flex w-full flex-col">
-        <SoundTableHeader />
+        <SoundTableHeader isGuildAvailable={isGuildAvailable} />
         <div className="divide-y">
           {data.map((guildSound) => (
             <SoundRow
@@ -111,10 +128,9 @@ export function SoundTableList({ data }: SoundTableListProps) {
               external={guildSound.external}
               className={cn({
                 "bg-yellow-100/5": guildSound.external,
-                "bg-red-500/5":
-                  typeof guildSound.available === "boolean" &&
-                  !guildSound.available,
+                "bg-red-500/5": guildSound.available === false,
               })}
+              isGuildAvailable={isGuildAvailable}
             />
           ))}
         </div>

@@ -8,7 +8,7 @@ import {
   type APIRole,
   type APISoundboardSound,
 } from "discord-api-types/v10";
-import { type CreateSoundParams } from "./types";
+import { type CreateSoundParams, type DiscordError } from "./types";
 import { BOT_AUTHORIZATION, createDiscordRequest } from "./utils";
 
 export const BotDiscordApi = {
@@ -40,9 +40,9 @@ export const BotDiscordApi = {
         BOT_AUTHORIZATION,
       );
 
-      return data.items;
-    } catch {
-      return [];
+      return { items: data.items };
+    } catch (error: unknown) {
+      return { error: error as DiscordError };
     }
   },
 

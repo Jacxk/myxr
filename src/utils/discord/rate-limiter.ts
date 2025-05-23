@@ -1,4 +1,5 @@
 import "server-only";
+import { DiscordError, type DiscordErrorType } from "./types";
 
 interface RateLimitInfo {
   remaining: number;
@@ -54,10 +55,8 @@ class RateLimiter {
           const response = await requestFn();
           this.updateRateLimitInfo(endpoint, response.headers);
           if (!response.ok) {
-            const data = (await response.json()) as { message?: string };
-            throw new Error(
-              data.message ?? "Failed to fetch data from Discord",
-            );
+            const data = (await response.json()) as DiscordErrorType;
+            throw new DiscordError(data.code, data.message);
           }
 
           const data = (await response.json()) as T;

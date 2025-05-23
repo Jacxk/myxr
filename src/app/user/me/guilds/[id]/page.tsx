@@ -36,8 +36,11 @@ const getEmoji = (sound: APISoundboardSound) => {
 
 async function GuildContent({ id }: { id: string }) {
   const guildSounds = await api.guild.getGuildSounds(id);
-  const externalSounds = await BotDiscordApi.getSoundBoard(id);
+  const data = await BotDiscordApi.getSoundBoard(id);
   const guild = await getGuild(id);
+
+  const externalSounds = data.items ?? [];
+  const isGuildAvailable = data.error?.code !== 10004;
 
   if (!guild) {
     return (
@@ -88,12 +91,13 @@ async function GuildContent({ id }: { id: string }) {
       <title>{`${guild.name} - Guild Sounds`}</title>
       <div className="flex w-full flex-col items-center">
         <h2 className="text-muted-foreground text-xl">{guild.name}</h2>
-        <ConfigSelect guildId={guild.id} />
+        {isGuildAvailable && <ConfigSelect guildId={guild.id} />}
         <SoundTableList
           data={[
             guildSounds as unknown as SoundListData,
             convertedExternalSound,
           ].flat()}
+          isGuildAvailable={isGuildAvailable}
         />
       </div>
     </>

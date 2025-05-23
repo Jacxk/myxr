@@ -47,11 +47,6 @@ export const guildRouter = createTRPCRouter({
     .mutation(async ({ input }) => {
       return GuildMutation.createSoundBoardSound(input);
     }),
-  getSoundBoard: protectedProcedure
-    .input(z.string())
-    .query(async ({ input }) => {
-      return await BotDiscordApi.getSoundBoard(input);
-    }),
   deleteSound: allowedToManageGuildProtectedProcedure
     .input(
       z.object({

@@ -1,6 +1,16 @@
-export interface DiscordError {
+export type DiscordErrorType = {
   message: string;
   code: number;
+};
+
+export class DiscordError extends Error {
+  code: number;
+
+  constructor(code: number, message: string) {
+    super(message);
+    this.name = "DiscordError";
+    this.code = code;
+  }
 }
 
 export const DiscordPermission = {
