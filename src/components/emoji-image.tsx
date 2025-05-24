@@ -12,7 +12,7 @@ export function getEmojiUrl(emoji: string, svg = false) {
   return `https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/${folder}/${codePoints}.${ext}`;
 }
 
-type EmojiImageProps = {
+export type EmojiImageProps = {
   emoji: string;
   size?: {
     width: number;
@@ -20,6 +20,7 @@ type EmojiImageProps = {
   };
   className?: string;
   displayIfEmpty?: boolean;
+  asSvg?: boolean;
 };
 
 export function EmojiImage({
@@ -27,10 +28,11 @@ export function EmojiImage({
   className,
   size,
   displayIfEmpty = false,
+  asSvg = false,
 }: EmojiImageProps) {
   if (!emoji && !displayIfEmpty) return null;
 
-  const emojiUrl = emoji.startsWith("http") ? emoji : getEmojiUrl(emoji);
+  const emojiUrl = emoji.startsWith("http") ? emoji : getEmojiUrl(emoji, asSvg);
 
   return (
     <Image

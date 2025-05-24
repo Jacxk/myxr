@@ -5,7 +5,7 @@ import { memo } from "react";
 import { cn } from "~/lib/utils";
 import type { RouterOutputs } from "~/trpc/react";
 import { useAudio } from "../../context/AudioContext";
-import { EmojiImage } from "../emoji-image";
+import { EmojiImage, type EmojiImageProps } from "../emoji-image";
 import { Button } from "../ui/button";
 import { AddToGuildButton } from "./add-button";
 import { DeleteSoundButton } from "./delete-button";
@@ -24,15 +24,15 @@ export type SoundProperties = {
   isPreview?: boolean;
 };
 
-const EmojiButton = memo(function EmojiButtonMemoized({
+export const EmojiButton = memo(function EmojiButtonMemoized({
   id,
   url,
   emoji,
+  ...emojiProps
 }: {
   id: string;
   url: string;
-  emoji: string;
-}) {
+} & EmojiImageProps) {
   const { isPlaying, currentId, play, preload } = useAudio();
   const currentlyPlay = isPlaying && currentId === id;
   const size = 72;
@@ -45,7 +45,11 @@ const EmojiButton = memo(function EmojiButtonMemoized({
       onMouseOver={() => preload(url)}
       onClick={() => play(id, url)}
     >
-      <EmojiImage emoji={emoji} size={{ width: size, height: size }} />
+      <EmojiImage
+        emoji={emoji}
+        size={{ width: size, height: size }}
+        {...emojiProps}
+      />
     </button>
   );
 });
