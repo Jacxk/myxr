@@ -1,11 +1,9 @@
-"use client";
-
 import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "~/components/ui/dropdown-menu";
-import { signIn } from "~/lib/auth-client";
+import { SignInButton } from "~/components/ui/signin-button";
 import { NotAuthenticatedClient } from "../authentication-client";
 import { ThemeSwitch } from "./theme-switch";
 
@@ -17,16 +15,7 @@ export function UnAuthenticatedMenu() {
         <span>Guest</span>
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
-      <DropdownMenuItem
-        onClick={() =>
-          signIn.social({
-            provider: "discord",
-            callbackURL: window.location.href,
-          })
-        }
-      >
-        Sign In
-      </DropdownMenuItem>
+      <SignInButton component={DropdownMenuItem}>Sign In</SignInButton>
       <DropdownMenuSeparator />
       <ThemeSwitch />
     </NotAuthenticatedClient>

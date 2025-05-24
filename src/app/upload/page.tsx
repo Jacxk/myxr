@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { unauthorized } from "next/navigation";
 import { Main } from "~/components/main";
 import { Step } from "~/components/step";
 import { StepsProvider } from "~/context/StepsContext";
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default async function UploadPage() {
   const session = await getServerSession();
-  if (!session) return notFound();
+  if (!session) return unauthorized();
 
   return (
     <Main>
