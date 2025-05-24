@@ -19,6 +19,11 @@ export const SoundQuery = {
       orderBy: { createdAt: "desc" },
       take,
       skip,
+      where: {
+        createdBy: {
+          removed: false,
+        },
+      },
       include: {
         ...soundInclude,
         likedBy: { where: { userId } },
@@ -35,7 +40,12 @@ export const SoundQuery = {
 
   getSound: async (id: string, userId?: string) => {
     const sound = await db.sound.findFirst({
-      where: { id },
+      where: {
+        id,
+        createdBy: {
+          removed: false,
+        },
+      },
       include: {
         ...soundInclude,
         likedBy: true,
@@ -54,7 +64,12 @@ export const SoundQuery = {
     const getData = (createdById: string) =>
       db.sound.findMany({
         orderBy: { createdAt: "desc" },
-        where: { createdById },
+        where: {
+          createdById,
+          createdBy: {
+            removed: false,
+          },
+        },
         include: { ...soundInclude, likedBy: { where: { userId: userId } } },
       });
     const sounds = await getData(userId);
@@ -80,7 +95,12 @@ export const SoundQuery = {
 
   getUserLikedSounds: async (userId: string) => {
     const sounds = await db.sound.findMany({
-      where: { likedBy: { some: { userId } } },
+      where: {
+        likedBy: { some: { userId } },
+        createdBy: {
+          removed: false,
+        },
+      },
       include: { ...soundInclude, likedBy: { where: { userId } } },
     });
 
@@ -136,6 +156,9 @@ export const SoundQuery = {
         cursor: cursor ? { id: cursor } : undefined,
         include: { likedBy: { where: { userId } } },
         where: {
+          createdBy: {
+            removed: false,
+          },
           OR: [
             { name: { search: soundSearch } },
             { tags: { some: { name: { search: tagSearch } } } },
@@ -182,6 +205,11 @@ export const SoundQuery = {
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
       const trendingSounds = await db.sound.findMany({
+        where: {
+          createdBy: {
+            removed: false,
+          },
+        },
         take: limit + 1,
         skip: cursor ? 1 : 0,
         cursor: cursor ? { id: cursor } : undefined,
@@ -214,6 +242,11 @@ export const SoundQuery = {
         .sort((a, b) => b.trendingScore - a.trendingScore);
     } else {
       sounds = await db.sound.findMany({
+        where: {
+          createdBy: {
+            removed: false,
+          },
+        },
         take: limit + 1,
         skip: cursor ? 1 : 0,
         cursor: cursor ? { id: cursor } : undefined,
@@ -232,11 +265,22 @@ export const SoundQuery = {
   },
 
   getSoundCount: () => {
-    return db.sound.count();
+    return db.sound.count({
+      where: {
+        createdBy: {
+          removed: false,
+        },
+      },
+    });
   },
 
   getAllSoundsIds: () => {
     return db.sound.findMany({
+      where: {
+        createdBy: {
+          removed: false,
+        },
+      },
       select: {
         id: true,
         updatedAt: true,
