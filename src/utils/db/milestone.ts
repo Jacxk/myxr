@@ -9,12 +9,14 @@ export enum MilestoneType {
   DOWNLOADS = "DOWNLOADS",
   LIKES = "LIKES",
   USAGE = "USAGE",
+  SHARES = "SHARES",
 }
 
 const MILESTONE_THRESHOLDS = {
   [MilestoneType.DOWNLOADS]: [10, 50, 100, 500, 1000, 5000, 10000],
   [MilestoneType.LIKES]: [5, 25, 50, 100, 500, 1000, 5000],
   [MilestoneType.USAGE]: [10, 50, 100, 500, 1000, 5000, 10000],
+  [MilestoneType.SHARES]: [5, 25, 50, 100, 500, 1000, 5000],
 };
 
 export const checkSoundMilestone = (

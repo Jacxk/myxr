@@ -139,4 +139,13 @@ export const soundRouter = createTRPCRouter({
         ctx.session?.user.id,
       );
     }),
+  share: publicProcedure
+    .input(
+      z.object({
+        soundId: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      return SoundMutations.incrementShareCount(input.soundId);
+    }),
 });

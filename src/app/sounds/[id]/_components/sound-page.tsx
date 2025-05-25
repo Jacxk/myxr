@@ -12,6 +12,7 @@ import { TooltipProvider } from "~/components/ui/tooltip";
 import type { RouterOutputs } from "~/trpc/react";
 import { DownloadButton } from "./action-button/download";
 import { ReportButton } from "./action-button/report";
+import { ShareButton } from "./action-button/share";
 import { CreatedDate } from "./created-date";
 import { Guild } from "./guild";
 import { SoundData } from "./sound-data";
@@ -45,6 +46,12 @@ function ActionButtons({ id, sound, isPreview }: SoundPageProps) {
           soundId={sound.id}
           soundName={sound.name}
           downloads={sound.downloadedSound.length}
+        />
+
+        <ShareButton
+          soundId={sound.id}
+          shares={sound.shareCount}
+          soundName={sound.name}
         />
       </TooltipProvider>
     </div>

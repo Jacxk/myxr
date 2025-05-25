@@ -96,6 +96,7 @@ model Sound {
     updatedAt       DateTime          @updatedAt
     createdById     String
     deletedAt       DateTime?
+    shareCount      Int               @default(0)
     guildSounds     GuildSound[]
     createdBy       User              @relation(fields: [createdById], references: [id], onDelete: Cascade)
     tags            Tag[]

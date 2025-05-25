@@ -230,9 +230,10 @@ export const SoundQuery = {
           );
 
           const trendingScore =
-            recentLikes.length * 3 +
-            recentDownloads.length * 2 +
-            sound.usegeCount * 5;
+            recentLikes.length * 5 +
+            recentDownloads.length * 3 +
+            sound.usegeCount * 2 +
+            sound.shareCount;
 
           return {
             ...sound,

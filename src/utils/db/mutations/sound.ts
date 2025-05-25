@@ -135,4 +135,21 @@ export const SoundMutations = {
       value: sound,
     };
   },
+  incrementShareCount: async (soundId: string) => {
+    const sound = await db.sound.update({
+      where: {
+        id: soundId,
+      },
+      data: {
+        shareCount: { increment: 1 },
+      },
+      select: {
+        createdById: true,
+        name: true,
+        shareCount: true,
+      },
+    });
+
+    checkSoundMilestone(sound.shareCount, sound, MilestoneType.SHARES);
+  },
 };
