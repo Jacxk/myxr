@@ -4,10 +4,20 @@ import AdDisplay from "~/components/ad/ad-display";
 import Sound from "~/components/sound/sound";
 import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { Badge } from "~/components/ui/badge";
 import { getServerSession } from "~/lib/auth";
 import { api } from "~/trpc/server";
 import { FollowButton } from "./follow-button";
+
+const getRoleColor = (role: string) => {
+  switch (role.toLowerCase()) {
+    case "admin":
+      return "bg-red-500 text-white";
+    case "pro":
+      return "bg-blue-500 text-white";
+    default:
+      return "bg-gray-500 text-white";
+  }
+};
 
 const getUser = cache(async (id: string) => {
   const user = await api.user.getUser({ id });
@@ -51,25 +61,31 @@ export default async function UserPage({
   return (
     <div className="flex w-full flex-col gap-20">
       <div className="flex flex-row gap-10">
-        <Avatar className="size-24 shrink-0 rounded-full">
-          <AvatarImage
-            src={createdBy?.image + "?size=96"}
-            alt={createdBy?.name ?? ""}
-            useNextImage
-          />
-          <AvatarFallback delayMs={500}>
-            {user.name?.charAt(0).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+        <div className="relative">
+          <Avatar className="size-24 shrink-0 rounded-full">
+            <AvatarImage
+              src={createdBy?.image + "?size=96"}
+              alt={createdBy?.name ?? ""}
+              useNextImage
+            />
+            <AvatarFallback delayMs={500}>
+              {user.name?.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          {user.role !== "user" && (
+            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 transform">
+              <div
+                className={`rounded-full ${getRoleColor(user.role)} border-background border-2 px-3 py-1 text-xs font-medium`}
+              >
+                <span>{user.role.toUpperCase()}</span>
+              </div>
+            </div>
+          )}
+        </div>
         <div className="flex w-full flex-col justify-between gap-4 sm:flex-row">
           <div className="flex w-full flex-col gap-2">
             <h1 className="flex gap-4 text-4xl font-bold">
               <span>{user.name}</span>
-              {user.role !== "USER" && (
-                <div className="flex items-start">
-                  <Badge variant="outline">{user.role}</Badge>
-                </div>
-              )}
             </h1>
             <div className="flex gap-6">
               <div className="flex gap-1">
