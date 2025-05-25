@@ -61,26 +61,28 @@ export default async function UserPage({
   return (
     <div className="flex w-full flex-col gap-20">
       <div className="flex flex-row gap-10">
-        <div className="relative">
-          <Avatar className="size-24 shrink-0 rounded-full">
-            <AvatarImage
-              src={createdBy?.image + "?size=96"}
-              alt={createdBy?.name ?? ""}
-              useNextImage
-            />
-            <AvatarFallback delayMs={500}>
-              {user.name?.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          {user.role !== "user" && (
-            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 transform">
-              <div
-                className={`rounded-full ${getRoleColor(user.role)} border-background border-2 px-3 py-1 text-xs font-medium`}
-              >
-                <span>{user.role.toUpperCase()}</span>
+        <div>
+          <div className="relative">
+            <Avatar className="size-24 shrink-0 rounded-full">
+              <AvatarImage
+                src={createdBy?.image + "?size=96"}
+                alt={createdBy?.name ?? ""}
+                useNextImage
+              />
+              <AvatarFallback delayMs={500}>
+                {user.name?.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            {user.role !== "user" && (
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 transform">
+                <div
+                  className={`rounded-full ${getRoleColor(user.role)} border-background border-2 px-3 py-1 text-xs font-medium`}
+                >
+                  <span>{user.role.toUpperCase()}</span>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
         <div className="flex w-full flex-col justify-between gap-4 sm:flex-row">
           <div className="flex w-full flex-col gap-2">
