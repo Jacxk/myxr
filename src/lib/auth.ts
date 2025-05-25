@@ -27,9 +27,17 @@ export const auth = betterAuth({
       const guilds = await GuildQuery.getUserGuilds(session.userId);
       guilds?.sort((a, b) => a.guild.name.localeCompare(b.guild.name));
 
+      const role = await db.user
+        .findUnique({
+          where: { id: user.id },
+          select: { role: true },
+        })
+        .then((user) => user?.role ?? "user");
+
       return {
         user: {
           ...user,
+          role,
           guilds: guilds?.map(({ guild }) => ({ ...guild })) ?? [],
         },
         session,
