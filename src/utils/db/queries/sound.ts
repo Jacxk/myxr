@@ -21,7 +21,7 @@ export const SoundQuery = {
       skip,
       where: {
         createdBy: {
-          removed: false,
+          banned: false,
         },
       },
       include: {
@@ -43,7 +43,7 @@ export const SoundQuery = {
       where: {
         id,
         createdBy: {
-          removed: false,
+          banned: false,
         },
       },
       include: {
@@ -67,7 +67,7 @@ export const SoundQuery = {
         where: {
           createdById,
           createdBy: {
-            removed: false,
+            banned: false,
           },
         },
         include: { ...soundInclude, likedBy: { where: { userId: userId } } },
@@ -98,7 +98,7 @@ export const SoundQuery = {
       where: {
         likedBy: { some: { userId } },
         createdBy: {
-          removed: false,
+          banned: false,
         },
       },
       include: { ...soundInclude, likedBy: { where: { userId } } },
@@ -157,7 +157,7 @@ export const SoundQuery = {
         include: { likedBy: { where: { userId } } },
         where: {
           createdBy: {
-            removed: false,
+            banned: false,
           },
           OR: [
             { name: { search: soundSearch } },
@@ -207,7 +207,7 @@ export const SoundQuery = {
       const trendingSounds = await db.sound.findMany({
         where: {
           createdBy: {
-            removed: false,
+            banned: false,
           },
         },
         take: limit + 1,
@@ -244,7 +244,7 @@ export const SoundQuery = {
       sounds = await db.sound.findMany({
         where: {
           createdBy: {
-            removed: false,
+            banned: false,
           },
         },
         take: limit + 1,
@@ -268,7 +268,7 @@ export const SoundQuery = {
     return db.sound.count({
       where: {
         createdBy: {
-          removed: false,
+          banned: false,
         },
       },
     });
@@ -278,7 +278,7 @@ export const SoundQuery = {
     return db.sound.findMany({
       where: {
         createdBy: {
-          removed: false,
+          banned: false,
         },
       },
       select: {

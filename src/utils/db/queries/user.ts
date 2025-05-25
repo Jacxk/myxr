@@ -16,7 +16,7 @@ export const UserQuery = {
   getUserCount: async () => {
     return db.user.count({
       where: {
-        removed: false,
+        banned: false,
       },
     });
   },
@@ -53,7 +53,7 @@ export const UserQuery = {
     const user = await db.user.findFirst({
       where: {
         id,
-        removed: false,
+        banned: false,
       },
       include: {
         _count: {
@@ -77,10 +77,10 @@ export const UserQuery = {
         followerId,
         userId,
         follower: {
-          removed: false,
+          banned: false,
         },
         user: {
-          removed: false,
+          banned: false,
         },
       },
     });
@@ -94,10 +94,10 @@ export const UserQuery = {
         followerId,
         userId,
         follower: {
-          removed: false,
+          banned: false,
         },
         user: {
-          removed: false,
+          banned: false,
         },
       },
     });

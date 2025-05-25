@@ -1,8 +1,7 @@
-import { Role } from "@prisma/client";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
-import { customSession } from "better-auth/plugins";
+import { admin, customSession } from "better-auth/plugins";
 import { headers } from "next/headers";
 import { env } from "~/env";
 import { db } from "~/server/db";
@@ -17,6 +16,10 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    admin({
+      defaultRole: "user",
+      adminRoles: ["admin"],
+    }),
     nextCookies(),
     customSession(async ({ user, session }) => {
       await UserMutation.updateGuildMemberShip(session.userId);
@@ -27,7 +30,6 @@ export const auth = betterAuth({
       return {
         user: {
           ...user,
-          role: Role.USER,
           guilds: guilds?.map(({ guild }) => ({ ...guild })) ?? [],
         },
         session,

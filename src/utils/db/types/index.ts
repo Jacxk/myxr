@@ -11,7 +11,7 @@ export const soundInclude = {
       image: true,
       name: true,
       role: true,
-      removed: true,
+      banned: true,
       id: true,
     },
   },
