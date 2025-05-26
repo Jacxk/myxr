@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import AdDisplay from "~/components/ad/ad-display";
 import { EmojiImage } from "~/components/emoji-image";
@@ -14,7 +12,7 @@ import { DownloadButton } from "./action-button/download";
 import { ReportButton } from "./action-button/report";
 import { ShareButton } from "./action-button/share";
 import { CreatedDate } from "./created-date";
-import { Guild } from "./guild";
+import { RelatedSounds } from "./related-sounds";
 import { SoundData } from "./sound-data";
 
 type SoundPageProps = {
@@ -100,20 +98,12 @@ export function SoundPage({ id, sound, isPreview }: SoundPageProps) {
             showProbability={1}
           />
 
-          {sound.guildSounds.length === 0 ? (
-            <span>No guilds are using this sound.</span>
-          ) : (
-            <span>Guilds using sound</span>
-          )}
-          <div className="flex flex-wrap gap-4">
-            {sound.guildSounds.map((guildSound) => (
-              <Guild
-                key={guildSound.guild.id}
-                name={guildSound.guild.name}
-                image={guildSound.guild.image}
-              />
-            ))}
-          </div>
+          <RelatedSounds
+            tags={sound.tags}
+            currentSoundId={sound.id}
+            soundName={sound.name}
+            createdByName={sound.createdBy.name}
+          />
         </div>
         <div className="flex flex-col gap-4 sm:w-1/5">
           <SoundData title="Created">
