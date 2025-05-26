@@ -252,9 +252,9 @@ export const SoundQuery = {
           );
 
           const trendingScore =
-            recentLikes.length * 5 +
+            sound.usegeCount * 5 +
+            recentLikes.length * 4 +
             recentDownloads.length * 3 +
-            sound.usegeCount * 2 +
             sound.shareCount;
 
           return {
