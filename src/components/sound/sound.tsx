@@ -66,7 +66,7 @@ export default memo(function Sound({
   return (
     <div
       className={cn(
-        "flex aspect-square size-40 flex-col items-center justify-center gap-2 p-2",
+        "flex aspect-square w-40 flex-col items-center justify-center gap-2 p-2",
         className,
       )}
     >
@@ -107,6 +107,10 @@ export default memo(function Sound({
             guildId={guildId!}
           />
         ) : null}
+      </div>
+      <div className="text-muted-foreground flex gap-4 text-xs">
+        <span>{Intl.NumberFormat().format(sound.usegeCount)} uses</span>
+        <span>{Intl.NumberFormat().format(sound.likes)} likes</span>
       </div>
     </div>
   );
