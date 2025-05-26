@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ReactNode } from "react";
 import AdDisplay from "~/components/ad/ad-display";
 import { EmojiImage } from "~/components/emoji-image";
 import { AddToGuildButton } from "~/components/sound/add-button";
@@ -12,13 +13,13 @@ import { DownloadButton } from "./action-button/download";
 import { ReportButton } from "./action-button/report";
 import { ShareButton } from "./action-button/share";
 import { CreatedDate } from "./created-date";
-import { RelatedSounds } from "./related-sounds";
 import { SoundData } from "./sound-data";
 
 type SoundPageProps = {
   id: string;
   sound: NonNullable<RouterOutputs["sound"]["getSound"]>;
   isPreview?: boolean;
+  related?: ReactNode;
 };
 
 function ActionButtons({ id, sound, isPreview }: SoundPageProps) {
@@ -56,7 +57,7 @@ function ActionButtons({ id, sound, isPreview }: SoundPageProps) {
   );
 }
 
-export function SoundPage({ id, sound, isPreview }: SoundPageProps) {
+export function SoundPage({ id, sound, isPreview, related }: SoundPageProps) {
   return (
     <div className="flex w-full flex-col gap-6">
       <div className="flex w-full flex-row gap-10">
@@ -98,12 +99,7 @@ export function SoundPage({ id, sound, isPreview }: SoundPageProps) {
             showProbability={1}
           />
 
-          <RelatedSounds
-            tags={sound.tags}
-            currentSoundId={sound.id}
-            soundName={sound.name}
-            createdByName={sound.createdBy.name}
-          />
+          {!isPreview && related}
         </div>
         <div className="flex flex-col gap-4 sm:w-1/5">
           <SoundData title="Created">

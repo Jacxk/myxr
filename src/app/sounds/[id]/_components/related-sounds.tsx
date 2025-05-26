@@ -16,7 +16,6 @@ export async function RelatedSounds({
   createdByName,
 }: RelatedSoundsProps) {
   const tagNames = tags.map((tag) => tag.name).join(" ");
-
   const searchQuery = [tagNames, soundName, createdByName].join(" ").trim();
 
   const { sounds } = await api.sound.search({
