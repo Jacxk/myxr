@@ -2,6 +2,7 @@ import "server-only";
 
 import { type Prisma } from "@prisma/client";
 import { db } from "~/server/db";
+import { sortSoundsByWeight } from "..";
 import type { SearchType } from "../types";
 import { populateLike, soundInclude } from "../types";
 
@@ -140,31 +141,52 @@ export const SoundQuery = {
     userId?: string,
   ) => {
     let sounds = null;
-    const formattedQuery = query
-      .trim()
-      .replace(/[()|&:*!]/g, "")
-      .split(/\s+/)
-      .map((word) => word + ":*");
+    const cleanQuery = query.trim().replace(/[()|&:*!]/g, "");
+    const formattedQuery = cleanQuery.split(/\s+/).map((word) => word + ":*");
 
-    const soundSearch = formattedQuery.join(" & ");
+    const wholeWord = formattedQuery.join(" & ");
+    const separateWords = formattedQuery.join(" | ");
     const tagSearch = formattedQuery.join(" | ");
 
     if (type === "normal") {
-      sounds = await db.sound.findMany({
+      const matchingSounds = await db.sound.findMany({
         take: limit + 1,
         skip: cursor ? 1 : 0,
         cursor: cursor ? { id: cursor } : undefined,
-        include: { likedBy: { where: { userId } } },
+        include: {
+          likedBy: { where: { userId } },
+          tags: true,
+          createdBy: {
+            select: {
+              name: true,
+            },
+          },
+        },
         where: {
           createdBy: {
             banned: false,
           },
           OR: [
-            { name: { search: soundSearch } },
+            {
+              OR: [
+                { name: { search: wholeWord } },
+                { name: { search: separateWords } },
+              ],
+            },
             { tags: { some: { name: { search: tagSearch } } } },
+            {
+              createdBy: {
+                OR: [
+                  { name: { search: wholeWord } },
+                  { name: { search: separateWords } },
+                ],
+              },
+            },
           ],
         },
       });
+
+      sounds = sortSoundsByWeight(matchingSounds, cleanQuery);
     } else {
       sounds = await SoundQuery.getSoundsFromTag(query, limit, cursor, userId);
     }
