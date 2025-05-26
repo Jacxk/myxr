@@ -1,3 +1,4 @@
+import { unauthorized } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { getServerSession } from "~/lib/auth";
 import { TabLink } from "../_components/tab-link";
@@ -8,7 +9,9 @@ export default async function Layout({
   children: React.ReactNode;
 }) {
   const session = await getServerSession();
-  const guilds = session?.user.guilds;
+  if (!session) return unauthorized();
+
+  const guilds = session.user.guilds;
 
   return (
     <div className="flex w-full flex-col">

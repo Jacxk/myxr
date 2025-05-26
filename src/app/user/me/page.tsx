@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { unauthorized } from "next/navigation";
 
 export default function MePage() {
-  redirect("/user/me/sounds");
+  unauthorized();
 }

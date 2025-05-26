@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import { unauthorized } from "next/navigation";
 import Sound from "~/components/sound/sound";
 import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { getServerSession } from "~/lib/auth";
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default async function MeSoundsPage() {
   const session = await getServerSession();
 
-  if (!session) return redirect("/");
+  if (!session) return unauthorized();
 
   const sounds = await api.user.getSounds(session.user.id);
 

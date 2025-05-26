@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { unauthorized } from "next/navigation";
 import { getServerSession } from "~/lib/auth";
 import { UserTabsAccount } from "./_components/tab-link";
 
@@ -9,7 +9,7 @@ export default async function Layout({
 }) {
   const session = await getServerSession();
 
-  if (!session?.user) return redirect("/");
+  if (!session?.user) return unauthorized();
 
   return (
     <div className="flex flex-col gap-4 sm:flex-row">
