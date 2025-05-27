@@ -28,18 +28,19 @@ export function AllSoundsClient({
   const [displayAsGrid, setDisplayAsGrid] = useState<boolean>();
 
   const api = useTRPC();
-  const { data, fetchNextPage, hasNextPage, isPending } = useInfiniteQuery(
-    api.sound.getAllSounds.infiniteQueryOptions(
-      { filter: searchParams.get("filter") },
-      {
-        initialData: {
-          pages: [initialData],
-          pageParams: [null],
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery(
+      api.sound.getAllSounds.infiniteQueryOptions(
+        { filter: searchParams.get("filter") },
+        {
+          initialData: {
+            pages: [initialData],
+            pageParams: [null],
+          },
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
         },
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-      },
-    ),
-  );
+      ),
+    );
 
   const allSounds = data?.pages.flatMap((p) => p.sounds) ?? [];
 
@@ -50,7 +51,7 @@ export function AllSoundsClient({
 
   useEffect(() => {
     const savedDisplayAsGrid = localStorage.getItem("displayAsGrid");
-    if (savedDisplayAsGrid) setDisplayAsGrid(savedDisplayAsGrid === "true");
+    setDisplayAsGrid(savedDisplayAsGrid === "true");
   }, []);
 
   return (
@@ -75,7 +76,8 @@ export function AllSoundsClient({
         {...infititeScrollProps}
         loadMore={fetchNextPage}
         hasMore={hasNextPage}
-        isLoading={isPending}
+        isLoading={isFetchingNextPage}
+        offsetPx={1000}
       >
         {displayAsGrid ? (
           <SoundsGrid>
