@@ -21,7 +21,7 @@ export function ShareButton({
 }: {
   soundId: string;
   soundName: string;
-  shares: number;
+  shares?: number;
 }) {
   const posthog = usePostHog();
   const router = useRouter();
@@ -52,7 +52,11 @@ export function ShareButton({
     <TooltipProvider delayDuration={0}>
       <Tooltip disableHoverableContent>
         <TooltipTrigger asChild>
-          <Button variant="outline" onClick={() => onShareClick()}>
+          <Button
+            size={typeof shares === "number" ? "default" : "icon"}
+            variant="outline"
+            onClick={() => onShareClick()}
+          >
             <Share />
 
             {shares &&

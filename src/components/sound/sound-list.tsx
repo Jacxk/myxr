@@ -2,7 +2,7 @@
 
 import type { Snowflake } from "discord-api-types/globals";
 import Link from "next/link";
-import { DownloadButton } from "~/app/sounds/[id]/_components/action-button/download";
+import { ShareButton } from "~/app/sounds/[id]/_components/action-button/share";
 import { AudioProvider, useAudio } from "~/context/AudioContext";
 import { cn } from "~/lib/utils";
 import type { RouterOutputs } from "~/trpc/react";
@@ -11,12 +11,14 @@ import { AddToGuildButton } from "./add-button";
 import { DeleteSoundButton } from "./delete-button";
 import { LikeButton } from "./like-button";
 
-type Sound = NonNullable<RouterOutputs["user"]["getSounds"]>[number];
+type Sound = NonNullable<
+  RouterOutputs["sound"]["getAllSounds"]["sounds"]
+>[number];
 
 export type SoundListData = {
   sound: Sound;
-  guildId: Snowflake;
-  discordSoundId: Snowflake;
+  guildId?: Snowflake;
+  discordSoundId?: Snowflake;
   external?: boolean;
   available?: boolean;
   isGuildAvailable?: boolean;
@@ -41,17 +43,17 @@ function SoundRow({
 
   const handleIconClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    play(discordSoundId, sound.url);
+    play(discordSoundId ?? sound.id, sound.url);
   };
 
   return (
     <div
       className={cn(
-        "hover:bg-accent/50 flex items-center justify-between p-4 transition-colors",
+        "hover:bg-accent/50 flex flex-col gap-4 p-4 transition-colors sm:flex-row sm:items-center sm:justify-between",
         className,
       )}
     >
-      <div className="flex items-start gap-4">
+      <div className="flex gap-4">
         <div
           onClick={handleIconClick}
           className="cursor-pointer transition-opacity hover:opacity-80"
@@ -65,10 +67,12 @@ function SoundRow({
           {external ? (
             <span className="font-medium">{sound.name}</span>
           ) : (
-            <Link href={`/sounds/${sound.id}`}>{sound.name}</Link>
+            <Link className="hover:underline" href={`/sounds/${sound.id}`}>
+              {sound.name}
+            </Link>
           )}
           <Link
-            className="text-muted-foreground"
+            className="text-muted-foreground hover:underline"
             href={`/user/${sound.createdBy.id}`}
           >
             {sound.createdBy.name}
@@ -82,23 +86,19 @@ function SoundRow({
           )}
         </div>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex gap-2 self-end">
         {!external ? (
           <>
             <AddToGuildButton soundId={sound.id} soundName={sound.name} />
             <LikeButton soundId={sound.id} liked={sound.likedByUser} />
-            <DownloadButton
-              soundId={sound.id}
-              soundName={sound.name}
-              soundUrl={sound.url}
-            />
+            <ShareButton soundId={sound.id} soundName={sound.name} />
           </>
         ) : (
           <span className="text-muted-foreground mr-4 text-xs italic">
             External Sound
           </span>
         )}
-        {isGuildAvailable && (
+        {discordSoundId && guildId && isGuildAvailable && (
           <DeleteSoundButton
             discordSoundId={discordSoundId}
             guildId={guildId}
@@ -123,10 +123,7 @@ function SoundTableHeader({
   );
 }
 
-export function SoundTableList({
-  data,
-  isGuildAvailable,
-}: SoundTableListProps) {
+export function SoundsList({ data, isGuildAvailable }: SoundTableListProps) {
   return (
     <AudioProvider>
       <div className="flex w-full flex-col">

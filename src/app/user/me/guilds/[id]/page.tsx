@@ -1,9 +1,6 @@
 import type { APISoundboardSound } from "discord-api-types/v10";
 import { cache } from "react";
-import {
-  type SoundListData,
-  SoundTableList,
-} from "~/components/sound/sound-list";
+import { type SoundListData, SoundsList } from "~/components/sound/sound-list";
 import { api } from "~/trpc/server";
 import { BotDiscordApi } from "~/utils/discord/bot-api";
 import ConfigSelect from "./_components/config-select";
@@ -93,7 +90,7 @@ async function GuildContent({ id }: { id: string }) {
       <div className="flex w-full flex-col items-center">
         <h2 className="text-muted-foreground text-xl">{guild.name}</h2>
         {isGuildAvailable && <ConfigSelect guildId={guild.id} />}
-        <SoundTableList
+        <SoundsList
           data={[
             guildSounds as unknown as SoundListData,
             convertedExternalSound,
