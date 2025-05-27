@@ -80,6 +80,7 @@ async function GuildContent({ id }: { id: string }) {
             emoji: getEmoji(sound),
             createdBy: {
               name: sound.user?.global_name ?? sound.user?.username,
+              id: sound.user?.id,
             },
             url: `https://cdn.discordapp.com/soundboard-sounds/${sound.sound_id}`,
           },

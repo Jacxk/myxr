@@ -82,8 +82,8 @@ export function DeleteSoundButton({
         </DialogContent>
       </Dialog>
 
-      <TooltipProvider>
-        <Tooltip>
+      <TooltipProvider delayDuration={0}>
+        <Tooltip disableHoverableContent>
           <TooltipTrigger asChild>
             <Button variant="destructive" onClick={onRemoveClick} size="icon">
               <Trash />

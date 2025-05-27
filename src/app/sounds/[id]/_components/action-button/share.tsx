@@ -8,6 +8,7 @@ import { Button } from "~/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 import { env } from "~/env";
@@ -48,18 +49,20 @@ export function ShareButton({
   };
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button variant="outline" onClick={() => onShareClick()}>
-          <Share />
+    <TooltipProvider delayDuration={0}>
+      <Tooltip disableHoverableContent>
+        <TooltipTrigger asChild>
+          <Button variant="outline" onClick={() => onShareClick()}>
+            <Share />
 
-          {shares &&
-            Intl.NumberFormat(navigator.language, {
-              notation: "compact",
-            }).format(shares)}
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent>Share</TooltipContent>
-    </Tooltip>
+            {shares &&
+              Intl.NumberFormat(navigator.language, {
+                notation: "compact",
+              }).format(shares)}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Share</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }

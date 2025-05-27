@@ -2,12 +2,14 @@
 
 import type { Snowflake } from "discord-api-types/globals";
 import Link from "next/link";
+import { DownloadButton } from "~/app/sounds/[id]/_components/action-button/download";
 import { AudioProvider, useAudio } from "~/context/AudioContext";
 import { cn } from "~/lib/utils";
 import type { RouterOutputs } from "~/trpc/react";
 import { EmojiImage } from "../emoji-image";
-import { Button } from "../ui/button";
+import { AddToGuildButton } from "./add-button";
 import { DeleteSoundButton } from "./delete-button";
+import { LikeButton } from "./like-button";
 
 type Sound = NonNullable<RouterOutputs["user"]["getSounds"]>[number];
 
@@ -35,57 +37,73 @@ function SoundRow({
   isGuildAvailable = true,
 }: SoundListData & { className: string }) {
   const { play } = useAudio();
-  const size = 34;
+  const size = 70;
 
-  const handleRowClick = (e: React.MouseEvent) => {
-    const target = e.target as HTMLElement;
-    if (!target.closest('[role="button"]')) {
-      return;
-    }
+  const handleIconClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     play(discordSoundId, sound.url);
   };
 
   return (
     <div
-      onClick={handleRowClick}
-      role="button"
-      className={cn("hover:bg-accent p-2 text-sm", className)}
+      className={cn(
+        "hover:bg-accent/50 flex items-center justify-between p-4 transition-colors",
+        className,
+      )}
     >
-      <div className="grid h-fit w-full cursor-pointer grid-cols-5 items-center">
-        <div>
+      <div className="flex items-start gap-4">
+        <div
+          onClick={handleIconClick}
+          className="cursor-pointer transition-opacity hover:opacity-80"
+        >
           <EmojiImage
             emoji={sound.emoji}
             size={{ width: size, height: size }}
           />
         </div>
-        <div className="col-span-2">
+        <div className="flex flex-col">
           {external ? (
-            <span>{sound.name}</span>
+            <span className="font-medium">{sound.name}</span>
           ) : (
-            <Button className="p-0" variant="link" asChild>
-              <Link href={`/sounds/${sound.id}`}>{sound.name}</Link>
-            </Button>
+            <Link href={`/sounds/${sound.id}`}>{sound.name}</Link>
+          )}
+          <Link
+            className="text-muted-foreground"
+            href={`/user/${sound.createdBy.id}`}
+          >
+            {sound.createdBy.name}
+          </Link>
+          {!external && (
+            <div className="text-muted-foreground mt-1 flex gap-4 text-xs">
+              <span>{sound.likes || 0} likes</span>
+              <span>{sound.shareCount || 0} shares</span>
+              <span>{sound.usegeCount || 0} uses</span>
+            </div>
           )}
         </div>
-        <div className="flex items-center justify-between">
-          {external ? (
-            <span>{sound.createdBy.name}</span>
-          ) : (
-            <Button className="p-0" variant="link" asChild>
-              <Link href={`/user/${sound.createdBy.id}`}>
-                {sound.createdBy.name}
-              </Link>
-            </Button>
-          )}
-        </div>
-        <div className="flex justify-end">
-          {isGuildAvailable && (
-            <DeleteSoundButton
-              discordSoundId={discordSoundId}
-              guildId={guildId}
+      </div>
+      <div className="flex items-center gap-2">
+        {!external ? (
+          <>
+            <AddToGuildButton soundId={sound.id} soundName={sound.name} />
+            <LikeButton soundId={sound.id} liked={sound.likedByUser} />
+            <DownloadButton
+              soundId={sound.id}
+              soundName={sound.name}
+              soundUrl={sound.url}
             />
-          )}
-        </div>
+          </>
+        ) : (
+          <span className="text-muted-foreground mr-4 text-xs italic">
+            External Sound
+          </span>
+        )}
+        {isGuildAvailable && (
+          <DeleteSoundButton
+            discordSoundId={discordSoundId}
+            guildId={guildId}
+          />
+        )}
       </div>
     </div>
   );
@@ -99,13 +117,8 @@ function SoundTableHeader({
   return (
     <div>
       {isGuildAvailable === false && (
-        <h1 className="text-muted-foreground text-right italic">ready only</h1>
+        <h1 className="text-muted-foreground text-right italic">read only</h1>
       )}
-      <div className="grid h-full w-full grid-cols-5 items-center p-4">
-        <span>Emoji</span>
-        <span className="col-span-2">Name</span>
-        <span>Created By</span>
-      </div>
     </div>
   );
 }

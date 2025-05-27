@@ -7,7 +7,6 @@ import { LikeButton } from "~/components/sound/like-button";
 import { SoundWaveForm } from "~/components/sound/sound-waveform";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
-import { TooltipProvider } from "~/components/ui/tooltip";
 import type { RouterOutputs } from "~/trpc/react";
 import { DownloadButton } from "./action-button/download";
 import { ReportButton } from "./action-button/report";
@@ -25,34 +24,32 @@ type SoundPageProps = {
 function ActionButtons({ id, sound, isPreview }: SoundPageProps) {
   return (
     <div className="flex flex-wrap gap-2">
-      <TooltipProvider delayDuration={0}>
-        <AddToGuildButton
-          soundId={id}
-          soundName={sound.name}
-          isPreview={isPreview}
-          usage={sound.usegeCount}
-        />
+      <AddToGuildButton
+        soundId={id}
+        soundName={sound.name}
+        isPreview={isPreview}
+        usage={sound.usegeCount}
+      />
 
-        <LikeButton
-          soundId={id}
-          liked={sound.likedByUser}
-          isPreview={isPreview}
-          likes={sound.likes}
-        />
+      <LikeButton
+        soundId={id}
+        liked={sound.likedByUser}
+        isPreview={isPreview}
+        likes={sound.likes}
+      />
 
-        <DownloadButton
-          soundUrl={sound.url}
-          soundId={sound.id}
-          soundName={sound.name}
-          downloads={sound.downloadedSound.length}
-        />
+      <DownloadButton
+        soundUrl={sound.url}
+        soundId={sound.id}
+        soundName={sound.name}
+        downloads={sound.downloadedSound.length}
+      />
 
-        <ShareButton
-          soundId={sound.id}
-          shares={sound.shareCount}
-          soundName={sound.name}
-        />
-      </TooltipProvider>
+      <ShareButton
+        soundId={sound.id}
+        shares={sound.shareCount}
+        soundName={sound.name}
+      />
     </div>
   );
 }

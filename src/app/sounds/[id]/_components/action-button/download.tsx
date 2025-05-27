@@ -9,6 +9,7 @@ import { Button } from "~/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 import { useTRPC } from "~/trpc/react";
@@ -39,7 +40,7 @@ export function DownloadButton({
   soundUrl: string;
   soundId: string;
   soundName: string;
-  downloads: number;
+  downloads?: number;
 }>) {
   const posthog = usePostHog();
   const router = useRouter();
@@ -64,18 +65,23 @@ export function DownloadButton({
   };
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button variant="outline" onClick={() => onDownloadClick()}>
-          <Download />
-
-          {downloads &&
-            Intl.NumberFormat(navigator.language, {
-              notation: "compact",
-            }).format(downloads)}
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent>Download</TooltipContent>
-    </Tooltip>
+    <TooltipProvider delayDuration={0}>
+      <Tooltip disableHoverableContent>
+        <TooltipTrigger asChild>
+          <Button
+            size={typeof downloads === "number" ? "default" : "icon"}
+            variant="outline"
+            onClick={() => onDownloadClick()}
+          >
+            <Download />
+            {downloads &&
+              Intl.NumberFormat(navigator.language, {
+                notation: "compact",
+              }).format(downloads)}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Download</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
