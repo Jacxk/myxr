@@ -1,18 +1,21 @@
 "use client";
 
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
-import React, { ReactNode } from "react";
+import { Grid, List } from "lucide-react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { InView } from "react-intersection-observer";
 import { Button } from "./ui/button";
 
+type DisplayType = "grid" | "list";
+
 export type InfiniteScrollProps<T> = {
   data: T[];
-  displayType?: "grid" | "list";
   listEstimatedSize: number;
   gridEstimatedSize: number;
-  minItemWidth?: number;
   hasMore: boolean;
   isLoading: boolean;
+  minItemWidth?: number;
+  displayType?: DisplayType;
   children?: React.ReactNode;
   title?: React.ReactNode;
   loader?: React.ReactNode;
@@ -41,36 +44,65 @@ interface GridVirtualizerProps<T> {
 
 export function InfiniteScroll<T>({
   data,
-  displayType = "list",
-  renderListItem,
-  renderGridItem,
   listEstimatedSize,
   gridEstimatedSize,
-  minItemWidth = 200,
-  loadMore,
   hasMore,
   isLoading,
   children,
   title,
+  displayType,
+  minItemWidth = 200,
   loader = <p className="text-center text-gray-500">Loading...</p>,
   endMessage = <p className="text-center text-gray-500">No more results.</p>,
   displayEndMessage = true,
   offsetPx = 300,
   threshold = 0,
   manualTrigger = true,
+  loadMore,
+  renderListItem,
+  renderGridItem,
 }: InfiniteScrollProps<T>) {
+  const [displayAsGrid, setDisplayAsGrid] = useState<boolean | undefined>(
+    displayType ? displayType === "grid" : undefined,
+  );
+
   const onInViewChange = (inView: boolean) => {
     if (inView && hasMore && !isLoading) {
       loadMore();
     }
   };
 
+  const changeDisplayType = (asGrid: boolean) => {
+    localStorage.setItem("displayAsGrid", String(asGrid));
+    setDisplayAsGrid(asGrid);
+  };
+
+  useEffect(() => {
+    const savedDisplayAsGrid = localStorage.getItem("displayAsGrid");
+    setDisplayAsGrid(savedDisplayAsGrid === "true");
+  }, []);
+
   return (
     <div className="flex flex-col gap-4">
       {title}
+      <div className="flex gap-2">
+        <Button
+          size="icon"
+          variant={displayAsGrid === true ? "default" : "outline"}
+          onClick={() => changeDisplayType(true)}
+        >
+          <Grid />
+        </Button>
+        <Button
+          size="icon"
+          variant={displayAsGrid === false ? "default" : "outline"}
+          onClick={() => changeDisplayType(false)}
+        >
+          <List />
+        </Button>
+      </div>
       {children}
-
-      {displayType === "list" && renderListItem && (
+      {!displayAsGrid && renderListItem && (
         <ListVirtualizer
           data={data}
           renderItem={renderListItem}
@@ -78,7 +110,7 @@ export function InfiniteScroll<T>({
         />
       )}
 
-      {displayType === "grid" && renderGridItem && (
+      {displayAsGrid && renderGridItem && (
         <GridVirtualizer
           data={data}
           renderItem={renderGridItem}
