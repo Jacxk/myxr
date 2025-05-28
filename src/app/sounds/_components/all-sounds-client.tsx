@@ -1,29 +1,21 @@
 "use client";
 
-import {
-  InfiniteScroll,
-  type InfiniteScrollProps,
-} from "~/components/infinite-scroll";
-import Sound from "~/components/sound/sound";
-import { SoundsGrid } from "~/components/sound/sounds-grid";
+import { InfiniteScroll } from "~/components/infinite-scroll";
 import { useTRPC, type RouterOutputs } from "~/trpc/react";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Grid2X2, List } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { Fragment, useEffect, useState } from "react";
-import AdDisplay from "~/components/ad/ad-display";
-import { SoundsList } from "~/components/sound/sound-list";
+import { useEffect, useState } from "react";
+import { SoundRow } from "~/components/sound/sound-list";
 import { Button } from "~/components/ui/button";
+import { AudioProvider } from "~/context/AudioContext";
 
 type AllSoundsClient = {
   initialData: RouterOutputs["sound"]["getAllSounds"];
 };
 
-export function AllSoundsClient({
-  initialData,
-  ...infititeScrollProps
-}: AllSoundsClient & Partial<InfiniteScrollProps>) {
+export function AllSoundsClient({ initialData }: AllSoundsClient) {
   const searchParams = useSearchParams();
   const [displayAsGrid, setDisplayAsGrid] = useState<boolean>();
 
@@ -72,31 +64,17 @@ export function AllSoundsClient({
           <List />
         </Button>
       </div>
-      <InfiniteScroll
-        {...infititeScrollProps}
-        loadMore={fetchNextPage}
-        hasMore={hasNextPage}
-        isLoading={isFetchingNextPage}
-        offsetPx={1000}
-      >
-        {displayAsGrid ? (
-          <SoundsGrid>
-            {allSounds.map((sound, i) => (
-              <Fragment key={sound.id}>
-                <Sound sound={sound} />
-                <AdDisplay
-                  adSlot="1944402367"
-                  width="100%"
-                  height="100%"
-                  showProbability={i === allSounds.length - 1 ? 1 : 0.4}
-                />
-              </Fragment>
-            ))}
-          </SoundsGrid>
-        ) : (
-          <SoundsList data={allSounds.map((sound) => ({ sound }))} />
-        )}
-      </InfiniteScroll>
+      <AudioProvider>
+        <InfiniteScroll
+          data={allSounds}
+          renderListItem={(item) => <SoundRow sound={item} />}
+          loadMore={fetchNextPage}
+          hasMore={hasNextPage}
+          isLoading={isFetchingNextPage}
+          offsetPx={1000}
+          listEstimatedSize={105}
+        />
+      </AudioProvider>
     </div>
   );
 }

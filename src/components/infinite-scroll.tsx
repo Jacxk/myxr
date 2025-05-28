@@ -1,13 +1,17 @@
 "use client";
 
+import { useWindowVirtualizer } from "@tanstack/react-virtual";
+import { ReactNode } from "react";
 import { InView } from "react-intersection-observer";
 import { Button } from "./ui/button";
 
-export type InfiniteScrollProps = {
-  loadMore: () => void;
+export type InfiniteScrollProps<T> = {
+  data: T[];
+  displayType?: "grid" | "list";
+  listEstimatedSize: number;
   hasMore: boolean;
   isLoading: boolean;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   title?: React.ReactNode;
   loader?: React.ReactNode;
   endMessage?: React.ReactNode;
@@ -15,9 +19,22 @@ export type InfiniteScrollProps = {
   offsetPx?: number;
   threshold?: number;
   manualTrigger?: boolean;
+  loadMore: () => void;
+  renderListItem?: (item: T, index: number) => ReactNode;
+  renderGridItem?: (item: T, index: number) => ReactNode;
 };
 
-export function InfiniteScroll({
+interface ListVirtualizerProps<T> {
+  data: T[];
+  estimatedSize: number;
+  renderItem: (item: T, index: number) => ReactNode;
+}
+
+export function InfiniteScroll<T>({
+  data,
+  displayType = "list",
+  renderListItem,
+  listEstimatedSize,
   loadMore,
   hasMore,
   isLoading,
@@ -29,7 +46,7 @@ export function InfiniteScroll({
   offsetPx = 300,
   threshold = 0,
   manualTrigger = true,
-}: Readonly<InfiniteScrollProps>) {
+}: InfiniteScrollProps<T>) {
   const onInViewChange = (inView: boolean) => {
     if (inView && hasMore && !isLoading) {
       loadMore();
@@ -40,6 +57,14 @@ export function InfiniteScroll({
     <div className="flex flex-col gap-4">
       {title}
       {children}
+
+      {displayType === "list" && (
+        <ListVirtualizer
+          data={data}
+          renderItem={renderListItem!}
+          estimatedSize={listEstimatedSize}
+        />
+      )}
       <InView
         rootMargin={`0px 0px ${offsetPx}px 0px`}
         threshold={threshold}
@@ -53,6 +78,50 @@ export function InfiniteScroll({
             Load more
           </Button>
         )}
+      </div>
+    </div>
+  );
+}
+
+function ListVirtualizer<T>({
+  data,
+  estimatedSize,
+  renderItem,
+}: ListVirtualizerProps<T>) {
+  const virtualizer = useWindowVirtualizer({
+    count: data.length,
+    estimateSize: () => estimatedSize,
+    overscan: 5,
+  });
+
+  const items = virtualizer.getVirtualItems();
+
+  return (
+    <div
+      style={{
+        height: virtualizer.getTotalSize(),
+        width: "100%",
+        position: "relative",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          transform: `translateY(${items[0]?.start ?? 0}px)`,
+        }}
+      >
+        {items.map((item) => (
+          <div
+            key={item.key}
+            data-index={item.index}
+            ref={virtualizer.measureElement}
+          >
+            {renderItem(data[item.index] as T, item.index)}
+          </div>
+        ))}
       </div>
     </div>
   );

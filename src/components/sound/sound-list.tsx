@@ -30,14 +30,14 @@ type SoundTableListProps = {
   isGuildAvailable?: boolean;
 };
 
-function SoundRow({
+export function SoundRow({
   sound,
   discordSoundId,
   guildId,
   external,
   className,
   isGuildAvailable = true,
-}: SoundListData & { className: string }) {
+}: SoundListData & { className?: string }) {
   const { play } = useAudio();
   const size = 70;
 
