@@ -79,7 +79,7 @@ export function InfiniteScroll<T>({
 
   useEffect(() => {
     const savedDisplayAsGrid = localStorage.getItem("displayAsGrid");
-    setDisplayAsGrid(savedDisplayAsGrid === "true");
+    if (savedDisplayAsGrid) setDisplayAsGrid(savedDisplayAsGrid === "true");
   }, []);
 
   if (displayAsGrid && !gridEstimatedSize) {
@@ -103,7 +103,7 @@ export function InfiniteScroll<T>({
         </Button>
         <Button
           size="icon"
-          variant={displayAsGrid === false ? "default" : "outline"}
+            variant={!displayAsGrid ? "default" : "outline"}
           onClick={() => changeDisplayType(false)}
         >
           <List />

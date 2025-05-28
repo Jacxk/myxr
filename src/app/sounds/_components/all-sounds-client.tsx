@@ -46,6 +46,7 @@ export function AllSoundsClient({ initialData }: AllSoundsClient) {
           listEstimatedSize={105}
           gridEstimatedSize={220}
           minItemWidth={160}
+          displayType="grid"
         />
       </AudioProvider>
     </div>
