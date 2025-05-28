@@ -43,7 +43,6 @@ export function AllSoundsClient({ initialData }: AllSoundsClient) {
           loadMore={fetchNextPage}
           hasMore={hasNextPage}
           isLoading={isFetchingNextPage}
-          offsetPx={1000}
           listEstimatedSize={105}
           gridEstimatedSize={220}
           minItemWidth={160}
