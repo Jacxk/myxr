@@ -125,6 +125,7 @@ export function Notifications() {
               ) : null
             }
             manualTrigger={false}
+            useTypeToggle={false}
           />
         </DropdownMenuGroup>
         <DropdownMenuSeparator />

@@ -12,6 +12,7 @@ export type InfiniteScrollProps<T> = {
   data: T[];
   hasMore: boolean;
   isLoading: boolean;
+  useTypeToggle?: boolean;
   listEstimatedSize?: number;
   gridEstimatedSize?: number;
   minItemWidth?: number;
@@ -51,6 +52,7 @@ export function InfiniteScroll<T>({
   children,
   title,
   displayType,
+  useTypeToggle = true,
   minItemWidth = 200,
   loader = <p className="text-center text-gray-500">Loading...</p>,
   endMessage = <p className="text-center text-gray-500">No more results.</p>,
@@ -78,37 +80,40 @@ export function InfiniteScroll<T>({
   };
 
   useEffect(() => {
+    if (!useTypeToggle) return;
     const savedDisplayAsGrid = localStorage.getItem("displayAsGrid");
     if (savedDisplayAsGrid) setDisplayAsGrid(savedDisplayAsGrid === "true");
   }, []);
 
-  if (displayAsGrid && !gridEstimatedSize) {
+  if (displayAsGrid === true && !gridEstimatedSize) {
     throw new Error("Must specify 'gridEstimatedSize' for grid type layout");
   }
 
-  if (!displayAsGrid && !listEstimatedSize) {
+  if (displayAsGrid === false && !listEstimatedSize) {
     throw new Error("Must specify 'listEstimatedSize' for list type layout");
   }
 
   return (
     <div className="flex flex-col gap-4">
       {title}
-      <div className="flex gap-2">
-        <Button
-          size="icon"
-          variant={displayAsGrid === true ? "default" : "outline"}
-          onClick={() => changeDisplayType(true)}
-        >
-          <Grid />
-        </Button>
-        <Button
-          size="icon"
+      {useTypeToggle && (
+        <div className="flex gap-2">
+          <Button
+            size="icon"
+            variant={displayAsGrid === true ? "default" : "outline"}
+            onClick={() => changeDisplayType(true)}
+          >
+            <Grid />
+          </Button>
+          <Button
+            size="icon"
             variant={!displayAsGrid ? "default" : "outline"}
-          onClick={() => changeDisplayType(false)}
-        >
-          <List />
-        </Button>
-      </div>
+            onClick={() => changeDisplayType(false)}
+          >
+            <List />
+          </Button>
+        </div>
+      )}
       {children}
       {!displayAsGrid && renderListItem && (
         <ListVirtualizer
