@@ -1,7 +1,7 @@
 "use client";
 
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { InView } from "react-intersection-observer";
 import { Button } from "./ui/button";
 
@@ -10,7 +10,7 @@ export type InfiniteScrollProps<T> = {
   displayType?: "grid" | "list";
   listEstimatedSize: number;
   gridEstimatedSize: number;
-  itemsPerRow?: number;
+  minItemWidth?: number;
   hasMore: boolean;
   isLoading: boolean;
   children?: React.ReactNode;
@@ -35,7 +35,7 @@ interface ListVirtualizerProps<T> {
 interface GridVirtualizerProps<T> {
   data: T[];
   estimatedSize: number;
-  itemsPerRow: number;
+  minItemWidth: number;
   renderItem: (item: T, index: number) => ReactNode;
 }
 
@@ -46,7 +46,7 @@ export function InfiniteScroll<T>({
   renderGridItem,
   listEstimatedSize,
   gridEstimatedSize,
-  itemsPerRow = 4,
+  minItemWidth = 200,
   loadMore,
   hasMore,
   isLoading,
@@ -83,7 +83,7 @@ export function InfiniteScroll<T>({
           data={data}
           renderItem={renderGridItem}
           estimatedSize={gridEstimatedSize}
-          itemsPerRow={itemsPerRow}
+          minItemWidth={minItemWidth}
         />
       )}
 
@@ -152,10 +152,33 @@ function ListVirtualizer<T>({
 function GridVirtualizer<T>({
   data,
   estimatedSize,
-  itemsPerRow,
+  minItemWidth,
   renderItem,
 }: GridVirtualizerProps<T>) {
-  const rowCount = Math.ceil(data.length / itemsPerRow);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = React.useState(0);
+
+  const columns = Math.max(1, Math.floor(containerWidth / minItemWidth));
+  const rowCount = Math.ceil(data.length / columns);
+
+  React.useEffect(() => {
+    const updateWidth = () => {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.offsetWidth);
+      }
+    };
+
+    const observer = new ResizeObserver(updateWidth);
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    updateWidth();
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   const virtualizer = useWindowVirtualizer({
     count: rowCount,
@@ -167,6 +190,7 @@ function GridVirtualizer<T>({
 
   return (
     <div
+      ref={containerRef}
       style={{
         height: virtualizer.getTotalSize(),
         width: "100%",
@@ -183,8 +207,8 @@ function GridVirtualizer<T>({
         }}
       >
         {rows.map((row) => {
-          const startIndex = row.index * itemsPerRow;
-          const endIndex = Math.min(startIndex + itemsPerRow, data.length);
+          const startIndex = row.index * columns;
+          const endIndex = Math.min(startIndex + columns, data.length);
           const rowItems = data.slice(startIndex, endIndex);
 
           return (
@@ -194,7 +218,7 @@ function GridVirtualizer<T>({
               ref={virtualizer.measureElement}
               className="grid gap-4"
               style={{
-                gridTemplateColumns: `repeat(${itemsPerRow}, minmax(0, 1fr))`,
+                gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
               }}
             >
               {rowItems.map((item, index) => (
