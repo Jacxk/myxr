@@ -1,13 +1,12 @@
 "use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Fragment } from "react";
 import type { z } from "zod";
-import AdDisplay from "~/components/ad/ad-display";
 import { InfiniteScroll } from "~/components/infinite-scroll";
 import Sound from "~/components/sound/sound";
-import { SoundsGrid } from "~/components/sound/sounds-grid";
+import { AudioProvider } from "~/context/AudioContext";
 import { type RouterOutputs, useTRPC } from "~/trpc/react";
+import { SoundRow, Sound as SoundType } from "./sound-list";
 
 interface SoundsSearchClientProps {
   initialData: RouterOutputs["sound"]["search"];
@@ -45,26 +44,20 @@ export function SoundsSearchClient({
   return (
     <>
       <h1 className="mb-4 text-xl">Searching Sounds: {query}</h1>
-      <InfiniteScroll
-        loadMore={fetchNextPage}
-        hasMore={hasNextPage}
-        isLoading={isPending}
-        endMessage={!hasData ? "No sounds where found." : ""}
-      >
-        <SoundsGrid>
-          {sounds.map((sound, i) => (
-            <Fragment key={sound.id}>
-              <Sound sound={sound} />
-              <AdDisplay
-                adSlot="1944402367"
-                width="100%"
-                height="100%"
-                showProbability={i === sounds.length - 1 ? 1 : 0.4}
-              />
-            </Fragment>
-          ))}
-        </SoundsGrid>
-      </InfiniteScroll>
+      <AudioProvider>
+        <InfiniteScroll
+          data={sounds}
+          renderListItem={(item) => <SoundRow sound={item as SoundType} />}
+          renderGridItem={(item) => <Sound sound={item} />}
+          loadMore={fetchNextPage}
+          hasMore={hasNextPage}
+          isLoading={isPending}
+          endMessage={!hasData ? "No sounds where found." : ""}
+          listEstimatedSize={105}
+          gridEstimatedSize={220}
+          minItemWidth={160}
+        />
+      </AudioProvider>
     </>
   );
 }

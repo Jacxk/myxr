@@ -11,7 +11,7 @@ import { AddToGuildButton } from "./add-button";
 import { DeleteSoundButton } from "./delete-button";
 import { LikeButton } from "./like-button";
 
-type Sound = NonNullable<
+export type Sound = NonNullable<
   RouterOutputs["sound"]["getAllSounds"]["sounds"]
 >[number];
 

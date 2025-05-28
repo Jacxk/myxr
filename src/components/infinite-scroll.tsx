@@ -10,10 +10,10 @@ type DisplayType = "grid" | "list";
 
 export type InfiniteScrollProps<T> = {
   data: T[];
-  listEstimatedSize: number;
-  gridEstimatedSize: number;
   hasMore: boolean;
   isLoading: boolean;
+  listEstimatedSize?: number;
+  gridEstimatedSize?: number;
   minItemWidth?: number;
   displayType?: DisplayType;
   children?: React.ReactNode;
@@ -82,6 +82,14 @@ export function InfiniteScroll<T>({
     setDisplayAsGrid(savedDisplayAsGrid === "true");
   }, []);
 
+  if (displayAsGrid && !gridEstimatedSize) {
+    throw new Error("Must specify 'gridEstimatedSize' for grid type layout");
+  }
+
+  if (!displayAsGrid && !listEstimatedSize) {
+    throw new Error("Must specify 'listEstimatedSize' for list type layout");
+  }
+
   return (
     <div className="flex flex-col gap-4">
       {title}
@@ -106,7 +114,7 @@ export function InfiniteScroll<T>({
         <ListVirtualizer
           data={data}
           renderItem={renderListItem}
-          estimatedSize={listEstimatedSize}
+          estimatedSize={listEstimatedSize!}
         />
       )}
 
@@ -114,7 +122,7 @@ export function InfiniteScroll<T>({
         <GridVirtualizer
           data={data}
           renderItem={renderGridItem}
-          estimatedSize={gridEstimatedSize}
+          estimatedSize={gridEstimatedSize!}
           minItemWidth={minItemWidth}
         />
       )}

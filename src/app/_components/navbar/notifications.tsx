@@ -110,6 +110,10 @@ export function Notifications() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup className="max-h-[300px] overflow-y-auto">
           <InfiniteScroll
+            data={notifications}
+            displayType="list"
+            renderListItem={(item) => <NotificationItem notification={item} />}
+            listEstimatedSize={100}
             loadMore={fetchNextPage}
             hasMore={hasNextPage}
             isLoading={isLoading}
@@ -121,14 +125,7 @@ export function Notifications() {
               ) : null
             }
             manualTrigger={false}
-          >
-            {notifications.map((notification) => (
-              <NotificationItem
-                key={notification.id}
-                notification={notification}
-              />
-            ))}
-          </InfiniteScroll>
+          />
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem
