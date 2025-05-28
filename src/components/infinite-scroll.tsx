@@ -9,6 +9,8 @@ export type InfiniteScrollProps<T> = {
   data: T[];
   displayType?: "grid" | "list";
   listEstimatedSize: number;
+  gridEstimatedSize: number;
+  itemsPerRow?: number;
   hasMore: boolean;
   isLoading: boolean;
   children?: React.ReactNode;
@@ -30,11 +32,21 @@ interface ListVirtualizerProps<T> {
   renderItem: (item: T, index: number) => ReactNode;
 }
 
+interface GridVirtualizerProps<T> {
+  data: T[];
+  estimatedSize: number;
+  itemsPerRow: number;
+  renderItem: (item: T, index: number) => ReactNode;
+}
+
 export function InfiniteScroll<T>({
   data,
   displayType = "list",
   renderListItem,
+  renderGridItem,
   listEstimatedSize,
+  gridEstimatedSize,
+  itemsPerRow = 4,
   loadMore,
   hasMore,
   isLoading,
@@ -58,13 +70,23 @@ export function InfiniteScroll<T>({
       {title}
       {children}
 
-      {displayType === "list" && (
+      {displayType === "list" && renderListItem && (
         <ListVirtualizer
           data={data}
-          renderItem={renderListItem!}
+          renderItem={renderListItem}
           estimatedSize={listEstimatedSize}
         />
       )}
+
+      {displayType === "grid" && renderGridItem && (
+        <GridVirtualizer
+          data={data}
+          renderItem={renderGridItem}
+          estimatedSize={gridEstimatedSize}
+          itemsPerRow={itemsPerRow}
+        />
+      )}
+
       <InView
         rootMargin={`0px 0px ${offsetPx}px 0px`}
         threshold={threshold}
@@ -122,6 +144,67 @@ function ListVirtualizer<T>({
             {renderItem(data[item.index] as T, item.index)}
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function GridVirtualizer<T>({
+  data,
+  estimatedSize,
+  itemsPerRow,
+  renderItem,
+}: GridVirtualizerProps<T>) {
+  const rowCount = Math.ceil(data.length / itemsPerRow);
+
+  const virtualizer = useWindowVirtualizer({
+    count: rowCount,
+    estimateSize: () => estimatedSize,
+    overscan: 5,
+  });
+
+  const rows = virtualizer.getVirtualItems();
+
+  return (
+    <div
+      style={{
+        height: virtualizer.getTotalSize(),
+        width: "100%",
+        position: "relative",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          transform: `translateY(${rows[0]?.start ?? 0}px)`,
+        }}
+      >
+        {rows.map((row) => {
+          const startIndex = row.index * itemsPerRow;
+          const endIndex = Math.min(startIndex + itemsPerRow, data.length);
+          const rowItems = data.slice(startIndex, endIndex);
+
+          return (
+            <div
+              key={row.key}
+              data-index={row.index}
+              ref={virtualizer.measureElement}
+              className="grid gap-4"
+              style={{
+                gridTemplateColumns: `repeat(${itemsPerRow}, minmax(0, 1fr))`,
+              }}
+            >
+              {rowItems.map((item, index) => (
+                <div key={startIndex + index}>
+                  {renderItem(item, startIndex + index)}
+                </div>
+              ))}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { Grid2X2, List } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import Sound from "~/components/sound/sound";
 import { SoundRow } from "~/components/sound/sound-list";
 import { Button } from "~/components/ui/button";
 import { AudioProvider } from "~/context/AudioContext";
@@ -68,11 +69,14 @@ export function AllSoundsClient({ initialData }: AllSoundsClient) {
         <InfiniteScroll
           data={allSounds}
           renderListItem={(item) => <SoundRow sound={item} />}
+          renderGridItem={(item) => <Sound sound={item} />}
           loadMore={fetchNextPage}
           hasMore={hasNextPage}
           isLoading={isFetchingNextPage}
           offsetPx={1000}
           listEstimatedSize={105}
+          gridEstimatedSize={220}
+          displayType={displayAsGrid === false ? "list" : "grid"}
         />
       </AudioProvider>
     </div>
