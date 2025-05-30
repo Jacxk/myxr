@@ -226,43 +226,97 @@ export const SoundQuery = {
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-      const trendingSounds = await db.sound.findMany({
-        where: {
-          createdBy: {
-            banned: false,
-          },
-        },
-        take: limit + 1,
-        skip: cursor ? 1 : 0,
-        cursor: cursor ? { id: cursor } : undefined,
-        include: {
-          createdBy: true,
-          downloadedSound: true,
-          likedBy: true,
-        },
-      });
+      type TrendingSound = {
+        id: string;
+        name: string;
+        emoji: string;
+        url: string;
+        usegeCount: number;
+        shareCount: number;
+        createdAt: Date;
+        updatedAt: Date;
+        createdById: string;
+        deletedAt: Date | null;
+        recentLikes: number;
+        recentDownloads: number;
+        trendingScore: number;
+        likedBy: { userId: string; createdAt: Date; soundId: string }[];
+        createdBy: {
+          id: string;
+          name: string | null;
+          image: string | null;
+        };
+      };
 
-      sounds = trendingSounds
-        .map((sound) => {
-          const recentLikes = sound.likedBy.filter(
-            (like) => like.createdAt >= thirtyDaysAgo,
-          );
-          const recentDownloads = sound.downloadedSound.filter(
-            (download) => download.createdAt >= thirtyDaysAgo,
-          );
+      sounds = await db.$queryRaw<TrendingSound[]>`
+        WITH recent_activity AS (
+          SELECT 
+            s.id,
+            s.name,
+            s.emoji,
+            s.url,
+            s."usegeCount" as "usegeCount",
+            s."shareCount" as "shareCount",
+            s."createdAt" as "createdAt",
+            s."updatedAt" as "updatedAt",
+            s."createdById" as "createdById",
+            s."deletedAt" as "deletedAt",
+            (
+              SELECT COUNT(DISTINCT "userId")
+              FROM "LikedSound" l
+              WHERE l."soundId" = s.id
+              AND l."createdAt" >= ${thirtyDaysAgo}
+            ) as "recentLikes",
+            (
+              SELECT COUNT(DISTINCT id)
+              FROM "DownloadedSound" d
+              WHERE d."soundId" = s.id
+              AND d."createdAt" >= ${thirtyDaysAgo}
+            ) as "recentDownloads",
+            COALESCE(
+              json_agg(
+                json_build_object(
+                  'userId', l."userId",
+                  'createdAt', l."createdAt",
+                  'soundId', l."soundId"
+                )
+              ) FILTER (WHERE l."userId" IS NOT NULL),
+              '[]'
+            ) as "likedBy",
+            json_build_object(
+              'id', u.id,
+              'name', u.name,
+              'image', u.image
+            ) as "createdBy"
+          FROM "Sound" s
+          LEFT JOIN "LikedSound" l ON s.id = l."soundId"
+          LEFT JOIN "user" u ON s."createdById" = u.id
+          WHERE s."deletedAt" IS NULL
+          GROUP BY s.id, u.id, u.name, u.image
+        ),
+        ranked_sounds AS (
+          SELECT 
+            *,
+            ("usegeCount" * 5 + "recentLikes" * 4 + "recentDownloads" * 3 + "shareCount") as "trendingScore"
+          FROM recent_activity
+        )
+        SELECT * FROM ranked_sounds
+        WHERE 
+          CASE 
+            WHEN ${cursor}::text IS NOT NULL THEN
+              ("trendingScore" < (SELECT "trendingScore" FROM ranked_sounds WHERE id = ${cursor}::text)
+              OR ("trendingScore" = (SELECT "trendingScore" FROM ranked_sounds WHERE id = ${cursor}::text)
+                  AND id > ${cursor}::text))
+            ELSE true
+          END
+        ORDER BY "trendingScore" DESC, id ASC
+        LIMIT ${limit + 1}
+      `;
 
-          const trendingScore =
-            sound.usegeCount * 5 +
-            recentLikes.length * 4 +
-            recentDownloads.length * 3 +
-            sound.shareCount;
-
-          return {
-            ...sound,
-            trendingScore,
-          };
-        })
-        .sort((a, b) => b.trendingScore - a.trendingScore);
+      // If we have a cursor, we need to filter out the previous item
+      if (cursor) {
+        sounds = sounds.filter((sound) => sound.id !== cursor);
+      }
     } else {
       sounds = await db.sound.findMany({
         where: {
