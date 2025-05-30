@@ -16,28 +16,63 @@ import Navbar from "./_components/navbar";
 export const metadata: Metadata = {
   metadataBase: new URL("https://myxr.cc"),
   title: {
-    default: "myxr",
-    template: "%s | myxr",
+    default: "myxr - Discord Soundboard Manager",
+    template: "%s | myxr - Discord Soundboard Manager",
   },
-  description: "Upload sounds to Discord with ease",
-  icons: { icon: "/favicon.ico" },
+  description:
+    "Upload, manage, and share custom sounds for your Discord soundboard. Create the perfect soundboard experience with myxr's easy-to-use sound management platform.",
+  keywords: [
+    "Discord soundboard",
+    "sound management",
+    "custom sounds",
+    "Discord bot",
+    "sound upload",
+    "audio sharing",
+    "Discord audio",
+    "sound effects",
+    "Discord sound effects",
+    "Discord sound manager",
+    "Discord audio bot",
+    "Discord sound upload",
+  ],
+  authors: [{ name: "Jacxk" }],
+  creator: "Jacxk",
+  publisher: "Jacxk",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+    shortcut: "/favicon.ico",
+  },
   openGraph: {
-    title: "Myxr",
-    description: "Upload sounds to Discord with ease",
+    title: "myxr - Discord Soundboard Manager",
+    description:
+      "Upload, manage, and share custom sounds for your Discord soundboard. Create the perfect soundboard experience with myxr's easy-to-use sound management platform.",
     url: "https://myxr.cc",
-    siteName: "Myxr",
+    siteName: "myxr",
     type: "website",
     locale: "en_US",
-    // TODO: Add images
-    // images: "/og.png",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "myxr - Discord Soundboard Manager",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Myxr",
-    description: "Upload sounds to Discord with ease",
-    // TODO: Add images
-    // images: "/og.png",
+    title: "myxr",
+    description:
+      "Upload, manage, and share custom sounds for your Discord soundboard. Create the perfect soundboard experience with myxr's easy-to-use sound management platform.",
+    images: ["/og-image.jpg"],
   },
+  category: "Discord Tools",
 };
 
 export default function RootLayout({
