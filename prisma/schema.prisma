@@ -178,7 +178,7 @@ model SoundReport {
     actionTaken ActionStatus @default(IN_PROGRESS)
     actionText  String?
     user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-    sound       Sound        @relation(fields: [soundId], references: [id])
+    sound       Sound        @relation(fields: [soundId], references: [id], onDelete: Cascade)
 
     @@index([userId])
     @@index([soundId])
