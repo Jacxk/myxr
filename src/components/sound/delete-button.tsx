@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { usePostHog } from "posthog-js/react";
 import { type MouseEvent, useState } from "react";
 import { toast } from "sonner";
+import { ErrorToast } from "~/lib/messages/toast.global";
 import { useTRPC } from "~/trpc/react";
 import { Button } from "../ui/button";
 import { DialogContent, DialogFooter, DialogHeader } from "../ui/dialog";
@@ -46,6 +47,9 @@ export function DeleteSoundButton({
       },
       onSettled: () => {
         setOpen(false);
+      },
+      onError: () => {
+        ErrorToast.unauthorized();
       },
     }),
   );

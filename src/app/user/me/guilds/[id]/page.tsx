@@ -40,9 +40,12 @@ async function GuildContent({ id }: { id: string }) {
   const isGuildAvailable = data.error?.code !== 10004;
 
   if (!guild) {
+    // TODO: Add the invite logic here
     return (
       <div className="flex w-full flex-wrap items-center justify-center">
-        <span>This guild does not exist... weird.</span>
+        <span>
+          It looks like the bot is not in that Guild... can you invite it?
+        </span>
       </div>
     );
   }
