@@ -26,4 +26,17 @@ export const UserDiscordApi = {
       return [];
     }
   },
+  async getAllGuilds(userId: string) {
+    try {
+      const authorization = await discordAuthorization(userId);
+      const data = await createDiscordRequest<APIGuild[]>(
+        "users/@me/guilds",
+        authorization,
+      );
+
+      return data;
+    } catch {
+      return [];
+    }
+  },
 };

@@ -9,6 +9,7 @@ import { NotificationQueries } from "~/utils/db/queries/notification";
 import { ReportQuery } from "~/utils/db/queries/report";
 import { SoundQuery } from "~/utils/db/queries/sound";
 import { UserQuery } from "~/utils/db/queries/user";
+import { UserDiscordApi } from "~/utils/discord/user-api";
 
 export const userRouter = createTRPCRouter({
   getSounds: publicProcedure.input(z.string()).query(async ({ input }) => {
@@ -116,4 +117,8 @@ export const userRouter = createTRPCRouter({
         return NotificationMutations.deleteMany(input.ids);
       }
     }),
+  getGuilds: protectedProcedure.query(({ ctx }) => {
+    const userId = ctx.session.user.id;
+    return UserDiscordApi.getAllGuilds(userId);
+  }),
 });

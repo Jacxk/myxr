@@ -1,7 +1,11 @@
 import { unauthorized } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { getServerSession } from "~/lib/auth";
+import { api } from "~/trpc/server";
 import { TabLink } from "../_components/tab-link";
+
+const getImage = (icon: string | null, id: string) =>
+  icon ? `https://cdn.discordapp.com/icons/${id}/${icon}.png` : null;
 
 export default async function Layout({
   children,
@@ -11,7 +15,7 @@ export default async function Layout({
   const session = await getServerSession();
   if (!session) return unauthorized();
 
-  const guilds = session.user.guilds;
+  const guilds = await api.user.getGuilds();
 
   return (
     <div className="flex w-full flex-col">
@@ -23,10 +27,10 @@ export default async function Layout({
             path={`/user/me/guilds/${guild.id}`}
           >
             <Avatar title={guild.name}>
-              {guild.image && (
+              {getImage(guild.icon, guild.id) && (
                 <AvatarImage
                   className="rounded-full"
-                  src={guild.image + "?size=32"}
+                  src={getImage(guild.icon, guild.id) + "?size=32"}
                   alt={guild.name}
                   useNextImage
                 />
