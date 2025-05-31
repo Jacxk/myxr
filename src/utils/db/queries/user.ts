@@ -30,11 +30,19 @@ export const UserQuery = {
     });
   },
 
-  hasSoundBoardCreatePermission: async (guildId: string, userId: string) => {
+  hasSoundBoardManagePermission: async (guildId: string, userId: string) => {
     const guildRoles = await db.guild.findFirst({
       where: { id: guildId },
       select: {
         soundMasterRoles: true,
+        users: {
+          where: {
+            userId,
+          },
+          select: {
+            canManage: true,
+          },
+        },
       },
     });
     const discordId = await UserQuery.getDiscordId(userId);
@@ -46,7 +54,7 @@ export const UserQuery = {
       guildRoles?.soundMasterRoles.some((guildRole) => guildRole === role),
     );
 
-    return hasPermission;
+    return hasPermission || guildRoles?.users[0]?.canManage;
   },
 
   getUser: async (id: string) => {
