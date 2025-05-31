@@ -60,7 +60,7 @@ export const UserQuery = {
   getUser: async (id: string) => {
     const user = await db.user.findFirst({
       where: {
-        id,
+        OR: [{ id }, { accounts: { some: { accountId: id } } }],
         banned: false,
       },
       include: {
