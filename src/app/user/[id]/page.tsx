@@ -52,10 +52,7 @@ export default async function UserPage({
   const user = await getUser(id);
   const sounds = await api.user.getSounds(id);
 
-  if (sounds.length === 0) return notFound();
-
   const session = await getServerSession();
-  const createdBy = sounds[0]?.createdBy;
   const followerCount = user._count.followers;
 
   return (
@@ -65,8 +62,8 @@ export default async function UserPage({
           <div className="relative">
             <Avatar className="size-24 shrink-0 rounded-full">
               <AvatarImage
-                src={createdBy?.image + "?size=96"}
-                alt={createdBy?.name ?? ""}
+                src={user.image + "?size=96"}
+                alt={user.name ?? ""}
                 useNextImage
               />
               <AvatarFallback delayMs={500}>
@@ -119,11 +116,17 @@ export default async function UserPage({
           layoutKey="-f9+4w+7x-eg+3a"
           showProbability={1}
         />
-        <SoundsGrid>
-          {sounds.map((sound) => (
-            <Sound key={sound.id} sound={sound} />
-          ))}
-        </SoundsGrid>
+        {sounds.length > 0 ? (
+          <SoundsGrid>
+            {sounds.map((sound) => (
+              <Sound key={sound.id} sound={sound} />
+            ))}
+          </SoundsGrid>
+        ) : (
+          <span className="text-muted-foreground">
+            User has not uploaded any sound yet.
+          </span>
+        )}
       </div>
     </div>
   );
