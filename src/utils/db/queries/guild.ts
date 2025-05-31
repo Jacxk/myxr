@@ -55,4 +55,17 @@ export const GuildQuery = {
       },
     });
   },
+  getGuildsWithSoundsCount: async () => {
+    const [data] = await db.$queryRaw<[{ count: number }]>`
+      SELECT COUNT(*) as count
+      FROM "Guild" guild
+      WHERE EXISTS (
+        SELECT 1
+        FROM "GuildSound" guildSound
+        WHERE guildSound."guildId" = guild.id
+      )
+    `;
+
+    return data.count;
+  },
 };

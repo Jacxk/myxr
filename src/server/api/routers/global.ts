@@ -8,7 +8,7 @@ export const globalRouter = createTRPCRouter({
     const [soundCount, userCount, guildCount] = await Promise.all([
       SoundQuery.getSoundCount(),
       UserQuery.getUserCount(),
-      GuildQuery.getGuildCount(),
+      GuildQuery.getGuildsWithSoundsCount(),
     ]);
 
     return {

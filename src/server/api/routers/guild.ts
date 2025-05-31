@@ -131,7 +131,6 @@ export const guildRouter = createTRPCRouter({
         GuildQuery.getNotificationChannel(input.guildId),
       ]);
 
-      console.log("🚀 ~ .query ~ query:", query);
       return discordChannels.map((channel) => ({
         ...channel,
         selected: query?.notificationsChannel === channel.id,
