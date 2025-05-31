@@ -86,7 +86,7 @@ function SoundRow({
           )}
         </div>
       </div>
-      <div className="flex gap-2 self-end">
+      <div className="flex items-center gap-2 self-end">
         {!external ? (
           <>
             <AddToGuildButton soundId={sound.id} soundName={sound.name} />
