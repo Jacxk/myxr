@@ -34,11 +34,45 @@ export async function generateMetadata({
   const { id } = await params;
 
   const user = await getUser(id);
+  const sounds = await api.user.getSounds(id);
+  const followerCount = user._count.followers;
+
+  const title = `${user.name} - User Profile`;
+  const description = `${user.name} has uploaded ${sounds.length} sounds and has ${followerCount} followers on myxr. Check out their profile!`;
 
   return {
-    title: `${user.name} - User`,
-    description: `View ${user.name}'s profile on Myxr`,
+    title,
+    description,
     authors: [{ name: user.name }],
+    openGraph: {
+      title,
+      description,
+      type: "profile",
+      url: `https://myxr.cc/user/${id}`,
+      images: [
+        {
+          url: user.image + "?size=1200",
+          width: 1200,
+          height: 1200,
+          alt: `${user.name}'s profile picture`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [user.image + "?size=1200"],
+    },
+    alternates: {
+      canonical: `https://myxr.cc/user/${id}`,
+    },
+    other: {
+      "profile:username": user.name,
+      "profile:followers": followerCount.toString(),
+      "profile:sounds": sounds.length.toString(),
+      "profile:role": user.role,
+    },
   };
 }
 

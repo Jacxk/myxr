@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import { cache } from "react";
+import { getEmojiUrl } from "~/components/emoji-image";
+import { env } from "~/env";
 import { api } from "~/trpc/server";
 import { RelatedSounds } from "./_components/related-sounds";
 import { SoundPage } from "./_components/sound-page";
@@ -20,8 +22,41 @@ export async function generateMetadata({
 
   const sound = await getSound(id);
 
+  const title = `${sound.name} - Sound`;
+  const description = `Check out this sound: ${sound.name} by ${sound.createdBy.name}${sound.tags.length > 0 ? `- Tags: ${sound.tags.map((tag) => tag.name).join(", ")}` : ""}.`;
+
   return {
-    title: `${sound.name} - Sound`,
+    title,
+    description,
+    authors: [{ name: sound.createdBy.name }],
+    openGraph: {
+      title,
+      description,
+      type: "music.song",
+      url: `${env.NEXT_PUBLIC_BASE_URL}/sounds/${id}`,
+      audio: sound.url,
+      images: [
+        {
+          url: getEmojiUrl(sound.emoji, true),
+          width: 1200,
+          height: 1200,
+          alt: `${sound.name} sound emoji`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [getEmojiUrl(sound.emoji)],
+    },
+    alternates: {
+      canonical: `${env.NEXT_PUBLIC_BASE_URL}/sounds/${id}`,
+    },
+    other: {
+      "audio:artist": sound.createdBy.name,
+      "audio:tags": sound.tags.map((tag) => tag.name).join(", "),
+    },
   };
 }
 

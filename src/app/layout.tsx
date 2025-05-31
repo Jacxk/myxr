@@ -8,13 +8,14 @@ import { ThemeProvider } from "next-themes";
 import NextTopLoader from "nextjs-toploader";
 import { PostHogProvider } from "~/components/PostHogProvider";
 import { Toaster } from "~/components/ui/sonner";
+import { env } from "~/env";
 import { TRPCReactProvider } from "~/trpc/react";
 import { HydrateClient } from "~/trpc/server";
 import { Footer } from "./_components/footer";
 import Navbar from "./_components/navbar";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://myxr.cc"),
+  metadataBase: new URL(env.NEXT_PUBLIC_BASE_URL),
   title: {
     default: "myxr - Discord Soundboard Manager",
     template: "%s | myxr - Discord Soundboard Manager",
@@ -52,7 +53,7 @@ export const metadata: Metadata = {
     title: "myxr - Discord Soundboard Manager",
     description:
       "Upload, manage, and share custom sounds for your Discord soundboard. Create the perfect soundboard experience with myxr's easy-to-use sound management platform.",
-    url: "https://myxr.cc",
+    url: env.NEXT_PUBLIC_BASE_URL,
     siteName: "myxr",
     type: "website",
     locale: "en_US",
