@@ -1,5 +1,6 @@
 import "server-only";
 
+import { type Prisma } from "@prisma/client";
 import { db } from "~/server/db";
 import { UserDiscordApi } from "~/utils/discord/user-api";
 import { GuildMutation } from "./guild";
@@ -34,8 +35,9 @@ export const UserMutation = {
     for (const guild of guilds) {
       await GuildMutation.upsertGuild(guild);
 
-      const data = {
+      const data: Prisma.GuildMembershipCreateArgs["data"] = {
         guildId: guild.id,
+        canManage: guild.canManage,
         userId,
       };
 

@@ -7,6 +7,7 @@ import { env } from "~/env";
 import { db } from "~/server/db";
 import { UserMutation } from "~/utils/db/mutations/user";
 import { GuildQuery } from "~/utils/db/queries/guild";
+import { UserQuery } from "~/utils/db/queries/user";
 
 export const auth = betterAuth({
   database: prismaAdapter(db, { provider: "postgresql" }),
@@ -24,8 +25,8 @@ export const auth = betterAuth({
     customSession(async ({ user, session }) => {
       await UserMutation.updateGuildMemberShip(session.userId);
 
-      const guilds = await GuildQuery.getUserGuilds(session.userId);
-      guilds?.sort((a, b) => a.guild.name.localeCompare(b.guild.name));
+      const data = await GuildQuery.getUserGuilds(session.userId);
+      const discordId = await UserQuery.getDiscordId(user.id);
 
       const role = await db.user
         .findUnique({
@@ -37,8 +38,13 @@ export const auth = betterAuth({
       return {
         user: {
           ...user,
+          discordId: discordId!,
           role,
-          guilds: guilds?.map(({ guild }) => ({ ...guild })) ?? [],
+          guilds:
+            data?.guilds.map(({ guild, canManage }) => ({
+              ...guild,
+              canManage,
+            })) ?? [],
         },
         session,
       };

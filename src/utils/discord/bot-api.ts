@@ -82,9 +82,7 @@ export const BotDiscordApi = {
       BOT_AUTHORIZATION,
     );
 
-    return {
-      roles: data.roles,
-    };
+    return data.roles;
   },
 
   async getAllTextChannels(guildId: string) {

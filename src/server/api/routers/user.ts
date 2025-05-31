@@ -5,6 +5,7 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import { NotificationMutations } from "~/utils/db/mutations/notification";
+import { GuildQuery } from "~/utils/db/queries/guild";
 import { NotificationQueries } from "~/utils/db/queries/notification";
 import { ReportQuery } from "~/utils/db/queries/report";
 import { SoundQuery } from "~/utils/db/queries/sound";
@@ -119,6 +120,11 @@ export const userRouter = createTRPCRouter({
     }),
   getGuilds: protectedProcedure.query(({ ctx }) => {
     const userId = ctx.session.user.id;
-    return UserDiscordApi.getAllGuilds(userId);
+    return UserDiscordApi.getGuilds(userId);
+  }),
+  getDbGuilds: protectedProcedure.query(({ ctx }) => {
+    const userId = ctx.session.user.id;
+
+    return GuildQuery.getUserGuilds(userId);
   }),
 });

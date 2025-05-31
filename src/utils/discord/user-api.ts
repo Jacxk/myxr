@@ -14,27 +14,15 @@ export const UserDiscordApi = {
         authorization,
       );
 
-      return data.filter(
-        (guild: APIGuild) =>
+      return data.map((guild: APIGuild) => ({
+        ...guild,
+        canManage:
           guild.owner ??
           hasPermission(
             guild.permissions,
             DiscordPermission.MANAGE_GUILD_EXPRESSIONS,
           ),
-      );
-    } catch {
-      return [];
-    }
-  },
-  async getAllGuilds(userId: string) {
-    try {
-      const authorization = await discordAuthorization(userId);
-      const data = await createDiscordRequest<APIGuild[]>(
-        "users/@me/guilds",
-        authorization,
-      );
-
-      return data;
+      }));
     } catch {
       return [];
     }

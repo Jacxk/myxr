@@ -156,18 +156,15 @@ export const allowedToManageGuildProtectedProcedure = protectedProcedure
     }),
   )
   .use(async ({ ctx, input, next }) => {
-    const hasPermission = await UserQuery.hasSoundBoardCreatePermission(
+    const hasPermission = await UserQuery.hasSoundBoardManagePermission(
       input.guildId,
       ctx.session.session.userId,
     );
-    const isAdmin =
-      ctx.session.user.guilds.filter((guild) => guild.id === input.guildId)
-        .length > 0;
 
-    if (!(hasPermission || isAdmin))
+    if (!hasPermission)
       throw new TRPCError({
         code: "UNAUTHORIZED",
-        message: "You are not allowed to manage this guild",
+        message: "NO_MANAGE_PERMISSION",
       });
 
     return next({

@@ -25,13 +25,22 @@ export const GuildQuery = {
     });
   },
 
+  getAllSoundMasterRoles: () => {
+    return db.guild.findMany({
+      select: {
+        soundMasterRoles: true,
+        id: true,
+      },
+    });
+  },
+
   getUserGuilds: async (userId: string) => {
     const data = await db.user.findFirst({
       where: { id: userId },
-      select: { guilds: { select: { guild: true } } },
+      select: { guilds: { select: { guild: true, canManage: true } } },
     });
 
-    return data?.guilds;
+    return data;
   },
 
   getGuildCount: () => {

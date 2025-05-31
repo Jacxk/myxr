@@ -3,7 +3,7 @@
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { type Snowflake } from "discord-api-types/v10";
-import { Check, Loader2, Plus } from "lucide-react";
+import { Check, Loader2, Plus, RefreshCcw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { usePostHog } from "posthog-js/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -41,7 +41,8 @@ type Guild = {
   id: Snowflake;
   name: string;
   image: string | null;
-  available: boolean;
+  canManage: boolean;
+  hasRole: boolean;
 };
 
 interface AddToGuildButtonProps {
@@ -67,6 +68,11 @@ const handleInternalServerError = (message: string): void => {
     case "SOUND_NOT_FOUND":
       ErrorToast.soundNotFound();
       break;
+    case "NO_MANAGE_PERMISSION":
+      toast.error(
+        "You need to have a sound master role to add sounds to this guild.",
+      );
+      break;
   }
 };
 
@@ -75,43 +81,53 @@ function GuildSelect({
 }: {
   onSelectGuild: (guild?: Guild) => void;
 }) {
-  const { data: session } = useSession();
-  const inputGuilds =
-    session?.user.guilds.map((guild) => ({
-      id: guild.id,
-      name: guild.name,
-      image: guild.image,
-    })) ?? [];
-
   const api = useTRPC();
+
   const {
     data: guilds,
     isFetching,
     isLoading,
     refetch,
-  } = useQuery(api.guild.getAvailableGuilds.queryOptions(inputGuilds));
+    isRefetching,
+    dataUpdatedAt,
+  } = useQuery(api.guild.getAvailableGuilds.queryOptions());
 
   const [selectedGuild, setSelectedGuild] = useState<Guild>();
   const [invitedGuildId, setInvitedGuildId] = useState<string>();
 
-  const availableGuilds = guilds?.filter((guild) => guild.available);
-  const unavailableGuilds = guilds?.filter((guild) => !guild.available);
+  const availableGuilds = guilds?.available ?? [];
+  const unavailableGuilds = guilds?.unavailable ?? [];
 
   const isWaitingForJoin = (guildId: string) =>
-    invitedGuildId === guildId && isFetching;
+    invitedGuildId === guildId && (isFetching || isRefetching);
+
   const hasBotJoined = useMemo(
     () => (guildId: string) =>
       invitedGuildId === guildId &&
       !isFetching &&
-      guilds?.some((guild) => guild.id === guildId && guild.available),
+      guilds?.available.some((guild) => guild.id === guildId),
     [invitedGuildId, isFetching, guilds],
   );
 
-  const onSelect = (guild: Guild) => {
-    if (!guild.available) {
+  const onSelect = (guild: Guild, available = false) => {
+    if (!available) {
+      if (!guild.canManage) {
+        toast.error(
+          "You need management permissions to invite the bot to this guild.",
+        );
+        return;
+      }
       toast.error("You need to invite the bot to this guild first.");
       return;
     }
+
+    if (!guild.canManage && !guild.hasRole) {
+      toast.error(
+        "You need to have a sound master role to add sounds to this guild.",
+      );
+      return;
+    }
+
     localStorage.setItem("selectedGuild", guild.id);
     setSelectedGuild(guild);
     onSelectGuild(guild);
@@ -130,31 +146,43 @@ function GuildSelect({
   };
 
   useEffect(() => {
+    if (!guilds) return;
+
     const savedGuild = localStorage.getItem("selectedGuild");
-    const selectedGuild = guilds?.find((guild) => guild.id === savedGuild);
+    const selectedGuild = guilds.available.find(
+      (guild) => guild.id === savedGuild,
+    );
 
-    setSelectedGuild(selectedGuild);
-    onSelectGuild(selectedGuild);
-
-    void refetch();
-  }, [guilds, refetch, onSelectGuild]);
+    if (selectedGuild && !selectedGuild.canManage && !selectedGuild.hasRole) {
+      setSelectedGuild(undefined);
+      onSelectGuild(undefined);
+      return;
+    }
+    if (selectedGuild) {
+      setSelectedGuild(selectedGuild);
+      onSelectGuild(selectedGuild);
+    }
+  }, [guilds, dataUpdatedAt, onSelectGuild]);
 
   useEffect(() => {
     if (!invitedGuildId) return;
 
     const checkBotJoined = () => {
-      void refetch();
-      if (hasBotJoined(invitedGuildId)) {
-        toast.success("Bot has joined the guild!");
-        setInvitedGuildId(undefined);
-      }
+      refetch()
+        .then(() => {
+          if (hasBotJoined(invitedGuildId)) {
+            toast.success("Bot has joined the guild!");
+          }
+        })
+        .catch(() => ErrorToast.internal())
+        .finally(() => setInvitedGuildId(undefined));
     };
 
     window.addEventListener("focus", checkBotJoined);
     return () => {
       window.removeEventListener("focus", checkBotJoined);
     };
-  }, [invitedGuildId, guilds, isFetching, hasBotJoined, refetch]);
+  }, [invitedGuildId, hasBotJoined, refetch]);
 
   if (isLoading)
     return (
@@ -170,62 +198,100 @@ function GuildSelect({
     );
 
   return (
-    <Command className="max-h-100 overflow-y-auto rounded-lg border shadow-md md:min-w-[450px]">
-      <CommandInput placeholder="Search for a guild..." />
-      <CommandList>
-        <CommandEmpty>No guilds found.</CommandEmpty>
-        <CommandGroup heading="Available Guilds">
-          {!guilds ? (
-            <CommandItem disabled>
-              It looks like you&apos;re not in a guild you can manage.
-            </CommandItem>
-          ) : (
-            guilds.length === 0 && (
+    <>
+      <div className="flex items-center justify-end gap-2">
+        <TooltipProvider>
+          <Tooltip disableHoverableContent>
+            <TooltipTrigger asChild>
+              <Button
+                size="icon"
+                variant="outline"
+                loading={isRefetching}
+                onClick={() => refetch()}
+              >
+                <RefreshCcw />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Refresh Guilds</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+      <Command className="max-h-100 overflow-y-auto rounded-lg border shadow-md md:min-w-[450px]">
+        <CommandInput placeholder="Search for a guild..." />
+        <CommandList>
+          <CommandEmpty>No guilds found.</CommandEmpty>
+          <CommandGroup heading="Available Guilds">
+            {!guilds ? (
               <CommandItem disabled>
-                No available guilds. Invite the bot to one.
+                It looks like you&apos;re not in a guild you can manage.
               </CommandItem>
-            )
-          )}
-          {availableGuilds?.map((guild) => (
-            <CommandItem key={guild.id} onSelect={() => onSelect(guild)}>
-              <Avatar>
-                <AvatarImage src={guild.image ?? undefined} alt={guild.name} />
-                <AvatarFallback className="flex items-center justify-center text-xs">
-                  {guild.name.slice(0, 1).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <span>{guild.name}</span>
-              <CommandShortcut>
-                {selectedGuild?.id === guild.id && <Check />}
-              </CommandShortcut>
-            </CommandItem>
-          ))}
-        </CommandGroup>
-        <CommandGroup heading="Unavailable Guilds">
-          {unavailableGuilds?.map((guild) => (
-            <CommandItem key={guild.id} onSelect={() => onSelect(guild)}>
-              <Avatar>
-                <AvatarImage src={guild.image ?? undefined} alt={guild.name} />
-                <AvatarFallback className="flex items-center justify-center text-xs">
-                  {guild.name.slice(0, 1).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <span>{guild.name}</span>
+            ) : (
+              availableGuilds.length === 0 && (
+                <CommandItem disabled>
+                  No available guilds. Invite the bot to one.
+                </CommandItem>
+              )
+            )}
+            {availableGuilds.map((guild) => (
+              <CommandItem
+                key={guild.id}
+                onSelect={() => onSelect(guild, true)}
+              >
+                <Avatar>
+                  <AvatarImage
+                    src={guild.image ?? undefined}
+                    alt={guild.name}
+                  />
+                  <AvatarFallback className="flex items-center justify-center text-xs">
+                    {guild.name.slice(0, 1).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <span>{guild.name}</span>
+                <CommandShortcut>
+                  {selectedGuild?.id === guild.id ? (
+                    <Check />
+                  ) : !guild.canManage && !guild.hasRole ? (
+                    <span className="text-muted-foreground">
+                      No Permissions
+                    </span>
+                  ) : null}
+                </CommandShortcut>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+          <CommandGroup heading="Unavailable Guilds">
+            {unavailableGuilds.map((guild) => (
+              <CommandItem key={guild.id} onSelect={() => onSelect(guild)}>
+                <Avatar>
+                  <AvatarImage
+                    src={guild.image ?? undefined}
+                    alt={guild.name}
+                  />
+                  <AvatarFallback className="flex items-center justify-center text-xs">
+                    {guild.name.slice(0, 1).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <span>{guild.name}</span>
 
-              <CommandShortcut>
-                <Button
-                  size="sm"
-                  onClick={(event) => onInviteClick(event, guild.id)}
-                  disabled={isWaitingForJoin(guild.id)}
-                >
-                  {isWaitingForJoin(guild.id) ? "Waiting..." : "Invite"}
-                </Button>
-              </CommandShortcut>
-            </CommandItem>
-          ))}
-        </CommandGroup>
-      </CommandList>
-    </Command>
+                <CommandShortcut>
+                  {guild.canManage ? (
+                    <Button
+                      size="sm"
+                      onClick={(event) => onInviteClick(event, guild.id)}
+                      disabled={isWaitingForJoin(guild.id)}
+                    >
+                      {isWaitingForJoin(guild.id) ? "Waiting..." : "Invite"}
+                    </Button>
+                  ) : (
+                    <span className="text-muted-foreground">Cannot Invite</span>
+                  )}
+                </CommandShortcut>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </CommandList>
+      </Command>
+    </>
   );
 }
 

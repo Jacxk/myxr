@@ -8,6 +8,7 @@ import {
 import { GuildMutation } from "~/utils/db/mutations/guild";
 import { GuildQuery } from "~/utils/db/queries/guild";
 import { BotDiscordApi } from "~/utils/discord/bot-api";
+import { UserDiscordApi } from "~/utils/discord/user-api";
 
 export const guildRouter = createTRPCRouter({
   getGuild: publicProcedure.input(z.string()).query(async ({ input }) => {
@@ -19,24 +20,50 @@ export const guildRouter = createTRPCRouter({
       value: await BotDiscordApi.isBotInGuild(input),
     };
   }),
-  getAvailableGuilds: publicProcedure
-    .input(
-      z.array(
-        z.object({
-          id: z.string(),
-          name: z.string(),
-          image: z.string().nullable(),
-        }),
-      ),
-    )
-    .query(async ({ input }) => {
-      const allGuilds = await BotDiscordApi.getAllGuilds();
+  getAvailableGuilds: protectedProcedure.query(async ({ ctx }) => {
+    const userGuilds = await UserDiscordApi.getGuilds(ctx.session.user.id);
+    const allGuilds = await BotDiscordApi.getAllGuilds();
+    const guildRoles = await GuildQuery.getAllSoundMasterRoles();
 
-      return input.map((guild) => ({
-        ...guild,
-        available: allGuilds.some((ag) => ag.id === guild.id),
-      }));
-    }),
+    const guildsWithInfo = await Promise.all(
+      userGuilds.map(async (guild) => {
+        const isAvailable = allGuilds.some((ag) => ag.id === guild.id);
+        let hasRole = false;
+
+        if (isAvailable) {
+          try {
+            const roles = await BotDiscordApi.getUserRoles(
+              guild.id,
+              ctx.session.user.discordId,
+            );
+
+            const masterRoles =
+              guildRoles.find((gr) => gr.id === guild.id)?.soundMasterRoles ??
+              [];
+            hasRole = roles.some((role) => masterRoles.includes(role));
+          } catch (error) {
+            console.error(`Failed to get roles for guild ${guild.id}:`, error);
+          }
+        }
+
+        return {
+          id: guild.id,
+          name: guild.name,
+          image: guild.icon
+            ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`
+            : null,
+          canManage: guild.canManage,
+          available: isAvailable,
+          hasRole,
+        };
+      }),
+    );
+
+    return {
+      available: guildsWithInfo.filter((guild) => guild.available),
+      unavailable: guildsWithInfo.filter((guild) => !guild.available),
+    };
+  }),
   createSound: allowedToManageGuildProtectedProcedure
     .input(
       z.object({

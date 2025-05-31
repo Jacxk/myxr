@@ -25,7 +25,7 @@ export async function HeroSection() {
         </h1>
         <p className="text-muted-foreground max-w-2xl text-lg">
           Create, share, and discover amazing sound effects for your Discord
-          server. Join our community of sound enthusiasts.
+          soundboard. Join now maybe you&apos;ll like it.
         </p>
       </div>
 

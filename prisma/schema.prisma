@@ -133,6 +133,8 @@ model GuildSound {
 }
 
 model GuildMembership {
+    canManage Boolean @default(false)
+
     userId  String
     user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
     guildId String

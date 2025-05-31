@@ -42,7 +42,7 @@ export const UserQuery = {
     if (!discordId) return false;
 
     const userRoles = await BotDiscordApi.getUserRoles(guildId, discordId);
-    const hasPermission = userRoles.roles.some((role) =>
+    const hasPermission = userRoles.some((role) =>
       guildRoles?.soundMasterRoles.some((guildRole) => guildRole === role),
     );
 
