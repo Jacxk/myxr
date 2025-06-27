@@ -11,7 +11,7 @@ import { AddToGuildButton } from "./add-button";
 import { DeleteSoundButton } from "./delete-button";
 import { LikeButton } from "./like-button";
 
-type Sound = NonNullable<
+export type Sound = NonNullable<
   RouterOutputs["sound"]["getAllSounds"]["sounds"]
 >[number];
 
@@ -30,14 +30,14 @@ type SoundTableListProps = {
   isGuildAvailable?: boolean;
 };
 
-function SoundRow({
+export function SoundRow({
   sound,
   discordSoundId,
   guildId,
   external,
   className,
   isGuildAvailable = true,
-}: SoundListData & { className: string }) {
+}: SoundListData & { className?: string }) {
   const { play } = useAudio();
   const size = 70;
 
