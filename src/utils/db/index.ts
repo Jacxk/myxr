@@ -1,6 +1,6 @@
-import { LikedSound, type Sound as PrismaSound } from "@prisma/client";
 import "server-only";
 
+import { type LikedSound, type Sound as PrismaSound } from "@prisma/client";
 import { db } from "~/server/db";
 
 interface Sound extends PrismaSound {

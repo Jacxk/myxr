@@ -102,12 +102,22 @@ export const SoundQuery = {
           banned: false,
         },
       },
-      include: { ...soundInclude, likedBy: { where: { userId } } },
+      include: {
+        _count: {
+          select: {
+            likedBy: true,
+          },
+        },
+        createdBy: true,
+        guildSounds: true,
+        likedBy: { where: { userId } },
+      },
     });
 
     return sounds.map((sound) => ({
       ...sound,
-      ...populateLike(sound.likedBy, userId),
+      likes: sound._count.likedBy,
+      likedByUser: true,
     }));
   },
 
