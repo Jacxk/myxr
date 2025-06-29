@@ -77,7 +77,7 @@ export function UserTabsAccount() {
 
   return (
     <>
-      <div className="flex flex-row justify-center gap-2 sm:w-1/2 sm:flex-col sm:justify-start lg:w-1/4">
+      <div className="flex flex-row justify-center gap-2 sm:w-1/2 sm:flex-col sm:justify-start lg:w-1/4 shrink-0">
         {tabs.map((tab) => (
           <TabLink
             key={tab.path}
