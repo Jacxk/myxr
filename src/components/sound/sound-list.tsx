@@ -53,10 +53,10 @@ function SoundRow({
         className,
       )}
     >
-      <div className="flex gap-4">
+      <div className="flex h-[75px] gap-4">
         <div
           onClick={handleIconClick}
-          className="cursor-pointer transition-opacity hover:opacity-80"
+          className="flex cursor-pointer items-center justify-center transition-opacity hover:opacity-80"
         >
           <EmojiImage
             emoji={sound.emoji}
@@ -123,10 +123,14 @@ function SoundTableHeader({
   );
 }
 
-export function SoundsList({ data, isGuildAvailable }: SoundTableListProps) {
+export function SoundsList({
+  data,
+  isGuildAvailable,
+  className,
+}: SoundTableListProps) {
   return (
     <AudioProvider>
-      <div className="flex w-full flex-col">
+      <div className={cn("flex w-full flex-col", className)}>
         <SoundTableHeader isGuildAvailable={isGuildAvailable} />
         <div className="divide-y">
           {data.map((guildSound) => (

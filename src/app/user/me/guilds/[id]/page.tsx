@@ -99,6 +99,7 @@ async function GuildContent({ id }: { id: string }) {
             convertedExternalSound,
           ].flat()}
           isGuildAvailable={isGuildAvailable}
+          className="mt-4"
         />
       </div>
     </>
