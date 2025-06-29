@@ -1,5 +1,6 @@
 import Sound from "~/components/sound/sound";
-import { SoundsGrid } from "~/components/sound/sounds-grid";
+import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
+import { AudioProvider } from "~/context/AudioContext";
 import { api } from "~/trpc/server";
 
 interface RelatedSoundsProps {
@@ -33,11 +34,16 @@ export async function RelatedSounds({
   return (
     <div className="flex flex-col gap-4">
       <h2 className="text-xl font-semibold">Related Sounds</h2>
-      <SoundsGrid>
-        {relatedSounds.map((sound) => (
-          <Sound key={sound.id} sound={sound} />
-        ))}
-      </SoundsGrid>
+      <AudioProvider>
+        <ScrollArea className="">
+          <div className="flex flex-row">
+            {relatedSounds.map((sound) => (
+              <Sound key={sound.id} sound={sound} />
+            ))}
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+      </AudioProvider>
     </div>
   );
 }

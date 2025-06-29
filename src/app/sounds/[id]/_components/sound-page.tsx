@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 import AdDisplay from "~/components/ad/ad-display";
 import { EmojiImage } from "~/components/emoji-image";
 import { AddToGuildButton } from "~/components/sound/add-button";
@@ -88,7 +88,7 @@ export function SoundPage({ id, sound, isPreview, related }: SoundPageProps) {
       <SoundWaveForm id={id} url={sound.url} />
       <div className="border-b" />
       <div className="flex flex-col-reverse justify-between gap-4 sm:flex-row">
-        <div className="flex w-full flex-col gap-4">
+        <div className="flex w-full min-w-0 flex-col gap-4">
           <AdDisplay
             adSlot="1970362642"
             format="fluid"
