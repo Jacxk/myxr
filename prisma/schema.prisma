@@ -4,6 +4,7 @@
 generator client {
     provider        = "prisma-client-js"
     previewFeatures = ["fullTextSearchPostgres"]
+    output          = "../node_modules/.prisma/client"
 }
 
 datasource db {
