@@ -15,7 +15,7 @@ export async function LatestSounds() {
         Latest Sounds
       </h1>
       <SoundsGrid>
-        {latestSounds.map((sound, i) => (
+        {latestSounds.map((sound: Sound, i) => (
           <Fragment key={sound.id}>
             <Sound sound={sound} />
             <AdDisplay
