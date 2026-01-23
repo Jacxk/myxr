@@ -3,6 +3,11 @@ import AdDisplay from "~/components/ad/ad-display";
 import Sound from "~/components/sound/sound";
 import { SoundsGrid } from "~/components/sound/sounds-grid";
 import { api } from "~/trpc/server";
+import type { inferRouterOutputs } from "@trpc/server";
+import type { AppRouter } from "~/server/api/root";
+
+type RouterOutputs = inferRouterOutputs<AppRouter>;
+type SoundItem = RouterOutputs["sound"]["getAllSounds"]["sounds"][number];
 
 export async function LatestSounds() {
   const { sounds: latestSounds } = await api.sound.getAllSounds({
@@ -15,7 +20,7 @@ export async function LatestSounds() {
         Latest Sounds
       </h1>
       <SoundsGrid>
-        {latestSounds.map((sound, i) => (
+        {latestSounds.map((sound: SoundItem, i) => (
           <Fragment key={sound.id}>
             <Sound sound={sound} />
             <AdDisplay
