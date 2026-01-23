@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import AdDisplay from "~/components/ad/ad-display";
 import Sound from "~/components/sound/sound";
 import { SoundsGrid } from "~/components/sound/sounds-grid";
+import type { Sound as SoundType } from "~/utils/db";
 import { api } from "~/trpc/server";
 
 export async function LatestSounds() {
@@ -15,7 +16,7 @@ export async function LatestSounds() {
         Latest Sounds
       </h1>
       <SoundsGrid>
-        {latestSounds.map((sound: Sound, i) => (
+        {latestSounds.map((sound: SoundType, i) => (
           <Fragment key={sound.id}>
             <Sound sound={sound} />
             <AdDisplay
